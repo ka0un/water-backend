@@ -8,6 +8,8 @@ const config = require('./config');
 const logger = require('./utils/logger');
 const routes = require('./routes');
 const { errorConverter, errorHandler, notFoundHandler } = require('./middlewares/error.middleware');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpecs = require('./config/swagger');
 
 const app = express();
 
@@ -55,6 +57,8 @@ app.use(morgan(morganFormat, { stream: logger.stream }));
 
 // API routes
 app.use('/api/v1', routes);
+// Swagger UI
+app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // Handle 404 routes
 app.use(notFoundHandler);

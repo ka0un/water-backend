@@ -8,9 +8,46 @@ const ApiResponse = require('../utils/ApiResponse');
 const router = express.Router();
 
 /**
- * @route GET /api/v1/users/profile
- * @desc Get current user profile
- * @access Private
+ * @swagger
+ * /users/profile:
+ *   get:
+ *     summary: Get current user profile
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Profile retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: string
+ *                         name:
+ *                           type: string
+ *                         email:
+ *                           type: string
+ *                         role:
+ *                           type: string
+ *                         isEmailVerified:
+ *                           type: boolean
+ *                         createdAt:
+ *                           type: string
+ *                           format: date-time
+ *                         lastLoginAt:
+ *                           type: string
+ *                           format: date-time
  */
 router.get('/profile', authenticate, asyncHandler(async (req, res) => {
     const user = {
