@@ -21,6 +21,8 @@ import {
     Menu as MenuIcon,
     Dashboard as DashboardIcon,
     Person as PersonIcon,
+    Gavel as GavelIcon,
+    ListAlt as ListAltIcon,
     ExitToApp as LogoutIcon,
 } from '@mui/icons-material';
 
@@ -39,6 +41,8 @@ const Layout = () => {
 
     const menuItems = [
         { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
+        { text: 'Moderator', icon: <GavelIcon />, path: '/moderator/water-tests' },
+        { text: 'Moderation Logs', icon: <ListAltIcon />, path: '/moderation/logs' },
         { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
     ];
 

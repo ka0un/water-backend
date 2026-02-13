@@ -7,6 +7,7 @@ const ApiResponse = require('../utils/ApiResponse');
 const authRoutes = require('./auth.routes');
 const userRoutes = require('./user.routes');
 const adminRoutes = require('./admin.routes');
+const moderationRoutes = require('./moderation.routes');
 
 const router = express.Router();
 
@@ -52,6 +53,7 @@ router.get('/', (req, res) => {
             auth: '/api/v1/auth',
             users: '/api/v1/users',
             admin: '/api/v1/admin',
+            moderation: '/api/v1/moderation',
             health: '/api/v1/health',
         },
     }, 'Welcome to Water Quality Report API');
@@ -61,5 +63,6 @@ router.get('/', (req, res) => {
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/admin', adminRoutes);
+router.use('/moderation', moderationRoutes);
 
 module.exports = router;
