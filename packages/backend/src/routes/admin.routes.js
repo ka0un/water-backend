@@ -125,4 +125,8 @@ router.patch('/users/:userId/status', authenticate, authorize(UserRole.ADMIN), a
     return ApiResponse.success(res, { user }, `User ${isActive ? 'activated' : 'deactivated'} successfully`);
 }));
 
+// Laboratory routes
+const laboratoryRoutes = require('./laboratory.routes');
+router.use('/laboratories', laboratoryRoutes);
+
 module.exports = router;
