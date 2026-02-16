@@ -90,6 +90,11 @@ const getAllLaboratories = asyncHandler(async (req, res) => {
 const getLaboratoryById = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
+  // Validate if it's a valid MongoDB ObjectId
+  if (!require('mongoose').Types.ObjectId.isValid(id)) {
+    throw new ApiError(400, 'Invalid laboratory ID format');
+  }
+
   const laboratory = await Laboratory.findById(id);
 
   if (!laboratory) {
@@ -108,6 +113,11 @@ const getLaboratoryById = asyncHandler(async (req, res) => {
 const updateLaboratory = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { name, email } = req.body;
+
+  // Validate if it's a valid MongoDB ObjectId
+  if (!require('mongoose').Types.ObjectId.isValid(id)) {
+    throw new ApiError(400, 'Invalid laboratory ID format');
+  }
 
   const laboratory = await Laboratory.findById(id);
 
@@ -165,6 +175,11 @@ const updateLaboratory = asyncHandler(async (req, res) => {
  */
 const deleteLaboratory = asyncHandler(async (req, res) => {
   const { id } = req.params;
+
+  // Validate if it's a valid MongoDB ObjectId
+  if (!require('mongoose').Types.ObjectId.isValid(id)) {
+    throw new ApiError(400, 'Invalid laboratory ID format');
+  }
 
   const laboratory = await Laboratory.findById(id);
 
