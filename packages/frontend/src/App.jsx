@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import ModeratorWaterTests from './pages/ModeratorWaterTests';
 import ModerationLogs from './pages/ModerationLogs';
+import LaboratoryManagement from './pages/LaboratoryManagement';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="moderator/water-tests" element={<ModeratorWaterTests />} />
             <Route path="moderation/logs" element={<ModerationLogs />} />
+            <Route path="laboratory" element={<LaboratoryManagement />} />
           </Route>
         </Routes>
       </BrowserRouter>

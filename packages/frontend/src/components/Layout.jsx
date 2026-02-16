@@ -24,6 +24,7 @@ import {
     Gavel as GavelIcon,
     ListAlt as ListAltIcon,
     ExitToApp as LogoutIcon,
+    Science as ScienceIcon,
 } from '@mui/icons-material';
 
 const drawerWidth = 240;
@@ -43,6 +44,7 @@ const Layout = () => {
         { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
         { text: 'Moderator', icon: <GavelIcon />, path: '/moderator/water-tests' },
         { text: 'Moderation Logs', icon: <ListAltIcon />, path: '/moderation/logs' },
+        { text: 'Laboratory Management', icon: <ScienceIcon />, path: '/laboratory' },
         { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
     ];
 
