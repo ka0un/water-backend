@@ -12,8 +12,10 @@ import {
     Close as CloseIcon, ArrowBack, ArrowForward, Search as SearchIcon,
     WaterDrop, AccessTime, Person, CameraAlt, Science,
     Warning as WarningIcon, Info as InfoIcon, Refresh as RefreshIcon,
-    FiberManualRecord as DotIcon,
+    FiberManualRecord as DotIcon, Map as MapIcon,
 } from '@mui/icons-material';
+import { MapContainer, TileLayer, CircleMarker } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 /* ── Constants ───────────────────────────────────────────────── */
 const STATUS_COLORS = { pending: '#ED6C02', approved: '#2E7D32', rejected: '#D32F2F' };
@@ -293,6 +295,8 @@ export default function ModeratorWaterTests() {
 
     const r = selectedReport;
     const hasPhotos = r?.images && r.images.length > 0;
+    const hasLocation = r?.location?.coordinates?.lat != null && r?.location?.coordinates?.lng != null;
+    const hasMiddleCol = hasPhotos || hasLocation;
 
     /* ── Observations list for detail panel ──────────────────── */
     const observations = r ? [
@@ -559,32 +563,62 @@ export default function ModeratorWaterTests() {
                                 </Box>
                             </Box>
 
-                            {/* MIDDLE — Photos (only if has photos) ── */}
-                            {hasPhotos ? (
+                            {/* MIDDLE — Map & Photos ── */}
+                            {hasMiddleCol ? (
                                 <Box sx={{
                                     width: { xs: '100%', md: 380 }, flexShrink: 0,
                                     borderRight: '1px solid', borderColor: 'divider',
                                     p: 2, bgcolor: '#F5F5F5', overflow: 'auto',
                                 }}>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <CameraAlt sx={{ fontSize: 18 }} /> Photos ({r.images.length})
-                                    </Typography>
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                        {r.images.map(img => (
-                                            <Box key={img._id} sx={{ borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider', bgcolor: '#fff' }}>
-                                                <AuthImage api={api} src={imgPath(r._id, img._id)} alt={img.imageType}
-                                                    sx={{ width: '100%', display: 'block', maxHeight: 340, objectFit: 'contain', bgcolor: '#EEEEEE' }} />
-                                                <Box sx={{ p: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    <Chip label={capitalize(img.imageType)} size="small" variant="outlined"
-                                                        sx={{ fontWeight: 600, fontSize: '0.65rem', height: 22, borderRadius: 1 }} />
-                                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>{fmtDate(img.uploadedAt)}</Typography>
-                                                </Box>
+                                    {hasLocation && (
+                                        <Box sx={{ mb: hasPhotos ? 3 : 0 }}>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <MapIcon sx={{ fontSize: 18, color: '#1565C0' }} /> Location Map
+                                            </Typography>
+                                            <Box sx={{ height: 220, width: '100%', borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider', bgcolor: '#E0E0E0' }}>
+                                                <MapContainer
+                                                    center={[r.location.coordinates.lat, r.location.coordinates.lng]}
+                                                    zoom={14}
+                                                    style={{ height: '100%', width: '100%' }}
+                                                    scrollWheelZoom={false}
+                                                >
+                                                    <TileLayer
+                                                        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                                                        attribution='&copy; CARTO'
+                                                    />
+                                                    <CircleMarker
+                                                        center={[r.location.coordinates.lat, r.location.coordinates.lng]}
+                                                        radius={6}
+                                                        pathOptions={{ fillColor: '#1565C0', color: '#fff', weight: 2, opacity: 1, fillOpacity: 0.9 }}
+                                                    />
+                                                </MapContainer>
                                             </Box>
-                                        ))}
-                                    </Box>
+                                        </Box>
+                                    )}
+
+                                    {hasPhotos && (
+                                        <Box>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <CameraAlt sx={{ fontSize: 18 }} /> Photos ({r.images.length})
+                                            </Typography>
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                                {r.images.map(img => (
+                                                    <Box key={img._id} sx={{ borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider', bgcolor: '#fff' }}>
+                                                        <AuthImage api={api} src={imgPath(r._id, img._id)} alt={img.imageType}
+                                                            sx={{ width: '100%', display: 'block', maxHeight: 340, objectFit: 'contain', bgcolor: '#EEEEEE' }} />
+                                                        <Box sx={{ p: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <Chip label={capitalize(img.imageType)} size="small" variant="outlined"
+                                                                sx={{ fontWeight: 600, fontSize: '0.65rem', height: 22, borderRadius: 1 }} />
+                                                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>{fmtDate(img.uploadedAt)}</Typography>
+                                                        </Box>
+                                                    </Box>
+                                                ))}
+                                            </Box>
+                                        </Box>
+                                    )}
                                 </Box>
                             ) : (
-                                /* No photos — inline notice only */
+                                /* No photos and no location — inline notice only */
                                 null
                             )}
 

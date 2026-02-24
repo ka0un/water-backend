@@ -16,7 +16,7 @@ import {
     XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     RadialBarChart, RadialBar, Legend, Treemap,
 } from 'recharts';
-import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Popup, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 /* ── Palette ──────────────────────────────────────────────────── */
@@ -63,6 +63,61 @@ function DashboardSkeleton() {
             <Sk variant="rounded" height={260} sx={{ borderRadius: 3 }} />
         </Box>
     );
+}
+
+/* ── Map Markers Layer ────────────────────────────────────────── */
+function MapMarkers({ bubbles, points, maxBubble, zoomThreshold = 9 }) {
+    const [zoomLevel, setZoomLevel] = useState(8);
+    const map = useMapEvents({
+        zoomend: () => setZoomLevel(map.getZoom()),
+    });
+
+    useEffect(() => {
+        setZoomLevel(map.getZoom());
+    }, [map]);
+
+    const isZoomedIn = zoomLevel >= zoomThreshold;
+
+    if (isZoomedIn && points && points.length > 0) {
+        return points.map((p, i) => (
+            <CircleMarker key={`point-${i}`} center={[p.lat, p.lng]} radius={5}
+                pathOptions={{
+                    fillColor: SOURCE_COLORS[p.waterSource] || '#1565C0',
+                    color: '#fff',
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.9
+                }}>
+                <Popup>
+                    <div style={{ textAlign: 'center', minWidth: 120 }}>
+                        <strong style={{ fontSize: 14, textTransform: 'capitalize' }}>{p.waterSource || 'Unknown'} Source</strong><br />
+                        <span style={{ fontSize: 12, color: '#666' }}>{p.district || 'Unknown Location'}</span><br />
+                        <Box sx={{ mt: 1 }}>
+                            <Chip label={p.mod_status || 'pending'} size="small" sx={{ height: 20, fontSize: '0.7rem', textTransform: 'capitalize', bgcolor: STATUS_COLORS[p.mod_status] || '#999', color: '#fff' }} />
+                        </Box>
+                    </div>
+                </Popup>
+            </CircleMarker>
+        ));
+    }
+
+    return bubbles.map((b, i) => {
+        const ratio = b.count / maxBubble;
+        const radius = 14 + ratio * 28;
+        const opacity = 0.4 + ratio * 0.45;
+        return (
+            <CircleMarker key={`bubble-${i}`} center={[b.lat, b.lng]} radius={radius}
+                pathOptions={{ fillColor: '#1565C0', color: '#0D47A1', weight: 1.5, opacity: 0.5, fillOpacity: opacity }}>
+                <Popup>
+                    <div style={{ textAlign: 'center', minWidth: 110 }}>
+                        <strong style={{ fontSize: 14 }}>{b.name}</strong><br />
+                        <span style={{ fontSize: 24, fontWeight: 800, color: '#1565C0' }}>{b.count}</span><br />
+                        <span style={{ fontSize: 11, color: '#666' }}>report{b.count > 1 ? 's' : ''}</span>
+                    </div>
+                </Popup>
+            </CircleMarker>
+        );
+    });
 }
 
 /* ══════════════════════════════════════════════════════════════ */
@@ -249,7 +304,7 @@ export default function Dashboard() {
                 <Box sx={{ width: '100%', height: 480, borderRadius: 2, overflow: 'hidden', bgcolor: '#F0F4F8' }}>
                     <MapContainer
                         center={SL_CENTER} zoom={8}
-                        minZoom={7} maxZoom={11}
+                        minZoom={7} maxZoom={16}
                         maxBounds={SL_BOUNDS} maxBoundsViscosity={1.0}
                         style={{ height: '100%', width: '100%' }}
                         scrollWheelZoom={true}
@@ -258,23 +313,7 @@ export default function Dashboard() {
                             attribution='&copy; <a href="https://carto.com/">CARTO</a>'
                             url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
                         />
-                        {mapBubbles.map((b, i) => {
-                            const ratio = b.count / maxBubble;
-                            const radius = 14 + ratio * 28;
-                            const opacity = 0.4 + ratio * 0.45;
-                            return (
-                                <CircleMarker key={i} center={[b.lat, b.lng]} radius={radius}
-                                    pathOptions={{ fillColor: '#1565C0', color: '#0D47A1', weight: 1.5, opacity: 0.5, fillOpacity: opacity }}>
-                                    <Popup>
-                                        <div style={{ textAlign: 'center', minWidth: 110 }}>
-                                            <strong style={{ fontSize: 14 }}>{b.name}</strong><br />
-                                            <span style={{ fontSize: 24, fontWeight: 800, color: '#1565C0' }}>{b.count}</span><br />
-                                            <span style={{ fontSize: 11, color: '#666' }}>report{b.count > 1 ? 's' : ''}</span>
-                                        </div>
-                                    </Popup>
-                                </CircleMarker>
-                            );
-                        })}
+                        <MapMarkers bubbles={mapBubbles} points={mapPoints || []} maxBubble={maxBubble} />
                     </MapContainer>
                 </Box>
                 {mapBubbles.length === 0 && (
