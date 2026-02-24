@@ -8,6 +8,7 @@ const UserRole = {
     USER: 'USER',
     MODERATOR: 'MODERATOR',
     ADMIN: 'ADMIN',
+    LAB_STAFF: 'LAB_STAFF',
 };
 
 const userSchema = new mongoose.Schema(
