@@ -1,29 +1,19 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
-    AppBar,
-    Box,
-    CssBaseline,
-    Divider,
-    Drawer,
-    IconButton,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Toolbar,
-    Typography,
-    useMediaQuery,
-    useTheme,
+    AppBar, Box, CssBaseline, Divider, Drawer, IconButton,
+    List, ListItem, ListItemButton, ListItemIcon, ListItemText,
+    Toolbar, Typography, useMediaQuery, useTheme, Chip, Avatar,
 } from '@mui/material';
 import {
     Menu as MenuIcon,
     Dashboard as DashboardIcon,
-    Person as PersonIcon,
     Gavel as GavelIcon,
     ListAlt as ListAltIcon,
     ExitToApp as LogoutIcon,
+    Science as ScienceIcon,
+    Person as PersonIcon,
 } from '@mui/icons-material';
 
 const drawerWidth = 240;
@@ -34,26 +24,52 @@ const Layout = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+    const { user, logout } = useAuth();
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
+    };
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login', { replace: true });
     };
 
     const menuItems = [
         { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
         { text: 'Moderator', icon: <GavelIcon />, path: '/moderator/water-tests' },
         { text: 'Moderation Logs', icon: <ListAltIcon />, path: '/moderation/logs' },
-        { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
+        { text: 'Laboratory Management', icon: <ScienceIcon />, path: '/laboratory' },
     ];
 
     const drawer = (
         <div>
-            <Toolbar>
-                <Typography variant="h6" noWrap component="div">
+            <Toolbar sx={{ gap: 1 }}>
+                <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700 }}>
                     Water Quality
                 </Typography>
             </Toolbar>
             <Divider />
+
+            {/* User info */}
+            {user && (
+                <Box sx={{ px: 2, py: 1.5 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: 14 }}>
+                            {user.name?.[0]?.toUpperCase() || 'U'}
+                        </Avatar>
+                        <Box sx={{ minWidth: 0 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }} noWrap>
+                                {user.name || 'User'}
+                            </Typography>
+                            <Chip label={user.role} size="small" color="primary" variant="outlined"
+                                sx={{ height: 18, fontSize: '0.65rem', mt: 0.3 }} />
+                        </Box>
+                    </Box>
+                </Box>
+            )}
+            <Divider />
+
             <List>
                 {menuItems.map((item) => (
                     <ListItem key={item.text} disablePadding>
@@ -73,11 +89,11 @@ const Layout = () => {
             <Divider />
             <List>
                 <ListItem disablePadding>
-                    <ListItemButton>
+                    <ListItemButton onClick={handleLogout}>
                         <ListItemIcon>
-                            <LogoutIcon />
+                            <LogoutIcon color="error" />
                         </ListItemIcon>
-                        <ListItemText primary="Logout" />
+                        <ListItemText primary="Logout" sx={{ color: 'error.main' }} />
                     </ListItemButton>
                 </ListItem>
             </List>
@@ -104,23 +120,25 @@ const Layout = () => {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" noWrap component="div">
+                    <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
                         Dashboard
                     </Typography>
+                    {user && (
+                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                            {user.email}
+                        </Typography>
+                    )}
                 </Toolbar>
             </AppBar>
             <Box
                 component="nav"
                 sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-                aria-label="mailbox folders"
             >
                 <Drawer
                     variant="temporary"
                     open={mobileOpen}
                     onClose={handleDrawerToggle}
-                    ModalProps={{
-                        keepMounted: true, // Better open performance on mobile.
-                    }}
+                    ModalProps={{ keepMounted: true }}
                     sx={{
                         display: { xs: 'block', sm: 'none' },
                         '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
