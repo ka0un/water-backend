@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, CircularProgress, Typography, Alert, Container } from '@mui/material';
+import { Box, CircularProgress, Alert, Container } from '@mui/material';
 import { AnimatePresence } from 'framer-motion';
 import { WizardProvider, useWizard } from '../context/WizardContext';
 
@@ -8,6 +8,7 @@ import { WizardProvider, useWizard } from '../context/WizardContext';
 import WelcomeStep from '../components/steps/WelcomeStep';
 import WaterSourceStep from '../components/steps/WaterSourceStep';
 import LocationStep from '../components/steps/LocationStep';
+import TestingMethodStep from '../components/steps/TestingMethodStep';
 import AppearanceStep from '../components/steps/AppearanceStep';
 import SmellStep from '../components/steps/SmellStep';
 import TasteStep from '../components/steps/TasteStep';
@@ -24,44 +25,70 @@ import WildlifeStep from '../components/steps/WildlifeStep';
 import PipeConditionStep from '../components/steps/PipeConditionStep';
 import WaterFlowStep from '../components/steps/WaterFlowStep';
 import TemperatureStep from '../components/steps/TemperatureStep';
-import TestingMethodStep from '../components/steps/TestingMethodStep';
 import AdvancedTestsStep from '../components/steps/AdvancedTestsStep';
+import ImageUploadStep from '../components/steps/ImageUploadStep';
+import ContactStep from '../components/steps/ContactStep';
 import ReviewStep from '../components/steps/ReviewStep';
 
 /**
- * Step definitions in order. Each step is numbered 1-based inside the wizard.
- * Step 0 is the Welcome/NIC step (no progress bar).
+ * Step order (reordered):
+ * 0:  Welcome / NIC
+ * 1:  Water Source
+ * 2:  Location
+ * 3:  Testing Method  ← moved earlier
+ * 4:  Advanced Tests   (skipped if observation-only)
+ * 5:  Appearance
+ * 6:  Smell
+ * 7:  Taste
+ * 8:  Turbidity
+ * 9:  Sediment
+ * 10: Oil/Grease
+ * 11: Foam
+ * 12: Algae
+ * 13: Trash
+ * 14: Mud
+ * 15: Insects
+ * 16: Plants
+ * 17: Wildlife
+ * 18: Pipes
+ * 19: Water Flow
+ * 20: Temperature
+ * 21: Image Upload     ← new
+ * 22: Contact Info     ← new
+ * 23: Review & Submit
  */
 const STEPS = [
-    { key: 'welcome', Component: WelcomeStep },      // 0
-    { key: 'source', Component: WaterSourceStep },    // 1
-    { key: 'location', Component: LocationStep },     // 2
-    { key: 'appearance', Component: AppearanceStep }, // 3
-    { key: 'smell', Component: SmellStep },           // 4
-    { key: 'taste', Component: TasteStep },           // 5
-    { key: 'turbidity', Component: TurbidityStep },   // 6
-    { key: 'sediment', Component: SedimentStep },     // 7
-    { key: 'oil', Component: OilGreaseStep },         // 8
-    { key: 'foam', Component: FoamStep },             // 9
-    { key: 'algae', Component: AlgaeStep },           // 10
-    { key: 'trash', Component: TrashStep },           // 11
-    { key: 'mud', Component: MudStep },               // 12
-    { key: 'insects', Component: InsectsStep },       // 13
-    { key: 'plants', Component: PlantMatterStep },    // 14
-    { key: 'wildlife', Component: WildlifeStep },     // 15
-    { key: 'pipes', Component: PipeConditionStep },   // 16
-    { key: 'flow', Component: WaterFlowStep },        // 17
-    { key: 'temperature', Component: TemperatureStep }, // 18
-    { key: 'testing', Component: TestingMethodStep }, // 19
-    { key: 'advanced', Component: AdvancedTestsStep }, // 20
-    { key: 'review', Component: ReviewStep },          // 21
+    { key: 'welcome', Component: WelcomeStep },
+    { key: 'source', Component: WaterSourceStep },
+    { key: 'location', Component: LocationStep },
+    { key: 'testing', Component: TestingMethodStep },
+    { key: 'advanced', Component: AdvancedTestsStep },
+    { key: 'appearance', Component: AppearanceStep },
+    { key: 'smell', Component: SmellStep },
+    { key: 'taste', Component: TasteStep },
+    { key: 'turbidity', Component: TurbidityStep },
+    { key: 'sediment', Component: SedimentStep },
+    { key: 'oil', Component: OilGreaseStep },
+    { key: 'foam', Component: FoamStep },
+    { key: 'algae', Component: AlgaeStep },
+    { key: 'trash', Component: TrashStep },
+    { key: 'mud', Component: MudStep },
+    { key: 'insects', Component: InsectsStep },
+    { key: 'plants', Component: PlantMatterStep },
+    { key: 'wildlife', Component: WildlifeStep },
+    { key: 'pipes', Component: PipeConditionStep },
+    { key: 'flow', Component: WaterFlowStep },
+    { key: 'temperature', Component: TemperatureStep },
+    { key: 'images', Component: ImageUploadStep },
+    { key: 'contact', Component: ContactStep },
+    { key: 'review', Component: ReviewStep },
 ];
 
 const TOTAL_STEPS = STEPS.length - 1; // exclude welcome
 
 function WizardContent() {
     const navigate = useNavigate();
-    const { currentStep, setCurrentStep, reportData, submitReport, loading, error } = useWizard();
+    const { currentStep, reportData, submitReport, loading, error } = useWizard();
     const [stepIndex, setStepIndex] = useState(currentStep || 0);
 
     const goNext = useCallback(() => {
@@ -72,7 +99,7 @@ function WizardContent() {
             if (STEPS[next]?.key === 'advanced') {
                 const method = reportData.testingMethod;
                 if (method === 'observation') {
-                    next++; // skip to review
+                    next++;
                 }
             }
 
@@ -118,7 +145,6 @@ function WizardContent() {
 
     const { Component } = currentStepDef;
 
-    // Common props for every step
     const stepProps = {
         onNext: goNext,
         onBack: goBack,

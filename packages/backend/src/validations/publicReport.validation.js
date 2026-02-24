@@ -109,6 +109,12 @@ const updateReportSchema = Joi.object({
         totalAlkalinity: testValueObj,
     }),
 
+    // Contact info
+    email: Joi.string().email().allow(null, ''),
+    phone: Joi.string().pattern(/^[0-9+\-\s()]{7,15}$/).allow(null, '').messages({
+        'string.pattern.base': 'Please provide a valid phone number',
+    }),
+
     // Wizard state
     currentStep: Joi.number().integer().min(0),
 }).min(1); // at least one field must be provided

@@ -124,6 +124,45 @@ const publicReportSchema = new mongoose.Schema(
             totalAlkalinity: testValueSchema,
         },
 
+        // ── Contact Info (optional) ─────────────────────────────
+        email: {
+            type: String,
+            default: null,
+            trim: true,
+        },
+        phone: {
+            type: String,
+            default: null,
+            trim: true,
+        },
+
+        // ── Images (stored as base64 in MongoDB) ─────────────────
+        images: [
+            {
+                imageType: {
+                    type: String,
+                    enum: ['water_source', 'water_sample', 'other'],
+                    required: true,
+                },
+                data: {
+                    type: String,  // base64 encoded
+                    required: true,
+                },
+                contentType: {
+                    type: String,
+                    required: true,
+                },
+                filename: {
+                    type: String,
+                    default: null,
+                },
+                uploadedAt: {
+                    type: Date,
+                    default: Date.now,
+                },
+            },
+        ],
+
         // ── Wizard State ─────────────────────────────────────────
         currentStep: {
             type: Number,

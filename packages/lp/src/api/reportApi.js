@@ -32,7 +32,7 @@ export const updateReport = async (id, updates) => {
 };
 
 /**
- * Find reports by NIC number
+ * Find reports by NIC number (includes completed)
  */
 export const getReportsByNic = async (nic) => {
     const { data } = await api.get(`/by-nic/${nic}`);
@@ -44,6 +44,22 @@ export const getReportsByNic = async (nic) => {
  */
 export const submitReport = async (id) => {
     const { data } = await api.post(`/${id}/submit`);
+    return data.data.report;
+};
+
+/**
+ * Upload images for a report
+ */
+export const uploadImages = async (id, images) => {
+    const { data } = await api.post(`/${id}/images`, { images });
+    return data.data;
+};
+
+/**
+ * Get full report data (for viewing past submissions)
+ */
+export const getReportFull = async (id) => {
+    const { data } = await api.get(`/${id}/full`);
     return data.data.report;
 };
 

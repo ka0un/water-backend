@@ -11,6 +11,8 @@ const {
     updateReport,
     getByNic,
     submitReport,
+    uploadImages,
+    getReportFull,
 } = require('../controllers/publicReport.controller');
 
 const router = express.Router();
@@ -24,10 +26,17 @@ router.post('/', validate(createReportSchema), createReport);
 
 /**
  * @route   GET /api/v1/public-reports/by-nic/:nic
- * @desc    Get in-progress reports by NIC number
+ * @desc    Get reports by NIC number (in-progress + completed)
  * @access  Public
  */
 router.get('/by-nic/:nic', validate(nicParamSchema, 'params'), getByNic);
+
+/**
+ * @route   GET /api/v1/public-reports/:id/full
+ * @desc    Get a full report (with image metadata, for viewing past submissions)
+ * @access  Public
+ */
+router.get('/:id/full', getReportFull);
 
 /**
  * @route   GET /api/v1/public-reports/:id
@@ -49,5 +58,12 @@ router.patch('/:id', validate(updateReportSchema), updateReport);
  * @access  Public
  */
 router.post('/:id/submit', submitReport);
+
+/**
+ * @route   POST /api/v1/public-reports/:id/images
+ * @desc    Upload images for a report (base64)
+ * @access  Public
+ */
+router.post('/:id/images', uploadImages);
 
 module.exports = router;
