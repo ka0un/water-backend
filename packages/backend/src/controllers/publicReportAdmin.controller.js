@@ -57,36 +57,103 @@ const listReports = asyncHandler(async (req, res) => {
 
 // ─── Get report statistics ───────────────────────────────────────
 const getStats = asyncHandler(async (req, res) => {
-    const [statusCounts, sourceCounts, districtCounts, dailyCounts, totalImages] = await Promise.all([
+    const baseMatch = { wizardCompleted: true, deletedAt: null };
+
+    const [
+        statusCounts, sourceCounts, districtCounts, dailyCounts, totalImages,
+        testingMethods, observationFreqs, mapPoints, weeklyTrend,
+    ] = await Promise.all([
         // By moderation status
         PublicReport.aggregate([
-            { $match: { wizardCompleted: true, deletedAt: null } },
+            { $match: baseMatch },
             { $group: { _id: '$mod_status', count: { $sum: 1 } } },
         ]),
         // By water source
         PublicReport.aggregate([
-            { $match: { wizardCompleted: true, waterSource: { $ne: null }, deletedAt: null } },
+            { $match: { ...baseMatch, waterSource: { $ne: null } } },
             { $group: { _id: '$waterSource', count: { $sum: 1 } } },
             { $sort: { count: -1 } },
         ]),
         // By district
         PublicReport.aggregate([
-            { $match: { wizardCompleted: true, 'location.district': { $ne: null }, deletedAt: null } },
+            { $match: { ...baseMatch, 'location.district': { $ne: null } } },
             { $group: { _id: '$location.district', count: { $sum: 1 } } },
             { $sort: { count: -1 } },
             { $limit: 25 },
         ]),
         // Daily submissions (last 30 days)
         PublicReport.aggregate([
-            { $match: { createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }, deletedAt: null } },
+            { $match: { createdAt: { $gte: new Date(Date.now() - 30 * 86400000) }, deletedAt: null } },
             { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } }, count: { $sum: 1 } } },
             { $sort: { _id: 1 } },
         ]),
-        // Total images count
+        // Total images
         PublicReport.aggregate([
             { $match: { deletedAt: null } },
             { $project: { imageCount: { $size: { $ifNull: ['$images', []] } } } },
             { $group: { _id: null, total: { $sum: '$imageCount' } } },
+        ]),
+        // Testing method breakdown
+        PublicReport.aggregate([
+            { $match: { ...baseMatch, testingMethod: { $ne: null } } },
+            { $group: { _id: '$testingMethod', count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+        ]),
+        // Observation frequency — count how many reports detected each issue
+        PublicReport.aggregate([
+            { $match: baseMatch },
+            {
+                $project: {
+                    issues: {
+                        $filter: {
+                            input: [
+                                { k: 'Smell', v: '$smell.detected' },
+                                { k: 'Taste', v: '$taste.detected' },
+                                { k: 'Sediment', v: '$sediment.detected' },
+                                { k: 'Oil/Grease', v: '$oilGrease.detected' },
+                                { k: 'Foam', v: '$foamBubbles.detected' },
+                                { k: 'Algae', v: '$algae.detected' },
+                                { k: 'Trash', v: '$trashDebris.detected' },
+                                { k: 'Mud/Silt', v: '$mudSilt.detected' },
+                                { k: 'Insects', v: '$insectsLarvae.detected' },
+                                { k: 'Plants', v: '$plantMatter.detected' },
+                                { k: 'Wildlife', v: '$deadWildlife.detected' },
+                                { k: 'Pipe Issues', v: '$pipeCondition.detected' },
+                            ],
+                            as: 'item',
+                            cond: { $eq: ['$$item.v', true] },
+                        },
+                    },
+                }
+            },
+            { $unwind: '$issues' },
+            { $group: { _id: '$issues.k', count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+        ]),
+        // Map markers — reports with coordinates
+        PublicReport.aggregate([
+            { $match: { ...baseMatch, 'location.coordinates.lat': { $ne: null }, 'location.coordinates.lng': { $ne: null } } },
+            {
+                $project: {
+                    lat: '$location.coordinates.lat',
+                    lng: '$location.coordinates.lng',
+                    waterSource: 1,
+                    mod_status: 1,
+                    district: '$location.district',
+                }
+            },
+            { $limit: 200 },
+        ]),
+        // Weekly trend (last 12 weeks)
+        PublicReport.aggregate([
+            { $match: { createdAt: { $gte: new Date(Date.now() - 84 * 86400000) }, deletedAt: null } },
+            {
+                $group: {
+                    _id: { $dateToString: { format: '%Y-W%V', date: '$createdAt' } },
+                    count: { $sum: 1 },
+                }
+            },
+            { $sort: { _id: 1 } },
         ]),
     ]);
 
@@ -101,8 +168,13 @@ const getStats = asyncHandler(async (req, res) => {
         byDistrict: districtCounts,
         dailySubmissions: dailyCounts,
         totalImages: totalImages[0]?.total || 0,
+        testingMethods,
+        observationFreqs,
+        mapPoints,
+        weeklyTrend,
     }, 'Statistics retrieved successfully');
 });
+
 
 // ─── Get single report (full, with image metadata) ───────────────
 const getReportDetail = asyncHandler(async (req, res) => {
