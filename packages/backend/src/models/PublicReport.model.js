@@ -203,6 +203,13 @@ const publicReportSchema = new mongoose.Schema(
             default: null,
             trim: true,
         },
+
+        // ── Soft Delete ─────────────────────────────────────────────
+        deletedAt: {
+            type: Date,
+            default: null,
+            index: true,
+        },
     },
     {
         timestamps: true,
@@ -221,8 +228,26 @@ const publicReportSchema = new mongoose.Schema(
 
 // Indexes
 publicReportSchema.index({ nic: 1, wizardCompleted: 1 });
-publicReportSchema.index({ mod_status: 1 });
 publicReportSchema.index({ createdAt: -1 });
+
+// Soft-delete: auto-exclude deleted records from all queries
+publicReportSchema.pre(/^find/, function () {
+    if (this.getFilter().deletedAt === undefined && !this.getFilter()._includeDeleted) {
+        this.where({ deletedAt: null });
+    }
+    // Clean up the helper flag
+    if (this.getFilter()._includeDeleted) {
+        delete this.getFilter()._includeDeleted;
+    }
+});
+publicReportSchema.pre('countDocuments', function () {
+    if (this.getFilter().deletedAt === undefined && !this.getFilter()._includeDeleted) {
+        this.where({ deletedAt: null });
+    }
+    if (this.getFilter()._includeDeleted) {
+        delete this.getFilter()._includeDeleted;
+    }
+});
 
 const PublicReport = mongoose.model('PublicReport', publicReportSchema);
 

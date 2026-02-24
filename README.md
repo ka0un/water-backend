@@ -85,6 +85,8 @@ Full API documentation with all endpoints, request/response examples:
 
 📄 **[API_DOCUMENTATION.md](./API_DOCUMENTATION.md)**
 
+📄 **[Public Reports API Reference](./PUBLIC_REPORTS_API.md)** — Full guide for the public reports wizard, moderator, and admin APIs
+
 ### Quick Reference
 
 | Method | Endpoint | Description | Auth |
@@ -97,6 +99,13 @@ Full API documentation with all endpoints, request/response examples:
 | GET | `/api/v1/users` | List users | MODERATOR+ |
 | GET | `/api/v1/admin/dashboard` | Admin stats | ADMIN |
 | PATCH | `/api/v1/admin/users/:id/role` | Update role | ADMIN |
+| POST | `/api/v1/public-reports` | Create public report | Public |
+| PATCH | `/api/v1/public-reports/:id` | Auto-save wizard step | Public |
+| POST | `/api/v1/public-reports/:id/submit` | Submit report | Public |
+| GET | `/api/v1/public-reports-admin` | List all reports | MODERATOR+ |
+| GET | `/api/v1/public-reports-admin/stats` | Report statistics | MODERATOR+ |
+| PATCH | `/api/v1/public-reports-admin/:id/moderate` | Approve/reject | MODERATOR+ |
+| DELETE | `/api/v1/public-reports-admin/:id` | Delete report | ADMIN |
 
 ---
 
