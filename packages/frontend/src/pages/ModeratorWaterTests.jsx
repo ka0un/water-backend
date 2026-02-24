@@ -29,6 +29,53 @@ const ADV_TEST_LABELS = {
 };
 const HEAVY_METALS = ['iron', 'chromium', 'lead', 'copper', 'mercury'];
 
+/* ── WHO / SL drinking water safety thresholds ──────────────── */
+// Each: { safe: [min,max], caution: [min,max], unit, desc }
+// Beyond caution range = danger
+const SAFETY_THRESHOLDS = {
+    ph: { safe: [6.5, 8.5], caution: [6.0, 9.0], unit: '', desc: 'WHO guideline: 6.5–8.5' },
+    tds: { safe: [0, 300], caution: [0, 600], unit: 'mg/L', desc: 'WHO: <600 acceptable, >1000 unpalatable' },
+    hardness: { safe: [0, 200], caution: [0, 500], unit: 'mg/L', desc: 'WHO: <200 good, >500 very hard' },
+    chlorine: { safe: [0, 4], caution: [0, 5], unit: 'mg/L', desc: 'WHO: <5 mg/L maximum' },
+    nitrate: { safe: [0, 50], caution: [0, 100], unit: 'mg/L', desc: 'WHO: <50 mg/L limit' },
+    nitrite: { safe: [0, 3], caution: [0, 10], unit: 'mg/L', desc: 'WHO: <3 mg/L short-term' },
+    fluoride: { safe: [0, 1.5], caution: [0, 2.0], unit: 'mg/L', desc: 'WHO: <1.5 mg/L limit' },
+    iron: { safe: [0, 0.3], caution: [0, 1.0], unit: 'mg/L', desc: 'WHO: <0.3 mg/L aesthetic' },
+    lead: { safe: [0, 0.01], caution: [0, 0.05], unit: 'mg/L', desc: 'WHO: <0.01 mg/L — toxic' },
+    copper: { safe: [0, 2.0], caution: [0, 5.0], unit: 'mg/L', desc: 'WHO: <2 mg/L limit' },
+    chromium: { safe: [0, 0.05], caution: [0, 0.1], unit: 'mg/L', desc: 'WHO: <0.05 mg/L limit' },
+    mercury: { safe: [0, 0.006], caution: [0, 0.01], unit: 'mg/L', desc: 'WHO: <0.006 mg/L — highly toxic' },
+    bromine: { safe: [0, 0.01], caution: [0, 0.1], unit: 'mg/L', desc: 'WHO: <0.01 mg/L limit' },
+    cyanuricAcid: { safe: [0, 50], caution: [0, 100], unit: 'mg/L', desc: 'Recommended: <50 mg/L' },
+    carbonate: { safe: [0, 200], caution: [0, 500], unit: 'mg/L', desc: 'Typical: <200 mg/L' },
+    totalAlkalinity: { safe: [20, 200], caution: [10, 500], unit: 'mg/L', desc: 'Optimal: 20–200 mg/L' },
+};
+
+const ISSUE_SEVERITY = {
+    safe: { label: 'Safe', color: '#2E7D32', bg: '#E8F5E9', icon: '✓' },
+    caution: { label: 'Caution', color: '#ED6C02', bg: '#FFF3E0', icon: '⚠' },
+    warning: { label: 'Warning', color: '#E65100', bg: '#FFE0B2', icon: '⚠' },
+    danger: { label: 'Danger', color: '#C62828', bg: '#FFEBEE', icon: '✕' },
+};
+
+function evaluateTestSafety(key, value) {
+    const t = SAFETY_THRESHOLDS[key];
+    if (!t || value == null) return null;
+    const v = Number(value);
+    if (isNaN(v)) return null;
+    if (v >= t.safe[0] && v <= t.safe[1]) return { severity: 'safe', ...ISSUE_SEVERITY.safe, threshold: t };
+    if (v >= t.caution[0] && v <= t.caution[1]) return { severity: 'caution', ...ISSUE_SEVERITY.caution, threshold: t };
+    // Beyond caution = danger for most, but check direction
+    if (key === 'ph') {
+        // pH can be too low or too high
+        if (v < t.caution[0] || v > t.caution[1]) return { severity: 'danger', ...ISSUE_SEVERITY.danger, threshold: t };
+        return { severity: 'warning', ...ISSUE_SEVERITY.warning, threshold: t };
+    }
+    // For alkalinity, below range is also a concern
+    if (key === 'totalAlkalinity' && v < t.caution[0]) return { severity: 'caution', ...ISSUE_SEVERITY.caution, threshold: t };
+    return { severity: 'danger', ...ISSUE_SEVERITY.danger, threshold: t };
+}
+
 const capitalize = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, ' ') : '—';
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
 const fmtDateTime = (d) => d ? new Date(d).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
@@ -569,6 +616,101 @@ export default function ModeratorWaterTests() {
                                     </Paper>
                                 </Section>
 
+                                {/* ═══ IDENTIFIED ISSUES SUMMARY ═══════════════ */}
+                                {(() => {
+                                    // Collect chemical issues
+                                    const chemIssues = advTests
+                                        .map(([key, val]) => {
+                                            const safety = evaluateTestSafety(key, val.value);
+                                            if (!safety || safety.severity === 'safe') return null;
+                                            return { key, label: ADV_TEST_LABELS[key] || key, value: val.value, unit: val.unit || safety.threshold?.unit || '', ...safety };
+                                        })
+                                        .filter(Boolean);
+
+                                    // Collect observation issues
+                                    const obsIssues = detectedIssues.map(o => ({
+                                        key: o.label, label: o.label, severity: o.data?.severity === 'severe' ? 'danger' : o.data?.severity === 'moderate' ? 'warning' : 'caution',
+                                        ...ISSUE_SEVERITY[o.data?.severity === 'severe' ? 'danger' : o.data?.severity === 'moderate' ? 'warning' : 'caution'],
+                                        detail: [o.data?.type && `Type: ${capitalize(o.data.type)}`, o.data?.notes && `"${o.data.notes}"`].filter(Boolean).join(' — '),
+                                    }));
+
+                                    // Visual issues (appearance, turbidity)
+                                    const visualIssues = [];
+                                    if (r.appearance?.value && !['clear', 'colorless'].includes(r.appearance.value)) {
+                                        visualIssues.push({ key: 'appearance', label: 'Abnormal Appearance', severity: 'caution', ...ISSUE_SEVERITY.caution, detail: `Water appears ${capitalize(r.appearance.value)}${r.appearance.notes ? ` — ${r.appearance.notes}` : ''}` });
+                                    }
+                                    if (r.turbidity?.value && !['clear'].includes(r.turbidity.value)) {
+                                        const turbSev = ['very_cloudy', 'opaque'].includes(r.turbidity.value) ? 'danger' : r.turbidity.value === 'cloudy' ? 'warning' : 'caution';
+                                        visualIssues.push({ key: 'turbidity', label: 'Turbidity Issue', severity: turbSev, ...ISSUE_SEVERITY[turbSev], detail: `Water is ${capitalize(r.turbidity.value)}` });
+                                    }
+
+                                    const allIssues = [...chemIssues, ...obsIssues, ...visualIssues]
+                                        .sort((a, b) => { const order = { danger: 0, warning: 1, caution: 2 }; return (order[a.severity] ?? 3) - (order[b.severity] ?? 3); });
+
+                                    if (allIssues.length === 0) return (
+                                        <Paper elevation={0} sx={{ p: 2, mb: 2, borderRadius: 2, bgcolor: '#E8F5E9', border: '1px solid #C8E6C9' }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                <ApproveIcon sx={{ color: '#2E7D32', fontSize: 22 }} />
+                                                <Box>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#2E7D32' }}>No Issues Identified</Typography>
+                                                    <Typography variant="caption" sx={{ color: '#558B2F' }}>All parameters are within safe drinking water limits.</Typography>
+                                                </Box>
+                                            </Box>
+                                        </Paper>
+                                    );
+
+                                    const dangerCount = allIssues.filter(i => i.severity === 'danger').length;
+                                    const warningCount = allIssues.filter(i => i.severity === 'warning').length;
+                                    const cautionCount = allIssues.filter(i => i.severity === 'caution').length;
+                                    const headerColor = dangerCount > 0 ? '#C62828' : warningCount > 0 ? '#E65100' : '#ED6C02';
+                                    const headerBg = dangerCount > 0 ? '#FFEBEE' : warningCount > 0 ? '#FFF3E0' : '#FFFDE7';
+
+                                    return (
+                                        <Paper elevation={0} sx={{ p: 2, mb: 2, borderRadius: 2.5, bgcolor: headerBg, border: '2px solid', borderColor: headerColor + '44' }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+                                                <WarningIcon sx={{ color: headerColor, fontSize: 22 }} />
+                                                <Box sx={{ flex: 1 }}>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: headerColor }}>
+                                                        {allIssues.length} Issue{allIssues.length !== 1 ? 's' : ''} Identified
+                                                    </Typography>
+                                                    <Stack direction="row" spacing={1} sx={{ mt: 0.3 }}>
+                                                        {dangerCount > 0 && <Chip label={`${dangerCount} Danger`} size="small" sx={{ height: 20, fontSize: '0.63rem', fontWeight: 700, bgcolor: '#C62828', color: '#fff' }} />}
+                                                        {warningCount > 0 && <Chip label={`${warningCount} Warning`} size="small" sx={{ height: 20, fontSize: '0.63rem', fontWeight: 700, bgcolor: '#E65100', color: '#fff' }} />}
+                                                        {cautionCount > 0 && <Chip label={`${cautionCount} Caution`} size="small" sx={{ height: 20, fontSize: '0.63rem', fontWeight: 700, bgcolor: '#F9A825', color: '#333' }} />}
+                                                    </Stack>
+                                                </Box>
+                                            </Box>
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                                {allIssues.map(issue => (
+                                                    <Paper key={issue.key} variant="outlined" sx={{ p: 1.5, borderRadius: 2, borderColor: issue.color + '55', bgcolor: issue.bg }}>
+                                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                                                            <Typography sx={{ fontSize: 14, lineHeight: 1 }}>{issue.icon}</Typography>
+                                                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.3 }}>
+                                                                    <Typography variant="caption" sx={{ fontWeight: 800, color: issue.color, fontSize: '0.78rem' }}>{issue.label}</Typography>
+                                                                    <Chip label={issue.label === issue.severity ? issue.severity : capitalize(issue.severity)} size="small"
+                                                                        sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700, bgcolor: issue.color, color: '#fff', ml: 'auto' }} />
+                                                                </Box>
+                                                                {issue.value != null && (
+                                                                    <Typography variant="caption" sx={{ display: 'block', fontWeight: 600, color: issue.color }}>
+                                                                        Measured: {issue.value} {issue.unit} — Safe range: {issue.threshold?.safe[0]}–{issue.threshold?.safe[1]} {issue.threshold?.unit}
+                                                                    </Typography>
+                                                                )}
+                                                                {issue.threshold?.desc && (
+                                                                    <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', fontStyle: 'italic', fontSize: '0.65rem' }}>{issue.threshold.desc}</Typography>
+                                                                )}
+                                                                {issue.detail && (
+                                                                    <Typography variant="caption" sx={{ display: 'block', color: '#5D4037', mt: 0.2 }}>{issue.detail}</Typography>
+                                                                )}
+                                                            </Box>
+                                                        </Box>
+                                                    </Paper>
+                                                ))}
+                                            </Box>
+                                        </Paper>
+                                    );
+                                })()}
+
                                 {/* Water characteristics */}
                                 <Section title="Water Characteristics" icon={<InfoIcon sx={{ fontSize: 18, color: '#0097A7' }} />}>
                                     <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden' }}>
@@ -591,13 +733,11 @@ export default function ModeratorWaterTests() {
                                         title={`Observations — ${detectedIssues.length} issue${detectedIssues.length !== 1 ? 's' : ''} detected`}
                                         icon={<WarningIcon sx={{ fontSize: 18, color: detectedIssues.length > 0 ? '#E65100' : '#BDBDBD' }} />}
                                     >
-                                        {/* Detected issues first — detailed cards */}
                                         {detectedIssues.length > 0 && (
                                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 1.5 }}>
                                                 {detectedIssues.map(o => <ObsCard key={o.label} label={o.label} data={o.data} />)}
                                             </Box>
                                         )}
-                                        {/* Undetected — compact list */}
                                         {undetectedIssues.length > 0 && (
                                             <Paper variant="outlined" sx={{ borderRadius: 2, p: 0.5 }}>
                                                 {undetectedIssues.map(o => <ObsCard key={o.label} label={o.label} data={o.data} />)}
@@ -606,43 +746,46 @@ export default function ModeratorWaterTests() {
                                     </Section>
                                 )}
 
-                                {/* Advanced tests — grouped */}
-                                {advTests.length > 0 && (() => {
-                                    const basicTests = advTests.filter(([k]) => !HEAVY_METALS.includes(k));
-                                    const metalTests = advTests.filter(([k]) => HEAVY_METALS.includes(k));
-                                    return (
-                                        <Section title="Advanced Test Results" icon={<Science sx={{ fontSize: 18, color: '#7B1FA2' }} />}>
-                                            {/* Basic water quality */}
-                                            {basicTests.length > 0 && (
-                                                <>
-                                                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', mb: 0.5, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.65rem' }}>Water Quality Parameters</Typography>
-                                                    <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden', mb: 1.5 }}>
-                                                        {basicTests.map(([key, val], i) => (
-                                                            <Box key={key}>
-                                                                {i > 0 && <Divider />}
-                                                                <DataRow label={ADV_TEST_LABELS[key] || key} value={`${val.value}${val.unit ? ` ${val.unit}` : ''}`} color="#7B1FA2" />
+                                {/* Advanced tests — with safety status */}
+                                {advTests.length > 0 && (
+                                    <Section title="Advanced Test Results" icon={<Science sx={{ fontSize: 18, color: '#7B1FA2' }} />}>
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                            {advTests.map(([key, val]) => {
+                                                const safety = evaluateTestSafety(key, val.value);
+                                                const sev = safety || { severity: 'safe', ...ISSUE_SEVERITY.safe };
+                                                const isMetal = HEAVY_METALS.includes(key);
+                                                return (
+                                                    <Paper key={key} variant="outlined" sx={{
+                                                        p: 1.5, borderRadius: 2,
+                                                        borderColor: sev.severity !== 'safe' ? sev.color + '55' : 'divider',
+                                                        bgcolor: sev.severity !== 'safe' ? sev.bg : '#FAFAFA',
+                                                    }}>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                            <Typography sx={{ fontSize: 14 }}>{sev.severity !== 'safe' ? sev.icon : '✓'}</Typography>
+                                                            <Box sx={{ flex: 1 }}>
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                    <Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.78rem', color: sev.severity !== 'safe' ? sev.color : 'text.primary' }}>
+                                                                        {isMetal ? '☢ ' : ''}{ADV_TEST_LABELS[key] || key}
+                                                                    </Typography>
+                                                                    <Typography variant="caption" sx={{ fontWeight: 800, color: sev.color, ml: 'auto', fontSize: '0.85rem' }}>
+                                                                        {val.value} {val.unit || safety?.threshold?.unit || ''}
+                                                                    </Typography>
+                                                                    <Chip label={capitalize(sev.severity)} size="small"
+                                                                        sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700, bgcolor: sev.color, color: '#fff', minWidth: 55 }} />
+                                                                </Box>
+                                                                {safety?.threshold && (
+                                                                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.63rem' }}>
+                                                                        Safe range: {safety.threshold.safe[0]}–{safety.threshold.safe[1]} {safety.threshold.unit} — {safety.threshold.desc}
+                                                                    </Typography>
+                                                                )}
                                                             </Box>
-                                                        ))}
+                                                        </Box>
                                                     </Paper>
-                                                </>
-                                            )}
-                                            {/* Heavy metals */}
-                                            {metalTests.length > 0 && (
-                                                <>
-                                                    <Typography variant="caption" sx={{ fontWeight: 700, color: '#D32F2F', mb: 0.5, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.65rem' }}>⚠ Heavy Metals & Contaminants</Typography>
-                                                    <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden', borderColor: '#FFCDD2' }}>
-                                                        {metalTests.map(([key, val], i) => (
-                                                            <Box key={key}>
-                                                                {i > 0 && <Divider />}
-                                                                <DataRow label={ADV_TEST_LABELS[key] || key} value={`${val.value}${val.unit ? ` ${val.unit}` : ''}`} color="#D32F2F" />
-                                                            </Box>
-                                                        ))}
-                                                    </Paper>
-                                                </>
-                                            )}
-                                        </Section>
-                                    );
-                                })()}
+                                                );
+                                            })}
+                                        </Box>
+                                    </Section>
+                                )}
 
                                 {/* Contact */}
                                 {(r.email || r.phone) && (
