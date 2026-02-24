@@ -62,6 +62,7 @@ const getStats = asyncHandler(async (req, res) => {
     const [
         statusCounts, sourceCounts, districtCounts, dailyCounts, totalImages,
         testingMethods, observationFreqs, mapPoints, weeklyTrend,
+        turbidityLevels, appearanceDist, hourlyPattern, photoStats, waterFlowDist,
     ] = await Promise.all([
         // By moderation status
         PublicReport.aggregate([
@@ -99,7 +100,7 @@ const getStats = asyncHandler(async (req, res) => {
             { $group: { _id: '$testingMethod', count: { $sum: 1 } } },
             { $sort: { count: -1 } },
         ]),
-        // Observation frequency — count how many reports detected each issue
+        // Observation frequency
         PublicReport.aggregate([
             { $match: baseMatch },
             {
@@ -130,16 +131,13 @@ const getStats = asyncHandler(async (req, res) => {
             { $group: { _id: '$issues.k', count: { $sum: 1 } } },
             { $sort: { count: -1 } },
         ]),
-        // Map markers — reports with coordinates
+        // Map markers
         PublicReport.aggregate([
             { $match: { ...baseMatch, 'location.coordinates.lat': { $ne: null }, 'location.coordinates.lng': { $ne: null } } },
             {
                 $project: {
-                    lat: '$location.coordinates.lat',
-                    lng: '$location.coordinates.lng',
-                    waterSource: 1,
-                    mod_status: 1,
-                    district: '$location.district',
+                    lat: '$location.coordinates.lat', lng: '$location.coordinates.lng',
+                    waterSource: 1, mod_status: 1, district: '$location.district',
                 }
             },
             { $limit: 200 },
@@ -147,13 +145,43 @@ const getStats = asyncHandler(async (req, res) => {
         // Weekly trend (last 12 weeks)
         PublicReport.aggregate([
             { $match: { createdAt: { $gte: new Date(Date.now() - 84 * 86400000) }, deletedAt: null } },
+            { $group: { _id: { $dateToString: { format: '%Y-W%V', date: '$createdAt' } }, count: { $sum: 1 } } },
+            { $sort: { _id: 1 } },
+        ]),
+        // ── NEW: Turbidity level distribution ──
+        PublicReport.aggregate([
+            { $match: { ...baseMatch, 'turbidity.value': { $ne: null } } },
+            { $group: { _id: '$turbidity.value', count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+        ]),
+        // ── NEW: Water appearance distribution ──
+        PublicReport.aggregate([
+            { $match: { ...baseMatch, 'appearance.value': { $ne: null } } },
+            { $group: { _id: '$appearance.value', count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+        ]),
+        // ── NEW: Hourly submission pattern (hour of day) ──
+        PublicReport.aggregate([
+            { $match: { ...baseMatch } },
             {
                 $group: {
-                    _id: { $dateToString: { format: '%Y-W%V', date: '$createdAt' } },
+                    _id: { $hour: '$createdAt' },
                     count: { $sum: 1 },
                 }
             },
             { $sort: { _id: 1 } },
+        ]),
+        // ── NEW: Photo coverage (with vs without photos) ──
+        PublicReport.aggregate([
+            { $match: baseMatch },
+            { $project: { hasPhoto: { $gt: [{ $size: { $ifNull: ['$images', []] } }, 0] } } },
+            { $group: { _id: '$hasPhoto', count: { $sum: 1 } } },
+        ]),
+        // ── NEW: Water flow distribution ──
+        PublicReport.aggregate([
+            { $match: { ...baseMatch, waterFlow: { $ne: null } } },
+            { $group: { _id: '$waterFlow', count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
         ]),
     ]);
 
@@ -172,6 +200,11 @@ const getStats = asyncHandler(async (req, res) => {
         observationFreqs,
         mapPoints,
         weeklyTrend,
+        turbidityLevels,
+        appearanceDist,
+        hourlyPattern,
+        photoStats,
+        waterFlowDist,
     }, 'Statistics retrieved successfully');
 });
 
