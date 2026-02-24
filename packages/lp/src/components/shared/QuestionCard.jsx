@@ -18,23 +18,23 @@ export default function QuestionCard({
 }) {
     return (
         <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.35 }}
         >
             <Card
                 sx={{
                     p: 4,
                     textAlign: 'center',
-                    bgcolor: 'rgba(17, 34, 64, 0.6)',
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    bgcolor: '#FFFFFF',
+                    border: '1px solid #E8ECF0',
                 }}
             >
                 {/* Icon */}
                 {icon && (
-                    <Box sx={{ mb: 2, fontSize: 48, lineHeight: 1 }}>
+                    <Box sx={{ mb: 2, fontSize: 44, lineHeight: 1 }}>
                         {typeof icon === 'string' ? (
-                            <span style={{ fontSize: 48 }}>{icon}</span>
+                            <span style={{ fontSize: 44 }}>{icon}</span>
                         ) : (
                             icon
                         )}
@@ -42,7 +42,7 @@ export default function QuestionCard({
                 )}
 
                 {/* Question */}
-                <Typography variant="h5" sx={{ mb: 1, fontWeight: 600 }}>
+                <Typography variant="h5" sx={{ mb: 1, fontWeight: 600, color: 'text.primary' }}>
                     {question}
                 </Typography>
                 {description && (
@@ -63,12 +63,11 @@ export default function QuestionCard({
                             maxWidth: 200,
                             py: 2,
                             fontSize: '1.1rem',
-                            borderColor: value === true ? 'primary.main' : 'rgba(255,255,255,0.15)',
-                            bgcolor: value === true ? undefined : 'transparent',
-                            color: value === true ? 'white' : 'text.primary',
+                            borderColor: value === true ? 'primary.main' : '#CFD8DC',
+                            color: value === true ? '#FFFFFF' : 'text.primary',
                             '&:hover': {
                                 borderColor: 'primary.main',
-                                bgcolor: value === true ? undefined : 'rgba(0,180,216,0.08)',
+                                bgcolor: value === true ? 'primary.dark' : 'rgba(21, 101, 192, 0.04)',
                             },
                         }}
                     >
@@ -79,21 +78,18 @@ export default function QuestionCard({
                         size="large"
                         startIcon={<CancelOutlinedIcon />}
                         onClick={() => onChange(false)}
+                        color={value === false ? 'error' : 'inherit'}
                         sx={{
                             flex: 1,
                             maxWidth: 200,
                             py: 2,
                             fontSize: '1.1rem',
-                            borderColor: value === false ? 'error.main' : 'rgba(255,255,255,0.15)',
-                            bgcolor: value === false ? 'rgba(255,82,82,0.2)' : 'transparent',
-                            color: value === false ? 'error.light' : 'text.primary',
+                            borderColor: value === false ? 'error.main' : '#CFD8DC',
+                            color: value === false ? '#FFFFFF' : 'text.primary',
                             '&:hover': {
                                 borderColor: 'error.main',
-                                bgcolor: 'rgba(255,82,82,0.1)',
+                                bgcolor: value === false ? 'error.dark' : 'rgba(211, 47, 47, 0.04)',
                             },
-                            ...(value === false && {
-                                background: 'linear-gradient(135deg, rgba(255,82,82,0.3) 0%, rgba(255,82,82,0.15) 100%)',
-                            }),
                         }}
                     >
                         {noLabel}

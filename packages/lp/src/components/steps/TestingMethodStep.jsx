@@ -4,6 +4,7 @@ import StepLayout from '../shared/StepLayout';
 import OptionGrid from '../shared/OptionGrid';
 import { useWizard } from '../../context/WizardContext';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 const OPTIONS = [
     { value: 'observation', label: 'Observation Only', icon: '👁️', description: 'I just looked at the water' },
@@ -33,9 +34,14 @@ export default function TestingMethodStep({ onNext, onBack, stepNumber }) {
             stepNumber={stepNumber}
             onBack={onBack}
         >
-            <Box sx={{ mb: 3 }}>
-                <Typography variant="body2" sx={{ color: 'warning.main', mb: 2, p: 2, bgcolor: 'rgba(255,183,77,0.08)', borderRadius: 2, border: '1px solid rgba(255,183,77,0.2)' }}>
-                    💡 If you've tested the water with test strips or a lab kit, we'll ask you for those results next. Otherwise, we'll skip to the review.
+            <Box sx={{
+                mb: 3, p: 2, bgcolor: 'rgba(237, 108, 2, 0.06)', borderRadius: 2,
+                border: '1px solid rgba(237, 108, 2, 0.2)',
+                display: 'flex', alignItems: 'flex-start', gap: 1.5,
+            }}>
+                <InfoOutlinedIcon sx={{ color: 'warning.main', fontSize: 20, mt: 0.2 }} />
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    If you've tested the water with test strips or a lab kit, we'll ask you for those results next. Otherwise, we'll skip to the review.
                 </Typography>
             </Box>
 

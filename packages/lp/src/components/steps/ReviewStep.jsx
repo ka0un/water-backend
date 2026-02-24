@@ -1,4 +1,4 @@
-import { Box, Typography, Button, Card, Divider, Chip } from '@mui/material';
+import { Box, Typography, Button, Card, Divider } from '@mui/material';
 import { motion } from 'framer-motion';
 import StepLayout from '../shared/StepLayout';
 import { useWizard } from '../../context/WizardContext';
@@ -14,8 +14,8 @@ const formatValue = (val) => {
 const Section = ({ title, icon, children, show = true }) => {
     if (!show) return null;
     return (
-        <Card sx={{ p: 2.5, mb: 2, bgcolor: 'rgba(17,34,64,0.5)' }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Card sx={{ p: 2.5, mb: 2 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1.5, display: 'flex', alignItems: 'center', gap: 1, color: 'text.primary' }}>
                 <span>{icon}</span> {title}
             </Typography>
             {children}
@@ -26,7 +26,7 @@ const Section = ({ title, icon, children, show = true }) => {
 const Row = ({ label, value }) => (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5 }}>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>{label}</Typography>
-        <Typography variant="body2" sx={{ fontWeight: 500 }}>{formatValue(value)}</Typography>
+        <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.primary' }}>{formatValue(value)}</Typography>
     </Box>
 );
 
@@ -70,7 +70,7 @@ export default function ReviewStep({ onBack, onSubmit, stepNumber }) {
                 <Row label="Turbidity" value={reportData.turbidity?.value} />
                 <Row label="Water Flow" value={reportData.waterFlow} />
                 <Row label="Temperature" value={reportData.temperature} />
-                <Divider sx={{ my: 1, borderColor: 'rgba(255,255,255,0.06)' }} />
+                <Divider sx={{ my: 1 }} />
                 <ObsRow label="Smell" data={reportData.smell} />
                 <ObsRow label="Taste" data={reportData.taste} />
                 <ObsRow label="Sediment" data={reportData.sediment} />
@@ -98,17 +98,14 @@ export default function ReviewStep({ onBack, onSubmit, stepNumber }) {
             </Section>
 
             {/* Submit */}
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
                 <Button
                     fullWidth variant="contained" size="large"
                     onClick={onSubmit}
                     disabled={loading}
                     startIcon={<SendIcon />}
-                    sx={{
-                        mt: 3, py: 2, fontSize: '1.15rem',
-                        background: 'linear-gradient(135deg, #00E676 0%, #00B4D8 100%)',
-                        '&:hover': { background: 'linear-gradient(135deg, #69F0AE 0%, #48CAE4 100%)' },
-                    }}
+                    color="success"
+                    sx={{ mt: 3, py: 2, fontSize: '1.1rem' }}
                 >
                     {loading ? 'Submitting...' : 'Submit Report'}
                 </Button>

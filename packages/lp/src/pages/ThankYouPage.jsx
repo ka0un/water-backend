@@ -11,25 +11,25 @@ export default function ThankYouPage() {
     const reportId = searchParams.get('id');
 
     return (
-        <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', bgcolor: '#F5F7FA' }}>
             <Container maxWidth="sm">
                 <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
+                    initial={{ scale: 0.95, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.6, ease: 'easeOut' }}
+                    transition={{ duration: 0.5, ease: 'easeOut' }}
                 >
                     <Card sx={{ p: 5, textAlign: 'center' }}>
                         {/* Success checkmark */}
                         <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
+                            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
                         >
-                            <CheckCircleIcon sx={{ fontSize: 80, color: 'success.main', mb: 2 }} />
+                            <CheckCircleIcon sx={{ fontSize: 72, color: 'success.main', mb: 2 }} />
                         </motion.div>
 
-                        <Typography variant="h3" sx={{ mb: 2 }}>
-                            Thank You! 🎉
+                        <Typography variant="h3" sx={{ mb: 2, color: 'text.primary' }}>
+                            Thank You!
                         </Typography>
 
                         <Typography variant="body1" sx={{ mb: 1, color: 'text.secondary', lineHeight: 1.7 }}>
@@ -39,12 +39,12 @@ export default function ThankYouPage() {
 
                         {reportId && (
                             <Typography variant="body2" sx={{ mb: 3, color: 'text.secondary' }}>
-                                Report ID: <strong style={{ color: '#48CAE4' }}>{reportId}</strong>
+                                Report ID: <strong style={{ color: '#1565C0' }}>{reportId}</strong>
                             </Typography>
                         )}
 
-                        <Card sx={{ p: 2, mb: 3, bgcolor: 'rgba(0,230,118,0.08)', border: '1px solid rgba(0,230,118,0.2)' }}>
-                            <Typography variant="body2" sx={{ color: 'success.light' }}>
+                        <Card sx={{ p: 2, mb: 3, bgcolor: 'rgba(46, 125, 50, 0.06)', border: '1px solid rgba(46, 125, 50, 0.2)' }}>
+                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                                 ✅ Your report is now <strong>pending review</strong>. A moderator will verify the information you provided.
                             </Typography>
                         </Card>

@@ -6,6 +6,7 @@ import { useWizard } from '../../context/WizardContext';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ReplayIcon from '@mui/icons-material/Replay';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import WaterDropIcon from '@mui/icons-material/WaterDrop';
 
 export default function WelcomeStep({ onNext }) {
     const { nic, setNic, startNewReport, checkExistingReports, resumeReport, existingReports, loading, error, setError } = useWizard();
@@ -32,7 +33,6 @@ export default function WelcomeStep({ onNext }) {
         const reports = await checkExistingReports(inputNic.trim());
         setChecked(true);
 
-        // If no existing in-progress reports, start new immediately
         const inProgress = reports.filter(r => !r.wizardCompleted);
         if (inProgress.length === 0) {
             try {
@@ -69,14 +69,21 @@ export default function WelcomeStep({ onNext }) {
             hideBack
         >
             <Box sx={{ mt: 2 }}>
-                {/* Water drop icon */}
+                {/* Water icon */}
                 <Box sx={{ textAlign: 'center', mb: 4 }}>
-                    <motion.div
-                        animate={{ y: [0, -8, 0] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                    <Box
+                        sx={{
+                            width: 64,
+                            height: 64,
+                            borderRadius: '50%',
+                            bgcolor: 'rgba(21, 101, 192, 0.08)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
                     >
-                        <Typography sx={{ fontSize: 64 }}>💧</Typography>
-                    </motion.div>
+                        <WaterDropIcon sx={{ fontSize: 32, color: '#1565C0' }} />
+                    </Box>
                 </Box>
 
                 {/* NIC Input */}
@@ -106,8 +113,8 @@ export default function WelcomeStep({ onNext }) {
                 {/* If in-progress reports found */}
                 {checked && inProgressReports.length > 0 && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                        <Card sx={{ p: 2, mb: 3, bgcolor: 'rgba(0,180,216,0.08)', border: '1px solid rgba(0,180,216,0.2)' }}>
-                            <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
+                        <Card sx={{ p: 2, mb: 3, bgcolor: 'rgba(21, 101, 192, 0.04)', border: '1px solid rgba(21, 101, 192, 0.15)' }}>
+                            <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600, color: 'text.primary' }}>
                                 📋 You have an in-progress report
                             </Typography>
                             <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
@@ -121,8 +128,9 @@ export default function WelcomeStep({ onNext }) {
                                         sx={{
                                             borderRadius: 2,
                                             mb: 0.5,
-                                            bgcolor: 'rgba(17,34,64,0.5)',
-                                            '&:hover': { bgcolor: 'rgba(0,180,216,0.1)' },
+                                            bgcolor: '#FFFFFF',
+                                            border: '1px solid #E8ECF0',
+                                            '&:hover': { bgcolor: 'rgba(21, 101, 192, 0.04)' },
                                         }}
                                     >
                                         <ListItemText

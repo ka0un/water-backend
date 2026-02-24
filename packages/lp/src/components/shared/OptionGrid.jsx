@@ -43,9 +43,9 @@ export default function OptionGrid({
             {options.map((option, index) => (
                 <motion.div
                     key={option.value}
-                    initial={{ opacity: 0, scale: 0.9 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                    transition={{ duration: 0.25, delay: index * 0.04 }}
                 >
                     <Card
                         sx={{
@@ -53,18 +53,20 @@ export default function OptionGrid({
                             overflow: 'visible',
                             border: isSelected(option.value)
                                 ? '2px solid'
-                                : '2px solid transparent',
+                                : '1px solid',
                             borderColor: isSelected(option.value)
                                 ? 'primary.main'
-                                : 'transparent',
+                                : '#E8ECF0',
                             bgcolor: isSelected(option.value)
-                                ? 'rgba(0, 180, 216, 0.12)'
-                                : 'rgba(17, 34, 64, 0.6)',
-                            transition: 'all 0.25s ease',
+                                ? 'rgba(21, 101, 192, 0.06)'
+                                : '#FFFFFF',
+                            boxShadow: isSelected(option.value)
+                                ? '0 0 0 3px rgba(21, 101, 192, 0.12)'
+                                : '0 1px 3px rgba(0,0,0,0.04)',
+                            transition: 'all 0.2s ease',
                             '&:hover': {
-                                borderColor: 'primary.dark',
-                                bgcolor: 'rgba(0, 180, 216, 0.06)',
-                                transform: 'translateY(-2px)',
+                                borderColor: isSelected(option.value) ? 'primary.main' : '#B0BEC5',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                             },
                         }}
                     >
@@ -80,16 +82,16 @@ export default function OptionGrid({
                                         top: 8,
                                         right: 8,
                                         color: 'primary.main',
-                                        fontSize: 22,
+                                        fontSize: 20,
                                     }}
                                 />
                             )}
 
                             {/* Icon */}
                             {option.icon && (
-                                <Box sx={{ mb: 1.5, fontSize: 36, lineHeight: 1 }}>
+                                <Box sx={{ mb: 1.5, fontSize: 32, lineHeight: 1 }}>
                                     {typeof option.icon === 'string' ? (
-                                        <span style={{ fontSize: 36 }}>{option.icon}</span>
+                                        <span style={{ fontSize: 32 }}>{option.icon}</span>
                                     ) : (
                                         option.icon
                                     )}
@@ -101,7 +103,7 @@ export default function OptionGrid({
                                 variant="body1"
                                 sx={{
                                     fontWeight: isSelected(option.value) ? 600 : 500,
-                                    color: isSelected(option.value) ? 'primary.light' : 'text.primary',
+                                    color: isSelected(option.value) ? 'primary.dark' : 'text.primary',
                                     fontSize: '0.95rem',
                                 }}
                             >

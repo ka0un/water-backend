@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, TextField, Button, Typography, Grid, Card, InputAdornment } from '@mui/material';
+import { Box, TextField, Button, Typography, Card, InputAdornment } from '@mui/material';
 import { motion } from 'framer-motion';
 import StepLayout from '../shared/StepLayout';
 import { useWizard } from '../../context/WizardContext';
@@ -68,7 +68,7 @@ export default function AdvancedTestsStep({ onNext, onBack, stepNumber }) {
             onBack={onBack}
         >
             <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" sx={{ color: 'primary.light' }}>
+                <Typography variant="body2" sx={{ color: 'primary.main', fontWeight: 500 }}>
                     📋 {filledCount} of {PARAMETERS.length} parameters filled
                 </Typography>
             </Box>
@@ -77,14 +77,14 @@ export default function AdvancedTestsStep({ onNext, onBack, stepNumber }) {
                 {PARAMETERS.map((param, index) => (
                     <motion.div
                         key={param.key}
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.03 }}
                     >
-                        <Card sx={{ p: 2, bgcolor: 'rgba(17,34,64,0.5)' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                <span style={{ fontSize: 20 }}>{param.icon}</span>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                        <Card sx={{ p: 2 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                                <span style={{ fontSize: 18 }}>{param.icon}</span>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.primary' }}>
                                     {param.label}
                                 </Typography>
                             </Box>

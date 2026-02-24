@@ -2,34 +2,35 @@ import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
     palette: {
-        mode: 'dark',
+        mode: 'light',
         primary: {
-            main: '#00B4D8',
-            light: '#48CAE4',
-            dark: '#0077B6',
+            main: '#1565C0',
+            light: '#1E88E5',
+            dark: '#0D47A1',
         },
         secondary: {
-            main: '#90E0EF',
-            light: '#CAF0F8',
-            dark: '#00B4D8',
+            main: '#0277BD',
+            light: '#039BE5',
+            dark: '#01579B',
         },
         background: {
-            default: '#0A1929',
-            paper: '#112240',
+            default: '#F5F7FA',
+            paper: '#FFFFFF',
         },
         success: {
-            main: '#00E676',
+            main: '#2E7D32',
         },
         warning: {
-            main: '#FFB74D',
+            main: '#ED6C02',
         },
         error: {
-            main: '#FF5252',
+            main: '#D32F2F',
         },
         text: {
-            primary: '#E0E0E0',
-            secondary: '#90A4AE',
+            primary: '#1A2027',
+            secondary: '#546E7A',
         },
+        divider: '#E0E0E0',
     },
     typography: {
         fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
@@ -38,6 +39,7 @@ const theme = createTheme({
             fontSize: '3rem',
             lineHeight: 1.2,
             letterSpacing: '-0.02em',
+            color: '#1A2027',
         },
         h2: {
             fontWeight: 700,
@@ -71,22 +73,22 @@ const theme = createTheme({
         },
     },
     shape: {
-        borderRadius: 16,
+        borderRadius: 12,
     },
     components: {
         MuiButton: {
             styleOverrides: {
                 root: {
-                    borderRadius: 12,
+                    borderRadius: 10,
                     padding: '12px 28px',
                     fontSize: '1rem',
+                    boxShadow: 'none',
                 },
                 containedPrimary: {
-                    background: 'linear-gradient(135deg, #00B4D8 0%, #0077B6 100%)',
-                    boxShadow: '0 4px 20px rgba(0, 180, 216, 0.3)',
+                    backgroundColor: '#1565C0',
                     '&:hover': {
-                        background: 'linear-gradient(135deg, #48CAE4 0%, #00B4D8 100%)',
-                        boxShadow: '0 6px 30px rgba(0, 180, 216, 0.5)',
+                        backgroundColor: '#0D47A1',
+                        boxShadow: '0 2px 8px rgba(21, 101, 192, 0.25)',
                     },
                 },
             },
@@ -94,10 +96,10 @@ const theme = createTheme({
         MuiCard: {
             styleOverrides: {
                 root: {
-                    borderRadius: 20,
-                    background: 'rgba(17, 34, 64, 0.8)',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255, 255, 255, 0.05)',
+                    borderRadius: 12,
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E8ECF0',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
                 },
             },
         },
@@ -111,13 +113,13 @@ const theme = createTheme({
         MuiLinearProgress: {
             styleOverrides: {
                 root: {
-                    borderRadius: 8,
-                    height: 8,
-                    backgroundColor: 'rgba(255,255,255,0.08)',
+                    borderRadius: 6,
+                    height: 6,
+                    backgroundColor: '#E8ECF0',
                 },
                 bar: {
-                    borderRadius: 8,
-                    background: 'linear-gradient(90deg, #00B4D8 0%, #48CAE4 100%)',
+                    borderRadius: 6,
+                    backgroundColor: '#1565C0',
                 },
             },
         },
@@ -125,7 +127,7 @@ const theme = createTheme({
             styleOverrides: {
                 root: {
                     '& .MuiOutlinedInput-root': {
-                        borderRadius: 12,
+                        borderRadius: 10,
                     },
                 },
             },

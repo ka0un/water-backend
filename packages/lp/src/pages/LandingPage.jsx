@@ -9,22 +9,22 @@ import GroupsIcon from '@mui/icons-material/Groups';
 
 const features = [
     {
-        icon: <WaterDropIcon sx={{ fontSize: 40, color: 'primary.main' }} />,
+        icon: <WaterDropIcon sx={{ fontSize: 36, color: '#1565C0' }} />,
         title: 'Report Issues',
         desc: 'Easily report water quality problems in your area — no login needed.',
     },
     {
-        icon: <VerifiedUserIcon sx={{ fontSize: 40, color: 'success.main' }} />,
+        icon: <VerifiedUserIcon sx={{ fontSize: 36, color: '#2E7D32' }} />,
         title: 'Expert Review',
         desc: 'Every report is reviewed by trained moderators and experts.',
     },
     {
-        icon: <SpeedIcon sx={{ fontSize: 40, color: 'secondary.main' }} />,
+        icon: <SpeedIcon sx={{ fontSize: 36, color: '#0277BD' }} />,
         title: 'Quick & Simple',
         desc: 'Just answer a few visual questions. Takes less than 5 minutes.',
     },
     {
-        icon: <GroupsIcon sx={{ fontSize: 40, color: 'warning.main' }} />,
+        icon: <GroupsIcon sx={{ fontSize: 36, color: '#ED6C02' }} />,
         title: 'Community Driven',
         desc: 'Help protect your community by contributing water quality data.',
     },
@@ -34,42 +34,55 @@ export default function LandingPage() {
     const navigate = useNavigate();
 
     return (
-        <Box sx={{ minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
+        <Box sx={{ minHeight: '100vh', bgcolor: '#F5F7FA' }}>
+            {/* Header Bar */}
+            <Box sx={{ bgcolor: '#FFFFFF', borderBottom: '1px solid #E8ECF0', py: 2, px: 3 }}>
+                <Container maxWidth="md">
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <WaterDropIcon sx={{ color: '#1565C0', fontSize: 28 }} />
+                        <Typography variant="h6" sx={{ fontWeight: 700, color: '#1A2027' }}>
+                            Water Quality Monitor
+                        </Typography>
+                    </Box>
+                </Container>
+            </Box>
+
             {/* Hero Section */}
             <Container maxWidth="md">
-                <Box
-                    sx={{
-                        py: { xs: 8, md: 14 },
-                        textAlign: 'center',
-                        position: 'relative',
-                        zIndex: 1,
-                    }}
-                >
-                    {/* Animated Water Drop */}
+                <Box sx={{ py: { xs: 8, md: 12 }, textAlign: 'center' }}>
                     <motion.div
-                        initial={{ y: -30, opacity: 0 }}
+                        initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
-                        transition={{ duration: 0.8, ease: 'easeOut' }}
+                        transition={{ duration: 0.6 }}
                     >
-                        <Typography sx={{ fontSize: { xs: 64, md: 80 }, mb: 2, lineHeight: 1 }}>
-                            💧
-                        </Typography>
+                        <Box
+                            sx={{
+                                width: 72,
+                                height: 72,
+                                borderRadius: '50%',
+                                bgcolor: 'rgba(21, 101, 192, 0.08)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                mx: 'auto',
+                                mb: 3,
+                            }}
+                        >
+                            <WaterDropIcon sx={{ fontSize: 36, color: '#1565C0' }} />
+                        </Box>
                     </motion.div>
 
                     <motion.div
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.2, duration: 0.8 }}
+                        transition={{ delay: 0.15, duration: 0.6 }}
                     >
                         <Typography
                             variant="h1"
                             sx={{
                                 mb: 2,
-                                fontSize: { xs: '2rem', sm: '2.75rem', md: '3.5rem' },
-                                background: 'linear-gradient(135deg, #CAF0F8 0%, #00B4D8 50%, #90E0EF 100%)',
-                                backgroundClip: 'text',
-                                WebkitBackgroundClip: 'text',
-                                color: 'transparent',
+                                fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+                                color: '#1A2027',
                             }}
                         >
                             Is Your Water Safe?
@@ -79,7 +92,7 @@ export default function LandingPage() {
                     <motion.div
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.4, duration: 0.8 }}
+                        transition={{ delay: 0.3, duration: 0.6 }}
                     >
                         <Typography
                             variant="h6"
@@ -100,7 +113,7 @@ export default function LandingPage() {
                     <motion.div
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.6, duration: 0.8 }}
+                        transition={{ delay: 0.45, duration: 0.6 }}
                     >
                         <Button
                             variant="contained"
@@ -108,11 +121,10 @@ export default function LandingPage() {
                             onClick={() => navigate('/report')}
                             endIcon={<ArrowForwardIcon />}
                             sx={{
-                                py: 2,
-                                px: 6,
-                                fontSize: '1.2rem',
-                                borderRadius: 3,
-                                boxShadow: '0 8px 40px rgba(0, 180, 216, 0.4)',
+                                py: 1.8,
+                                px: 5,
+                                fontSize: '1.1rem',
+                                borderRadius: 2.5,
                             }}
                         >
                             Report a Water Issue
@@ -122,7 +134,7 @@ export default function LandingPage() {
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ delay: 0.8, duration: 0.8 }}
+                        transition={{ delay: 0.6, duration: 0.6 }}
                     >
                         <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
                             No account needed — just your NIC number
@@ -135,31 +147,30 @@ export default function LandingPage() {
                     sx={{
                         display: 'grid',
                         gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' },
-                        gap: 3,
+                        gap: 2.5,
                         pb: 10,
                     }}
                 >
                     {features.map((feature, i) => (
                         <motion.div
                             key={i}
-                            initial={{ y: 30, opacity: 0 }}
+                            initial={{ y: 20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 1 + i * 0.15, duration: 0.6 }}
+                            transition={{ delay: 0.7 + i * 0.1, duration: 0.5 }}
                         >
                             <Card
                                 sx={{
                                     p: 3,
                                     textAlign: 'center',
                                     height: '100%',
-                                    transition: 'transform 0.3s, box-shadow 0.3s',
+                                    transition: 'box-shadow 0.2s',
                                     '&:hover': {
-                                        transform: 'translateY(-6px)',
-                                        boxShadow: '0 12px 40px rgba(0,180,216,0.15)',
+                                        boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
                                     },
                                 }}
                             >
                                 <Box sx={{ mb: 2 }}>{feature.icon}</Box>
-                                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600, fontSize: '1rem' }}>
+                                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600, fontSize: '0.95rem', color: 'text.primary' }}>
                                     {feature.title}
                                 </Typography>
                                 <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>
@@ -172,7 +183,7 @@ export default function LandingPage() {
             </Container>
 
             {/* Footer */}
-            <Box sx={{ textAlign: 'center', py: 4, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+            <Box sx={{ textAlign: 'center', py: 4, borderTop: '1px solid #E8ECF0', bgcolor: '#FFFFFF' }}>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     Water Quality Monitoring System &copy; {new Date().getFullYear()}
                 </Typography>

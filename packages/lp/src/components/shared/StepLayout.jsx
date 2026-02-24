@@ -23,17 +23,17 @@ export default function StepLayout({
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4, ease: 'easeOut' }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
         >
             <Box sx={{ maxWidth: 640, mx: 'auto', px: 2, py: 3 }}>
                 {/* Progress Bar */}
                 {showProgress && (
                     <Box sx={{ mb: 4 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>
                                 Step {stepNumber} of {totalSteps}
                             </Typography>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -43,14 +43,14 @@ export default function StepLayout({
                                         label="Saving..."
                                         size="small"
                                         sx={{
-                                            bgcolor: 'rgba(0,180,216,0.15)',
-                                            color: 'primary.light',
+                                            bgcolor: 'rgba(21,101,192,0.08)',
+                                            color: 'primary.main',
                                             fontSize: '0.75rem',
                                             height: 24,
                                         }}
                                     />
                                 )}
-                                <Typography variant="body2" sx={{ color: 'primary.main', fontWeight: 600 }}>
+                                <Typography variant="body2" sx={{ color: 'primary.main', fontWeight: 600, fontSize: '0.85rem' }}>
                                     {Math.round(progress)}%
                                 </Typography>
                             </Box>
@@ -67,7 +67,7 @@ export default function StepLayout({
                         sx={{
                             mb: 2,
                             color: 'text.secondary',
-                            '&:hover': { color: 'primary.main' },
+                            '&:hover': { color: 'primary.main', bgcolor: 'rgba(21,101,192,0.04)' },
                         }}
                     >
                         Back
@@ -75,7 +75,7 @@ export default function StepLayout({
                 )}
 
                 {/* Title */}
-                <Typography variant="h4" sx={{ mb: 1, fontWeight: 700 }}>
+                <Typography variant="h4" sx={{ mb: 1, fontWeight: 700, color: 'text.primary' }}>
                     {title}
                 </Typography>
                 {subtitle && (
