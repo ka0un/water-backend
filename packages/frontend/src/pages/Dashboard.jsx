@@ -16,7 +16,7 @@ import {
     XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     RadialBarChart, RadialBar, Legend, Treemap,
 } from 'recharts';
-import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Popup, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 /* ── Palette ──────────────────────────────────────────────────── */
@@ -65,6 +65,61 @@ function DashboardSkeleton() {
     );
 }
 
+/* ── Map Markers Layer ────────────────────────────────────────── */
+function MapMarkers({ bubbles, points, maxBubble, zoomThreshold = 9 }) {
+    const [zoomLevel, setZoomLevel] = useState(8);
+    const map = useMapEvents({
+        zoomend: () => setZoomLevel(map.getZoom()),
+    });
+
+    useEffect(() => {
+        setZoomLevel(map.getZoom());
+    }, [map]);
+
+    const isZoomedIn = zoomLevel >= zoomThreshold;
+
+    if (isZoomedIn && points && points.length > 0) {
+        return points.map((p, i) => (
+            <CircleMarker key={`point-${i}`} center={[p.lat, p.lng]} radius={5}
+                pathOptions={{
+                    fillColor: SOURCE_COLORS[p.waterSource] || '#1565C0',
+                    color: '#fff',
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.9
+                }}>
+                <Popup>
+                    <div style={{ textAlign: 'center', minWidth: 120 }}>
+                        <strong style={{ fontSize: 14, textTransform: 'capitalize' }}>{p.waterSource || 'Unknown'} Source</strong><br />
+                        <span style={{ fontSize: 12, color: '#666' }}>{p.district || 'Unknown Location'}</span><br />
+                        <Box sx={{ mt: 1 }}>
+                            <Chip label={p.mod_status || 'pending'} size="small" sx={{ height: 20, fontSize: '0.7rem', textTransform: 'capitalize', bgcolor: STATUS_COLORS[p.mod_status] || '#999', color: '#fff' }} />
+                        </Box>
+                    </div>
+                </Popup>
+            </CircleMarker>
+        ));
+    }
+
+    return bubbles.map((b, i) => {
+        const ratio = b.count / maxBubble;
+        const radius = 14 + ratio * 28;
+        const opacity = 0.4 + ratio * 0.45;
+        return (
+            <CircleMarker key={`bubble-${i}`} center={[b.lat, b.lng]} radius={radius}
+                pathOptions={{ fillColor: '#1565C0', color: '#0D47A1', weight: 1.5, opacity: 0.5, fillOpacity: opacity }}>
+                <Popup>
+                    <div style={{ textAlign: 'center', minWidth: 110 }}>
+                        <strong style={{ fontSize: 14 }}>{b.name}</strong><br />
+                        <span style={{ fontSize: 24, fontWeight: 800, color: '#1565C0' }}>{b.count}</span><br />
+                        <span style={{ fontSize: 11, color: '#666' }}>report{b.count > 1 ? 's' : ''}</span>
+                    </div>
+                </Popup>
+            </CircleMarker>
+        );
+    });
+}
+
 /* ══════════════════════════════════════════════════════════════ */
 export default function Dashboard() {
     const { api } = useAuth();
@@ -97,6 +152,7 @@ export default function Dashboard() {
     const {
         overview, byStatus, bySource, byDistrict, dailySubmissions,
         totalImages, testingMethods, observationFreqs, mapPoints, weeklyTrend,
+        turbidityLevels, appearanceDist, hourlyPattern, photoStats, waterFlowDist,
     } = stats;
 
     /* Prep chart data */
@@ -124,6 +180,36 @@ export default function Dashboard() {
         { name: 'Completion', value: completionRate, fill: '#1565C0' },
         { name: 'Approval', value: approvalRate, fill: '#2E7D32' },
     ];
+
+    /* NEW chart data */
+    const TURBIDITY_COLORS = { clear: '#4FC3F7', slightly_cloudy: '#81D4FA', cloudy: '#FFB74D', very_cloudy: '#FF8A65', opaque: '#A1887F' };
+    const APPEARANCE_COLORS = { clear: '#42A5F5', murky: '#8D6E63', brown: '#A1887F', green: '#66BB6A', yellow: '#FFCA28', red: '#EF5350', black: '#616161', white: '#E0E0E0' };
+    const FLOW_COLORS = { still: '#90CAF9', slow: '#42A5F5', moderate: '#1E88E5', fast: '#1565C0', flooding: '#C62828' };
+
+    const turbidityData = (turbidityLevels || []).map((t, i) => ({
+        name: (t._id || '').replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase()),
+        count: t.count,
+        fill: TURBIDITY_COLORS[t._id] || COLORS[i % COLORS.length],
+    }));
+    const appearanceData = (appearanceDist || []).map((a, i) => ({
+        name: (a._id || '').replace(/^\w/, c => c.toUpperCase()),
+        value: a.count,
+        color: APPEARANCE_COLORS[a._id] || COLORS[i % COLORS.length],
+    }));
+    const hourlyData = Array.from({ length: 24 }, (_, h) => {
+        const found = (hourlyPattern || []).find(p => p._id === h);
+        return { hour: `${String(h).padStart(2, '0')}:00`, count: found?.count || 0 };
+    });
+    const photoData = (photoStats || []).map(p => ({
+        name: p._id ? 'With Photos' : 'No Photos',
+        value: p.count,
+        color: p._id ? '#1565C0' : '#E0E0E0',
+    }));
+    const flowData = (waterFlowDist || []).map((f, i) => ({
+        name: (f._id || '').replace(/^\w/, c => c.toUpperCase()),
+        value: f.count,
+        color: FLOW_COLORS[f._id] || COLORS[i % COLORS.length],
+    }));
 
     /* Sri Lankan district center coordinates */
     const SL_DISTRICT_COORDS = {
@@ -218,7 +304,7 @@ export default function Dashboard() {
                 <Box sx={{ width: '100%', height: 480, borderRadius: 2, overflow: 'hidden', bgcolor: '#F0F4F8' }}>
                     <MapContainer
                         center={SL_CENTER} zoom={8}
-                        minZoom={7} maxZoom={11}
+                        minZoom={7} maxZoom={16}
                         maxBounds={SL_BOUNDS} maxBoundsViscosity={1.0}
                         style={{ height: '100%', width: '100%' }}
                         scrollWheelZoom={true}
@@ -227,23 +313,7 @@ export default function Dashboard() {
                             attribution='&copy; <a href="https://carto.com/">CARTO</a>'
                             url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
                         />
-                        {mapBubbles.map((b, i) => {
-                            const ratio = b.count / maxBubble;
-                            const radius = 14 + ratio * 28;
-                            const opacity = 0.4 + ratio * 0.45;
-                            return (
-                                <CircleMarker key={i} center={[b.lat, b.lng]} radius={radius}
-                                    pathOptions={{ fillColor: '#1565C0', color: '#0D47A1', weight: 1.5, opacity: 0.5, fillOpacity: opacity }}>
-                                    <Popup>
-                                        <div style={{ textAlign: 'center', minWidth: 110 }}>
-                                            <strong style={{ fontSize: 14 }}>{b.name}</strong><br />
-                                            <span style={{ fontSize: 24, fontWeight: 800, color: '#1565C0' }}>{b.count}</span><br />
-                                            <span style={{ fontSize: 11, color: '#666' }}>report{b.count > 1 ? 's' : ''}</span>
-                                        </div>
-                                    </Popup>
-                                </CircleMarker>
-                            );
-                        })}
+                        <MapMarkers bubbles={mapBubbles} points={mapPoints || []} maxBubble={maxBubble} />
                     </MapContainer>
                 </Box>
                 {mapBubbles.length === 0 && (
@@ -388,6 +458,122 @@ export default function Dashboard() {
                                 </BarChart>
                             </ResponsiveContainer>
                         </Box>
+                    ) : <Empty />}
+                </Paper>
+            </Box>
+
+            {/* ─── Turbidity + Appearance + Flow ─────────────── */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' }, gap: 3, alignItems: 'stretch' }}>
+                {/* Turbidity levels */}
+                <Paper elevation={0} sx={{ ...paper, display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>🌊 Turbidity Levels</Typography>
+                    {turbidityData.length > 0 ? (
+                        <Box sx={{ flex: 1, width: '100%', minHeight: 180 }}>
+                            <ResponsiveContainer width="100%" height={Math.max(180, turbidityData.length * 36)}>
+                                <BarChart data={turbidityData} layout="vertical" margin={{ top: 0, right: 15, left: 5, bottom: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#E8ECF0" horizontal={false} />
+                                    <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
+                                    <YAxis type="category" dataKey="name" width={90} tick={{ fontSize: 11, fontWeight: 500 }} />
+                                    <Tooltip contentStyle={{ borderRadius: 8, fontSize: 13 }} />
+                                    <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={16} name="Reports">
+                                        {turbidityData.map((e, i) => <Cell key={i} fill={e.fill} />)}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </Box>
+                    ) : <Empty />}
+                </Paper>
+
+                {/* Water appearance */}
+                <Paper elevation={0} sx={{ ...paper, display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>👁️ Water Appearance</Typography>
+                    {appearanceData.length > 0 ? (
+                        <>
+                            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <ResponsiveContainer width="100%" height={180}>
+                                    <PieChart><Pie data={appearanceData} cx="50%" cy="50%" outerRadius={70} paddingAngle={3} dataKey="value">
+                                        {appearanceData.map((e, i) => <Cell key={i} fill={e.color} />)}
+                                    </Pie><Tooltip contentStyle={{ borderRadius: 8, fontSize: 13 }} /></PieChart>
+                                </ResponsiveContainer>
+                            </Box>
+                            <Divider sx={{ my: 1 }} />
+                            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+                                {appearanceData.map(a => (
+                                    <Box key={a.name} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <Box sx={{ width: 9, height: 9, borderRadius: '50%', bgcolor: a.color, flexShrink: 0 }} />
+                                        <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.65rem' }}>{a.name}: {a.value}</Typography>
+                                    </Box>
+                                ))}
+                            </Box>
+                        </>
+                    ) : <Empty />}
+                </Paper>
+
+                {/* Water flow */}
+                <Paper elevation={0} sx={{ ...paper, display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>🌀 Water Flow</Typography>
+                    {flowData.length > 0 ? (
+                        <>
+                            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <ResponsiveContainer width="100%" height={180}>
+                                    <PieChart><Pie data={flowData} cx="50%" cy="50%" innerRadius={40} outerRadius={70} paddingAngle={4} dataKey="value">
+                                        {flowData.map((e, i) => <Cell key={i} fill={e.color} />)}
+                                    </Pie><Tooltip contentStyle={{ borderRadius: 8, fontSize: 13 }} /></PieChart>
+                                </ResponsiveContainer>
+                            </Box>
+                            <Divider sx={{ my: 1 }} />
+                            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+                                {flowData.map(f => (
+                                    <Box key={f.name} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <Box sx={{ width: 9, height: 9, borderRadius: '50%', bgcolor: f.color, flexShrink: 0 }} />
+                                        <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.65rem' }}>{f.name}: {f.value}</Typography>
+                                    </Box>
+                                ))}
+                            </Box>
+                        </>
+                    ) : <Empty />}
+                </Paper>
+            </Box>
+
+            {/* ─── Hourly Pattern + Photo Coverage ────────────── */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '7fr 5fr' }, gap: 3, alignItems: 'stretch' }}>
+                {/* Hourly submission pattern */}
+                <Paper elevation={0} sx={{ ...paper, display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>🕐 Submission Time Pattern</Typography>
+                    <Box sx={{ flex: 1, width: '100%', minHeight: 220 }}>
+                        <ResponsiveContainer width="100%" height={220}>
+                            <BarChart data={hourlyData} margin={{ top: 5, right: 10, left: -15, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#E8ECF0" />
+                                <XAxis dataKey="hour" tick={{ fontSize: 9 }} stroke="#BDBDBD" interval={1} />
+                                <YAxis allowDecimals={false} tick={{ fontSize: 11 }} stroke="#BDBDBD" />
+                                <Tooltip contentStyle={{ borderRadius: 8, fontSize: 13 }} />
+                                <Bar dataKey="count" fill="#0097A7" radius={[3, 3, 0, 0]} barSize={14} name="Submissions" />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </Box>
+                </Paper>
+
+                {/* Photo coverage */}
+                <Paper elevation={0} sx={{ ...paper, display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>📷 Photo Coverage</Typography>
+                    {photoData.length > 0 ? (
+                        <>
+                            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <PieChart><Pie data={photoData} cx="50%" cy="50%" innerRadius={55} outerRadius={78} paddingAngle={4} dataKey="value">
+                                        {photoData.map((e, i) => <Cell key={i} fill={e.color} />)}
+                                    </Pie><Tooltip contentStyle={{ borderRadius: 8, fontSize: 13 }} /></PieChart>
+                                </ResponsiveContainer>
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, mt: 1 }}>
+                                {photoData.map(p => (
+                                    <Box key={p.name} sx={{ textAlign: 'center' }}>
+                                        <Typography variant="h6" sx={{ fontWeight: 800, color: p.color === '#E0E0E0' ? 'text.secondary' : p.color }}>{p.value}</Typography>
+                                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>{p.name}</Typography>
+                                    </Box>
+                                ))}
+                            </Box>
+                        </>
                     ) : <Empty />}
                 </Paper>
             </Box>
