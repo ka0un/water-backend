@@ -616,96 +616,71 @@ export default function ModeratorWaterTests() {
                                     </Paper>
                                 </Section>
 
-                                {/* ═══ IDENTIFIED ISSUES SUMMARY ═══════════════ */}
+                                {/* ═══ WATER SAFETY VERDICT ═══════════════ */}
                                 {(() => {
-                                    // Collect chemical issues
                                     const chemIssues = advTests
                                         .map(([key, val]) => {
                                             const safety = evaluateTestSafety(key, val.value);
                                             if (!safety || safety.severity === 'safe') return null;
-                                            return { key, label: ADV_TEST_LABELS[key] || key, value: val.value, unit: val.unit || safety.threshold?.unit || '', ...safety };
+                                            return { key, label: ADV_TEST_LABELS[key] || key, severity: safety.severity };
                                         })
                                         .filter(Boolean);
 
-                                    // Collect observation issues
-                                    const obsIssues = detectedIssues.map(o => ({
-                                        key: o.label, label: o.label, severity: o.data?.severity === 'severe' ? 'danger' : o.data?.severity === 'moderate' ? 'warning' : 'caution',
-                                        ...ISSUE_SEVERITY[o.data?.severity === 'severe' ? 'danger' : o.data?.severity === 'moderate' ? 'warning' : 'caution'],
-                                        detail: [o.data?.type && `Type: ${capitalize(o.data.type)}`, o.data?.notes && `"${o.data.notes}"`].filter(Boolean).join(' — '),
+                                    const obsIssuesList = detectedIssues.map(o => ({
+                                        key: o.label, label: o.label,
+                                        severity: o.data?.severity === 'severe' ? 'danger' : o.data?.severity === 'moderate' ? 'warning' : 'caution',
                                     }));
 
-                                    // Visual issues (appearance, turbidity)
-                                    const visualIssues = [];
-                                    if (r.appearance?.value && !['clear', 'colorless'].includes(r.appearance.value)) {
-                                        visualIssues.push({ key: 'appearance', label: 'Abnormal Appearance', severity: 'caution', ...ISSUE_SEVERITY.caution, detail: `Water appears ${capitalize(r.appearance.value)}${r.appearance.notes ? ` — ${r.appearance.notes}` : ''}` });
-                                    }
-                                    if (r.turbidity?.value && !['clear'].includes(r.turbidity.value)) {
-                                        const turbSev = ['very_cloudy', 'opaque'].includes(r.turbidity.value) ? 'danger' : r.turbidity.value === 'cloudy' ? 'warning' : 'caution';
-                                        visualIssues.push({ key: 'turbidity', label: 'Turbidity Issue', severity: turbSev, ...ISSUE_SEVERITY[turbSev], detail: `Water is ${capitalize(r.turbidity.value)}` });
-                                    }
+                                    const visualIssuesList = [];
+                                    if (r.appearance?.value && !['clear', 'colorless'].includes(r.appearance.value))
+                                        visualIssuesList.push({ key: 'appearance', label: 'Abnormal Appearance', severity: 'caution' });
+                                    if (r.turbidity?.value && !['clear'].includes(r.turbidity.value))
+                                        visualIssuesList.push({ key: 'turbidity', label: 'Turbidity', severity: ['very_cloudy', 'opaque'].includes(r.turbidity.value) ? 'danger' : 'caution' });
 
-                                    const allIssues = [...chemIssues, ...obsIssues, ...visualIssues]
-                                        .sort((a, b) => { const order = { danger: 0, warning: 1, caution: 2 }; return (order[a.severity] ?? 3) - (order[b.severity] ?? 3); });
-
-                                    if (allIssues.length === 0) return (
-                                        <Paper elevation={0} sx={{ p: 2, mb: 2, borderRadius: 2, bgcolor: '#E8F5E9', border: '1px solid #C8E6C9' }}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                <ApproveIcon sx={{ color: '#2E7D32', fontSize: 22 }} />
-                                                <Box>
-                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#2E7D32' }}>No Issues Identified</Typography>
-                                                    <Typography variant="caption" sx={{ color: '#558B2F' }}>All parameters are within safe drinking water limits.</Typography>
-                                                </Box>
-                                            </Box>
-                                        </Paper>
-                                    );
-
+                                    const allIssues = [...chemIssues, ...obsIssuesList, ...visualIssuesList];
                                     const dangerCount = allIssues.filter(i => i.severity === 'danger').length;
                                     const warningCount = allIssues.filter(i => i.severity === 'warning').length;
                                     const cautionCount = allIssues.filter(i => i.severity === 'caution').length;
-                                    const headerColor = dangerCount > 0 ? '#C62828' : warningCount > 0 ? '#E65100' : '#ED6C02';
-                                    const headerBg = dangerCount > 0 ? '#FFEBEE' : warningCount > 0 ? '#FFF3E0' : '#FFFDE7';
+                                    const isSafe = allIssues.length === 0;
+                                    const isUnsafe = dangerCount > 0 || warningCount > 0;
+
+                                    // Top concern names (max 3)
+                                    const topConcerns = allIssues
+                                        .sort((a, b) => ({ danger: 0, warning: 1, caution: 2 }[a.severity] ?? 3) - ({ danger: 0, warning: 1, caution: 2 }[b.severity] ?? 3))
+                                        .slice(0, 3)
+                                        .map(i => i.label);
 
                                     return (
-                                        <Paper elevation={0} sx={{ p: 2, mb: 2, borderRadius: 2.5, bgcolor: headerBg, border: '2px solid', borderColor: headerColor + '44' }}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                                                <WarningIcon sx={{ color: headerColor, fontSize: 22 }} />
+                                        <Paper elevation={0} sx={{
+                                            p: 2.5, mb: 2, borderRadius: 3,
+                                            bgcolor: isSafe ? '#E8F5E9' : isUnsafe ? '#FFEBEE' : '#FFF8E1',
+                                            border: '2px solid',
+                                            borderColor: isSafe ? '#66BB6A' : isUnsafe ? '#EF5350' : '#FFB300',
+                                        }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                {isSafe ? (
+                                                    <ApproveIcon sx={{ fontSize: 36, color: '#2E7D32' }} />
+                                                ) : (
+                                                    <WarningIcon sx={{ fontSize: 36, color: isUnsafe ? '#C62828' : '#F57F17' }} />
+                                                )}
                                                 <Box sx={{ flex: 1 }}>
-                                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: headerColor }}>
-                                                        {allIssues.length} Issue{allIssues.length !== 1 ? 's' : ''} Identified
+                                                    <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.1rem', color: isSafe ? '#1B5E20' : isUnsafe ? '#B71C1C' : '#E65100', lineHeight: 1.3 }}>
+                                                        {isSafe ? '✓ Safe for Consumption' : isUnsafe ? '✕ NOT Safe for Consumption' : '⚠ Use with Caution'}
                                                     </Typography>
-                                                    <Stack direction="row" spacing={1} sx={{ mt: 0.3 }}>
-                                                        {dangerCount > 0 && <Chip label={`${dangerCount} Danger`} size="small" sx={{ height: 20, fontSize: '0.63rem', fontWeight: 700, bgcolor: '#C62828', color: '#fff' }} />}
-                                                        {warningCount > 0 && <Chip label={`${warningCount} Warning`} size="small" sx={{ height: 20, fontSize: '0.63rem', fontWeight: 700, bgcolor: '#E65100', color: '#fff' }} />}
-                                                        {cautionCount > 0 && <Chip label={`${cautionCount} Caution`} size="small" sx={{ height: 20, fontSize: '0.63rem', fontWeight: 700, bgcolor: '#F9A825', color: '#333' }} />}
-                                                    </Stack>
+                                                    <Typography variant="body2" sx={{ color: isSafe ? '#388E3C' : 'text.secondary', mt: 0.3, fontSize: '0.8rem' }}>
+                                                        {isSafe
+                                                            ? 'All tested parameters are within WHO safe drinking water limits.'
+                                                            : `${allIssues.length} issue${allIssues.length !== 1 ? 's' : ''} found${topConcerns.length > 0 ? `: ${topConcerns.join(', ')}` : ''}`
+                                                        }
+                                                    </Typography>
+                                                    {!isSafe && (
+                                                        <Stack direction="row" spacing={0.5} sx={{ mt: 0.8 }}>
+                                                            {dangerCount > 0 && <Chip label={`${dangerCount} Danger`} size="small" sx={{ height: 20, fontSize: '0.63rem', fontWeight: 700, bgcolor: '#C62828', color: '#fff' }} />}
+                                                            {warningCount > 0 && <Chip label={`${warningCount} Warning`} size="small" sx={{ height: 20, fontSize: '0.63rem', fontWeight: 700, bgcolor: '#E65100', color: '#fff' }} />}
+                                                            {cautionCount > 0 && <Chip label={`${cautionCount} Caution`} size="small" sx={{ height: 20, fontSize: '0.63rem', fontWeight: 700, bgcolor: '#F9A825', color: '#333' }} />}
+                                                        </Stack>
+                                                    )}
                                                 </Box>
-                                            </Box>
-                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                                {allIssues.map(issue => (
-                                                    <Paper key={issue.key} variant="outlined" sx={{ p: 1.5, borderRadius: 2, borderColor: issue.color + '55', bgcolor: issue.bg }}>
-                                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                                                            <Typography sx={{ fontSize: 14, lineHeight: 1 }}>{issue.icon}</Typography>
-                                                            <Box sx={{ flex: 1, minWidth: 0 }}>
-                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.3 }}>
-                                                                    <Typography variant="caption" sx={{ fontWeight: 800, color: issue.color, fontSize: '0.78rem' }}>{issue.label}</Typography>
-                                                                    <Chip label={issue.label === issue.severity ? issue.severity : capitalize(issue.severity)} size="small"
-                                                                        sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700, bgcolor: issue.color, color: '#fff', ml: 'auto' }} />
-                                                                </Box>
-                                                                {issue.value != null && (
-                                                                    <Typography variant="caption" sx={{ display: 'block', fontWeight: 600, color: issue.color }}>
-                                                                        Measured: {issue.value} {issue.unit} — Safe range: {issue.threshold?.safe[0]}–{issue.threshold?.safe[1]} {issue.threshold?.unit}
-                                                                    </Typography>
-                                                                )}
-                                                                {issue.threshold?.desc && (
-                                                                    <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', fontStyle: 'italic', fontSize: '0.65rem' }}>{issue.threshold.desc}</Typography>
-                                                                )}
-                                                                {issue.detail && (
-                                                                    <Typography variant="caption" sx={{ display: 'block', color: '#5D4037', mt: 0.2 }}>{issue.detail}</Typography>
-                                                                )}
-                                                            </Box>
-                                                        </Box>
-                                                    </Paper>
-                                                ))}
                                             </Box>
                                         </Paper>
                                     );
