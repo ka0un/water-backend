@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import {
     Box, Paper, Typography, Chip, Button, IconButton, TextField,
@@ -20,9 +20,56 @@ const STATUS_COLORS = { pending: '#ED6C02', approved: '#2E7D32', rejected: '#D32
 const STATUS_BG = { pending: '#FFF3E0', approved: '#E8F5E9', rejected: '#FFEBEE' };
 const SEVERITY_BG = { severe: '#FFCDD2', moderate: '#FFE0B2', mild: '#E8F5E9', slight: '#E3F2FD' };
 
+const ADV_TEST_LABELS = {
+    ph: 'pH', hardness: 'Hardness', chlorine: 'Chlorine', tds: 'TDS (Total Dissolved Solids)',
+    cyanuricAcid: 'Cyanuric Acid', bromine: 'Bromine', nitrate: 'Nitrate', nitrite: 'Nitrite',
+    iron: 'Iron (Fe)', chromium: 'Chromium (Cr)', lead: 'Lead (Pb)', copper: 'Copper (Cu)',
+    mercury: 'Mercury (Hg)', fluoride: 'Fluoride (F)', carbonate: 'Carbonate',
+    totalAlkalinity: 'Total Alkalinity',
+};
+const HEAVY_METALS = ['iron', 'chromium', 'lead', 'copper', 'mercury'];
+
 const capitalize = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, ' ') : '—';
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
 const fmtDateTime = (d) => d ? new Date(d).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+
+/* ── Authenticated image component ───────────────────────────── */
+const AuthImage = ({ src, alt, sx, api }) => {
+    const [blobUrl, setBlobUrl] = useState(null);
+    const [imgError, setImgError] = useState(false);
+    const urlRef = useRef(null);
+
+    useEffect(() => {
+        let cancelled = false;
+        setBlobUrl(null);
+        setImgError(false);
+        if (!src || !api) return;
+
+        api.get(src, { responseType: 'blob' })
+            .then(res => {
+                if (cancelled) return;
+                const url = URL.createObjectURL(res.data);
+                urlRef.current = url;
+                setBlobUrl(url);
+            })
+            .catch(() => { if (!cancelled) setImgError(true); });
+
+        return () => {
+            cancelled = true;
+            if (urlRef.current) URL.revokeObjectURL(urlRef.current);
+        };
+    }, [src, api]);
+
+    if (imgError) return (
+        <Box sx={{ ...sx, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#F5F5F5', color: '#BDBDBD' }}>
+            <CameraAlt sx={{ fontSize: 40, opacity: 0.4 }} />
+        </Box>
+    );
+    if (!blobUrl) return (
+        <Skeleton variant="rectangular" sx={{ ...sx, minHeight: 200 }} />
+    );
+    return <Box component="img" src={blobUrl} alt={alt} sx={sx} />;
+};
 
 /* ── Observation detail card (expanded when detected) ────────── */
 const ObsCard = ({ label, data }) => {
@@ -194,7 +241,7 @@ export default function ModeratorWaterTests() {
     };
 
     /* ── Helpers ─────────────────────────────────────────────── */
-    const imgUrl = (reportId, imageId) => `/api/v1/public-reports-admin/${reportId}/images/${imageId}`;
+    const imgPath = (reportId, imageId) => `/public-reports-admin/${reportId}/images/${imageId}`;
     const { page, pages, total } = pagination;
 
     const r = selectedReport;
@@ -478,7 +525,7 @@ export default function ModeratorWaterTests() {
                                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                         {r.images.map(img => (
                                             <Box key={img._id} sx={{ borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider', bgcolor: '#fff' }}>
-                                                <Box component="img" src={imgUrl(r._id, img._id)} alt={img.imageType}
+                                                <AuthImage api={api} src={imgPath(r._id, img._id)} alt={img.imageType}
                                                     sx={{ width: '100%', display: 'block', maxHeight: 340, objectFit: 'contain', bgcolor: '#EEEEEE' }} />
                                                 <Box sx={{ p: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                     <Chip label={capitalize(img.imageType)} size="small" variant="outlined"
@@ -509,6 +556,7 @@ export default function ModeratorWaterTests() {
                                 <Section title="Water Source & Location" icon={<WaterDrop sx={{ fontSize: 18, color: '#1565C0' }} />}>
                                     <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden' }}>
                                         <DataRow label="Water Source" value={capitalize(r.waterSource)} color="#1565C0" />
+                                        {r.waterSourceOther && <><Divider /><DataRow label="Other Source Detail" value={r.waterSourceOther} /></>}
                                         <Divider />
                                         <DataRow label="District" value={r.location?.district || '—'} />
                                         <Divider />
@@ -558,23 +606,43 @@ export default function ModeratorWaterTests() {
                                     </Section>
                                 )}
 
-                                {/* Advanced tests */}
-                                {advTests.length > 0 && (
-                                    <Section title="Advanced Test Results" icon={<Science sx={{ fontSize: 18, color: '#7B1FA2' }} />}>
-                                        <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden' }}>
-                                            {advTests.map(([key, val], i) => (
-                                                <Box key={key}>
-                                                    {i > 0 && <Divider />}
-                                                    <DataRow
-                                                        label={key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase())}
-                                                        value={`${val.value}${val.unit ? ` ${val.unit}` : ''}`}
-                                                        color="#7B1FA2"
-                                                    />
-                                                </Box>
-                                            ))}
-                                        </Paper>
-                                    </Section>
-                                )}
+                                {/* Advanced tests — grouped */}
+                                {advTests.length > 0 && (() => {
+                                    const basicTests = advTests.filter(([k]) => !HEAVY_METALS.includes(k));
+                                    const metalTests = advTests.filter(([k]) => HEAVY_METALS.includes(k));
+                                    return (
+                                        <Section title="Advanced Test Results" icon={<Science sx={{ fontSize: 18, color: '#7B1FA2' }} />}>
+                                            {/* Basic water quality */}
+                                            {basicTests.length > 0 && (
+                                                <>
+                                                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', mb: 0.5, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.65rem' }}>Water Quality Parameters</Typography>
+                                                    <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden', mb: 1.5 }}>
+                                                        {basicTests.map(([key, val], i) => (
+                                                            <Box key={key}>
+                                                                {i > 0 && <Divider />}
+                                                                <DataRow label={ADV_TEST_LABELS[key] || key} value={`${val.value}${val.unit ? ` ${val.unit}` : ''}`} color="#7B1FA2" />
+                                                            </Box>
+                                                        ))}
+                                                    </Paper>
+                                                </>
+                                            )}
+                                            {/* Heavy metals */}
+                                            {metalTests.length > 0 && (
+                                                <>
+                                                    <Typography variant="caption" sx={{ fontWeight: 700, color: '#D32F2F', mb: 0.5, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.65rem' }}>⚠ Heavy Metals & Contaminants</Typography>
+                                                    <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden', borderColor: '#FFCDD2' }}>
+                                                        {metalTests.map(([key, val], i) => (
+                                                            <Box key={key}>
+                                                                {i > 0 && <Divider />}
+                                                                <DataRow label={ADV_TEST_LABELS[key] || key} value={`${val.value}${val.unit ? ` ${val.unit}` : ''}`} color="#D32F2F" />
+                                                            </Box>
+                                                        ))}
+                                                    </Paper>
+                                                </>
+                                            )}
+                                        </Section>
+                                    );
+                                })()}
 
                                 {/* Contact */}
                                 {(r.email || r.phone) && (
