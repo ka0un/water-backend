@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, CircularProgress, Alert, Container } from '@mui/material';
 import { AnimatePresence } from 'framer-motion';
@@ -30,33 +30,7 @@ import ImageUploadStep from '../components/steps/ImageUploadStep';
 import ContactStep from '../components/steps/ContactStep';
 import ReviewStep from '../components/steps/ReviewStep';
 
-/**
- * Step order (reordered):
- * 0:  Welcome / NIC
- * 1:  Water Source
- * 2:  Location
- * 3:  Testing Method  ← moved earlier
- * 4:  Advanced Tests   (skipped if observation-only)
- * 5:  Appearance
- * 6:  Smell
- * 7:  Taste
- * 8:  Turbidity
- * 9:  Sediment
- * 10: Oil/Grease
- * 11: Foam
- * 12: Algae
- * 13: Trash
- * 14: Mud
- * 15: Insects
- * 16: Plants
- * 17: Wildlife
- * 18: Pipes
- * 19: Water Flow
- * 20: Temperature
- * 21: Image Upload     ← new
- * 22: Contact Info     ← new
- * 23: Review & Submit
- */
+// ─── Step definitions ────────────────────────────────────────────
 const STEPS = [
     { key: 'welcome', Component: WelcomeStep },
     { key: 'source', Component: WaterSourceStep },
@@ -84,44 +58,78 @@ const STEPS = [
     { key: 'review', Component: ReviewStep },
 ];
 
-const TOTAL_STEPS = STEPS.length - 1; // exclude welcome
+// ─── Source-based skip rules ─────────────────────────────────────
+// Steps listed here will be SKIPPED for the given water source.
+const SOURCE_SKIP = {
+    tap: ['algae', 'trash', 'wildlife', 'plants', 'mud'],
+    well: ['pipes', 'trash', 'wildlife', 'foam'],
+    borehole: ['pipes', 'algae', 'trash', 'wildlife', 'plants', 'mud', 'foam'],
+    river: ['pipes'],
+    lake: ['pipes'],
+    canal: ['pipes'],
+    spring: ['pipes', 'foam'],
+    tank: ['algae', 'trash', 'wildlife', 'plants', 'mud', 'oil', 'foam'],
+    rainwater: ['algae', 'trash', 'wildlife', 'plants', 'mud', 'oil', 'foam', 'pipes'],
+    other: [],
+};
 
+// ─── Determine if a step should be skipped ───────────────────────
+function shouldSkip(stepKey, reportData) {
+    // Advanced tests gate — skip if observation-only
+    if (stepKey === 'advanced') {
+        return reportData.testingMethod === 'observation';
+    }
+
+    // Source-based observation skipping
+    const source = reportData.waterSource;
+    if (source && SOURCE_SKIP[source]) {
+        return SOURCE_SKIP[source].includes(stepKey);
+    }
+
+    return false;
+}
+
+// ─── Wizard orchestrator ─────────────────────────────────────────
 function WizardContent() {
     const navigate = useNavigate();
     const { currentStep, reportData, submitReport, loading, error } = useWizard();
     const [stepIndex, setStepIndex] = useState(currentStep || 0);
 
+    // Compute active (non-skipped) step count for progress bar
+    const activeStepCount = useMemo(() => {
+        return STEPS.filter((s) => s.key !== 'welcome' && !shouldSkip(s.key, reportData)).length;
+    }, [reportData.waterSource, reportData.testingMethod]);
+
+    // Compute current progress position (which active step number we're on)
+    const activeStepNumber = useMemo(() => {
+        let count = 0;
+        for (let i = 1; i <= stepIndex; i++) {
+            if (!shouldSkip(STEPS[i]?.key, reportData)) count++;
+        }
+        return count;
+    }, [stepIndex, reportData.waterSource, reportData.testingMethod]);
+
     const goNext = useCallback(() => {
         setStepIndex((prev) => {
             let next = prev + 1;
-
-            // Gate: skip advanced tests if observation-only
-            if (STEPS[next]?.key === 'advanced') {
-                const method = reportData.testingMethod;
-                if (method === 'observation') {
-                    next++;
-                }
+            // Skip any steps that should be skipped
+            while (next < STEPS.length && shouldSkip(STEPS[next]?.key, reportData)) {
+                next++;
             }
-
             return Math.min(next, STEPS.length - 1);
         });
-    }, [reportData.testingMethod]);
+    }, [reportData]);
 
     const goBack = useCallback(() => {
         setStepIndex((prev) => {
             let back = prev - 1;
-
-            // Gate: skip advanced tests going backward if observation-only
-            if (STEPS[back]?.key === 'advanced') {
-                const method = reportData.testingMethod;
-                if (method === 'observation') {
-                    back--;
-                }
+            // Skip any steps that should be skipped going backward
+            while (back > 0 && shouldSkip(STEPS[back]?.key, reportData)) {
+                back--;
             }
-
             return Math.max(back, 0);
         });
-    }, [reportData.testingMethod]);
+    }, [reportData]);
 
     const handleSubmit = async () => {
         try {
@@ -148,8 +156,8 @@ function WizardContent() {
     const stepProps = {
         onNext: goNext,
         onBack: goBack,
-        stepNumber: stepIndex,
-        totalSteps: TOTAL_STEPS,
+        stepNumber: activeStepNumber,
+        totalSteps: activeStepCount,
     };
 
     return (

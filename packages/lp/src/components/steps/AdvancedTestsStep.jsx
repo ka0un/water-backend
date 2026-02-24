@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Box, TextField, Button, Typography, Card, InputAdornment } from '@mui/material';
 import { motion } from 'framer-motion';
 import StepLayout from '../shared/StepLayout';
 import { useWizard } from '../../context/WizardContext';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
-const PARAMETERS = [
+const ALL_PARAMETERS = [
     { key: 'ph', label: 'pH Level', unit: 'pH', icon: '⚗️', min: 0, max: 14, desc: 'Acidity / alkalinity (0-14)' },
     { key: 'hardness', label: 'Water Hardness', unit: 'ppm', icon: '💎', desc: 'Calcium carbonate level' },
     { key: 'chlorine', label: 'Free Chlorine', unit: 'ppm', icon: '🧴', desc: 'Disinfectant level' },
@@ -24,21 +24,35 @@ const PARAMETERS = [
     { key: 'carbonate', label: 'Carbonate', unit: 'ppm', icon: '🪨', desc: 'Mineral content' },
 ];
 
-export default function AdvancedTestsStep({ onNext, onBack, stepNumber }) {
+// Test strips can only measure these basic params
+const TEST_STRIP_KEYS = ['ph', 'chlorine', 'hardness', 'nitrate', 'nitrite'];
+
+// Lab kits and professional labs can measure everything
+
+export default function AdvancedTestsStep({ onNext, onBack, stepNumber, totalSteps }) {
     const { reportData, saveStepData } = useWizard();
     const [values, setValues] = useState({});
+
+    // Filter parameters based on testing method
+    const visibleParams = useMemo(() => {
+        if (reportData.testingMethod === 'test_strips') {
+            return ALL_PARAMETERS.filter(p => TEST_STRIP_KEYS.includes(p.key));
+        }
+        // lab_kit and professional_lab get all parameters
+        return ALL_PARAMETERS;
+    }, [reportData.testingMethod]);
 
     useEffect(() => {
         if (reportData.advancedTests) {
             const initial = {};
-            for (const param of PARAMETERS) {
+            for (const param of visibleParams) {
                 if (reportData.advancedTests[param.key]?.value != null) {
                     initial[param.key] = String(reportData.advancedTests[param.key].value);
                 }
             }
             setValues(initial);
         }
-    }, [reportData.advancedTests]);
+    }, [reportData.advancedTests, visibleParams]);
 
     const handleChange = (key) => (e) => {
         setValues((prev) => ({ ...prev, [key]: e.target.value }));
@@ -46,7 +60,7 @@ export default function AdvancedTestsStep({ onNext, onBack, stepNumber }) {
 
     const handleNext = async () => {
         const advancedTests = {};
-        for (const param of PARAMETERS) {
+        for (const param of visibleParams) {
             if (values[param.key] && values[param.key].trim() !== '') {
                 advancedTests[param.key] = {
                     value: parseFloat(values[param.key]),
@@ -60,21 +74,28 @@ export default function AdvancedTestsStep({ onNext, onBack, stepNumber }) {
 
     const filledCount = Object.values(values).filter((v) => v && v.trim() !== '').length;
 
+    const methodLabel = {
+        test_strips: 'Test Strips',
+        lab_kit: 'Home Lab Kit',
+        professional_lab: 'Professional Lab',
+    }[reportData.testingMethod] || 'Test';
+
     return (
         <StepLayout
             title="Enter Your Test Results"
-            subtitle="Fill in any values you have — leave blank any you didn't test."
+            subtitle={`Fill in any values from your ${methodLabel} — leave blank any you didn't test.`}
             stepNumber={stepNumber}
+            totalSteps={totalSteps}
             onBack={onBack}
         >
             <Box sx={{ mb: 2 }}>
                 <Typography variant="body2" sx={{ color: 'primary.main', fontWeight: 500 }}>
-                    📋 {filledCount} of {PARAMETERS.length} parameters filled
+                    📋 {filledCount} of {visibleParams.length} parameters filled
                 </Typography>
             </Box>
 
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-                {PARAMETERS.map((param, index) => (
+                {visibleParams.map((param, index) => (
                     <motion.div
                         key={param.key}
                         initial={{ opacity: 0, y: 4 }}
