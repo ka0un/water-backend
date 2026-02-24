@@ -29,20 +29,22 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// Rate limiting
-const limiter = rateLimit({
-    windowMs: config.rateLimit.windowMs,
-    max: config.rateLimit.max,
-    message: {
-        success: false,
-        statusCode: 429,
-        message: 'Too many requests, please try again later.',
-        timestamp: new Date().toISOString(),
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
-app.use('/api', limiter);
+// Rate limiting (skip in test environment)
+if (config.env !== 'test') {
+    const limiter = rateLimit({
+        windowMs: config.rateLimit.windowMs,
+        max: config.rateLimit.max,
+        message: {
+            success: false,
+            statusCode: 429,
+            message: 'Too many requests, please try again later.',
+            timestamp: new Date().toISOString(),
+        },
+        standardHeaders: true,
+        legacyHeaders: false,
+    });
+    app.use('/api', limiter);
+}
 
 // Body parsing
 app.use(express.json({ limit: '15mb' }));
