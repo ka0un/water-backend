@@ -8,6 +8,8 @@ const authRoutes = require('./auth.routes');
 const userRoutes = require('./user.routes');
 const adminRoutes = require('./admin.routes');
 const moderationRoutes = require('./moderation.routes');
+const publicReportRoutes = require('./publicReport.routes');
+const publicReportAdminRoutes = require('./publicReportAdmin.routes');
 
 const router = express.Router();
 
@@ -54,6 +56,8 @@ router.get('/', (req, res) => {
             users: '/api/v1/users',
             admin: '/api/v1/admin',
             moderation: '/api/v1/moderation',
+            publicReports: '/api/v1/public-reports',
+            publicReportsAdmin: '/api/v1/public-reports-admin',
             health: '/api/v1/health',
         },
     }, 'Welcome to Water Quality Report API');
@@ -64,5 +68,7 @@ router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/admin', adminRoutes);
 router.use('/moderation', moderationRoutes);
+router.use('/public-reports', publicReportRoutes);
+router.use('/public-reports-admin', publicReportAdminRoutes);
 
 module.exports = router;

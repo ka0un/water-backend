@@ -7,6 +7,7 @@
     "scripts": {
         "dev:backend": "npm run dev --workspace=@water-backend/backend",
         "dev:frontend": "npm run dev --workspace=@water-backend/frontend",
+        "dev:lp": "npm run dev --workspace=@water-backend/lp",
         "start:backend": "npm run start --workspace=@water-backend/backend"
     }
 }
