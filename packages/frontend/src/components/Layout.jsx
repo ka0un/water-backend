@@ -35,12 +35,25 @@ const Layout = () => {
         navigate('/login', { replace: true });
     };
 
-    const menuItems = [
-        { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
-        { text: 'Moderator', icon: <GavelIcon />, path: '/moderator/water-tests' },
-        { text: 'Moderation Logs', icon: <ListAltIcon />, path: '/moderation/logs' },
-        { text: 'Laboratory Management', icon: <ScienceIcon />, path: '/laboratory' },
-    ];
+    // Role-based menu items
+    const getMenuItems = () => {
+        if (user?.role === 'LAB_STAFF') {
+            // Lab staff only sees lab-related items
+            return [
+                { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
+            ];
+        }
+        
+        // Admin and Moderator see all items
+        return [
+            { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
+            { text: 'Moderator', icon: <GavelIcon />, path: '/moderator/water-tests' },
+            { text: 'Moderation Logs', icon: <ListAltIcon />, path: '/moderation/logs' },
+            { text: 'Laboratory Management', icon: <ScienceIcon />, path: '/laboratory' },
+        ];
+    };
+
+    const menuItems = getMenuItems();
 
     const drawer = (
         <div>
