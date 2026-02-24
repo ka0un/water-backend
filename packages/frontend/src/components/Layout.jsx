@@ -14,6 +14,7 @@ import {
     ExitToApp as LogoutIcon,
     Science as ScienceIcon,
     Person as PersonIcon,
+    BiotechOutlined as BiotechIcon,
 } from '@mui/icons-material';
 
 const drawerWidth = 240;
@@ -38,9 +39,10 @@ const Layout = () => {
     // Role-based menu items
     const getMenuItems = () => {
         if (user?.role === 'LAB_STAFF') {
-            // Lab staff only sees lab-related items
+            // Lab staff sees dashboard and lab test management
             return [
                 { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
+                { text: 'Lab Tests', icon: <BiotechIcon />, path: '/lab-tests' },
             ];
         }
         
@@ -50,6 +52,7 @@ const Layout = () => {
             { text: 'Moderator', icon: <GavelIcon />, path: '/moderator/water-tests' },
             { text: 'Moderation Logs', icon: <ListAltIcon />, path: '/moderation/logs' },
             { text: 'Laboratory Management', icon: <ScienceIcon />, path: '/laboratory' },
+            { text: 'Lab Tests', icon: <BiotechIcon />, path: '/lab-tests' },
         ];
     };
 

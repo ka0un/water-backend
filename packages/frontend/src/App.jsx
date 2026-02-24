@@ -7,6 +7,7 @@ import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import LabStaffDashboard from './pages/LabStaffDashboard';
+import LabTestManagement from './pages/LabTestManagement';
 import ModeratorWaterTests from './pages/ModeratorWaterTests';
 import ModerationLogs from './pages/ModerationLogs';
 import LaboratoryManagement from './pages/LaboratoryManagement';
@@ -45,6 +46,7 @@ function App() {
               <Route path="moderator/water-tests" element={<ModeratorWaterTests />} />
               <Route path="moderation/logs" element={<ModerationLogs />} />
               <Route path="laboratory" element={<LaboratoryManagement />} />
+              <Route path="lab-tests" element={<LabTestManagement />} />
             </Route>
           </Routes>
         </BrowserRouter>
