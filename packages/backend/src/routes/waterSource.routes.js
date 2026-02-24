@@ -122,6 +122,22 @@ router.patch(
 );
 
 /**
+ * @route   PATCH /api/v1/water-sources/:id/contamination
+ * @desc    Update contamination status of a water source
+ * @access  Private (authenticated users)
+ * 
+ * Body:
+ * - contamination_status (required): 'Clean', 'Contaminated', or 'Unknown'
+ * - notes (optional)
+ */
+router.patch(
+    '/:id/contamination',
+    auth,
+    validate(waterSourceValidation.updateContaminationStatus),
+    waterSourceController.updateContaminationStatus
+);
+
+/**
  * @route   PATCH /api/v1/water-sources/:id/verify
  * @desc    Verify a water source
  * @access  Private (Moderator or Admin only)

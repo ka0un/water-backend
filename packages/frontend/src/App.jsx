@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import ModeratorWaterTests from './pages/ModeratorWaterTests';
 import ModerationLogs from './pages/ModerationLogs';
 import LaboratoryManagement from './pages/LaboratoryManagement';
+import WaterInventory from './pages/WaterInventory';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
               <Route path="moderator/water-tests" element={<ModeratorWaterTests />} />
               <Route path="moderation/logs" element={<ModerationLogs />} />
               <Route path="laboratory" element={<LaboratoryManagement />} />
+              <Route path="water-inventory" element={<WaterInventory />} />
             </Route>
           </Routes>
         </BrowserRouter>

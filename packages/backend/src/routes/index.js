@@ -11,6 +11,7 @@ const moderationRoutes = require('./moderation.routes');
 const waterSourceRoutes = require('./waterSource.routes');
 const publicReportRoutes = require('./publicReport.routes');
 const publicReportAdminRoutes = require('./publicReportAdmin.routes');
+const mapConfigRoutes = require('./mapConfig.routes');
 
 
 const router = express.Router();
@@ -74,5 +75,6 @@ router.use('/moderation', moderationRoutes);
 router.use('/water-sources', waterSourceRoutes);
 router.use('/public-reports', publicReportRoutes);
 router.use('/public-reports-admin', publicReportAdminRoutes);
+router.use('/config', mapConfigRoutes);
 
 module.exports = router;

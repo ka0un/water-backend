@@ -14,6 +14,7 @@ import {
     ExitToApp as LogoutIcon,
     Science as ScienceIcon,
     Person as PersonIcon,
+    WaterDrop as WaterDropIcon,
 } from '@mui/icons-material';
 
 const drawerWidth = 240;
@@ -40,6 +41,7 @@ const Layout = () => {
         { text: 'Moderator', icon: <GavelIcon />, path: '/moderator/water-tests' },
         { text: 'Moderation Logs', icon: <ListAltIcon />, path: '/moderation/logs' },
         { text: 'Laboratory Management', icon: <ScienceIcon />, path: '/laboratory' },
+        { text: 'Water Inventory', icon: <WaterDropIcon />, path: '/water-inventory' },
     ];
 
     const drawer = (

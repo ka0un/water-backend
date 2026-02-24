@@ -30,6 +30,15 @@ const AccessType = {
     RESTRICTED: 'Restricted',
 };
 
+/**
+ * Contamination status enum
+ */
+const ContaminationStatus = {
+    CLEAN: 'Clean',
+    CONTAMINATED: 'Contaminated',
+    UNKNOWN: 'Unknown',
+};
+
 const waterSourceSchema = new mongoose.Schema(
     {
         /**
@@ -103,6 +112,16 @@ const waterSourceSchema = new mongoose.Schema(
             type: String,
             enum: Object.values(AccessType),
             default: AccessType.PUBLIC,
+            index: true,
+        },
+
+        /**
+         * Contamination status of the water source
+         */
+        contamination_status: {
+            type: String,
+            enum: Object.values(ContaminationStatus),
+            default: ContaminationStatus.UNKNOWN,
             index: true,
         },
 
@@ -299,3 +318,4 @@ module.exports = WaterSource;
 module.exports.WaterSourceType = WaterSourceType;
 module.exports.OperationalStatus = OperationalStatus;
 module.exports.AccessType = AccessType;
+module.exports.ContaminationStatus = ContaminationStatus;
