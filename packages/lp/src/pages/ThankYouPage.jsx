@@ -14,16 +14,16 @@ export default function ThankYouPage() {
         <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', bgcolor: '#F5F7FA' }}>
             <Container maxWidth="sm">
                 <motion.div
-                    initial={{ scale: 0.95, opacity: 0 }}
+                    initial={{ scale: 0.97, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.5, ease: 'easeOut' }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
                 >
                     <Card sx={{ p: 5, textAlign: 'center' }}>
                         {/* Success checkmark */}
                         <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                            transition={{ delay: 0.1, type: 'spring', stiffness: 300 }}
                         >
                             <CheckCircleIcon sx={{ fontSize: 72, color: 'success.main', mb: 2 }} />
                         </motion.div>

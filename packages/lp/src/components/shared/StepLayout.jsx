@@ -23,10 +23,10 @@ export default function StepLayout({
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.35, ease: 'easeOut' }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
         >
             <Box sx={{ maxWidth: 640, mx: 'auto', px: 2, py: 3 }}>
                 {/* Progress Bar */}

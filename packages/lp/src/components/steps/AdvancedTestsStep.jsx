@@ -77,9 +77,9 @@ export default function AdvancedTestsStep({ onNext, onBack, stepNumber }) {
                 {PARAMETERS.map((param, index) => (
                     <motion.div
                         key={param.key}
-                        initial={{ opacity: 0, y: 8 }}
+                        initial={{ opacity: 0, y: 4 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.03 }}
+                        transition={{ delay: index * 0.015 }}
                     >
                         <Card sx={{ p: 2 }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>

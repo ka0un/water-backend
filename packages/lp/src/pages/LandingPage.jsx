@@ -51,9 +51,9 @@ export default function LandingPage() {
             <Container maxWidth="md">
                 <Box sx={{ py: { xs: 8, md: 12 }, textAlign: 'center' }}>
                     <motion.div
-                        initial={{ y: 20, opacity: 0 }}
+                        initial={{ y: 10, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
-                        transition={{ duration: 0.6 }}
+                        transition={{ duration: 0.2 }}
                     >
                         <Box
                             sx={{
@@ -73,9 +73,9 @@ export default function LandingPage() {
                     </motion.div>
 
                     <motion.div
-                        initial={{ y: 20, opacity: 0 }}
+                        initial={{ y: 10, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.15, duration: 0.6 }}
+                        transition={{ delay: 0.05, duration: 0.2 }}
                     >
                         <Typography
                             variant="h1"
@@ -90,9 +90,9 @@ export default function LandingPage() {
                     </motion.div>
 
                     <motion.div
-                        initial={{ y: 20, opacity: 0 }}
+                        initial={{ y: 10, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.3, duration: 0.6 }}
+                        transition={{ delay: 0.1, duration: 0.2 }}
                     >
                         <Typography
                             variant="h6"
@@ -111,9 +111,9 @@ export default function LandingPage() {
                     </motion.div>
 
                     <motion.div
-                        initial={{ y: 20, opacity: 0 }}
+                        initial={{ y: 10, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.45, duration: 0.6 }}
+                        transition={{ delay: 0.15, duration: 0.2 }}
                     >
                         <Button
                             variant="contained"
@@ -134,7 +134,7 @@ export default function LandingPage() {
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ delay: 0.6, duration: 0.6 }}
+                        transition={{ delay: 0.2, duration: 0.15 }}
                     >
                         <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
                             No account needed — just your NIC number
@@ -154,9 +154,9 @@ export default function LandingPage() {
                     {features.map((feature, i) => (
                         <motion.div
                             key={i}
-                            initial={{ y: 20, opacity: 0 }}
+                            initial={{ y: 10, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 0.7 + i * 0.1, duration: 0.5 }}
+                            transition={{ delay: 0.2 + i * 0.04, duration: 0.15 }}
                         >
                             <Card
                                 sx={{

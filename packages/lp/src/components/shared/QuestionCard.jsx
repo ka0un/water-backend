@@ -18,9 +18,9 @@ export default function QuestionCard({
 }) {
     return (
         <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35 }}
+            transition={{ duration: 0.15 }}
         >
             <Card
                 sx={{

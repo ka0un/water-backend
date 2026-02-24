@@ -43,9 +43,9 @@ export default function OptionGrid({
             {options.map((option, index) => (
                 <motion.div
                     key={option.value}
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.97 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.25, delay: index * 0.04 }}
+                    transition={{ duration: 0.12, delay: index * 0.02 }}
                 >
                     <Card
                         sx={{

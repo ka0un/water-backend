@@ -98,7 +98,7 @@ export default function ReviewStep({ onBack, onSubmit, stepNumber }) {
             </Section>
 
             {/* Submit */}
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
                 <Button
                     fullWidth variant="contained" size="large"
                     onClick={onSubmit}
