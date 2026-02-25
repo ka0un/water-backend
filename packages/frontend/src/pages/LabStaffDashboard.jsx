@@ -17,8 +17,11 @@ import {
 
 /* ── Palette ──────────────────────────────────────────────────── */
 const STATUS_COLORS = {
-    pending: '#ED6C02',
-    in_progress: '#1565C0',
+    pending_acceptance: '#ED6C02',
+    accepted: '#1565C0',
+    sample_scheduled: '#7B1FA2',
+    sample_collected: '#0097A7',
+    testing_in_progress: '#1565C0',
     completed: '#2E7D32',
     rejected: '#D32F2F',
 };
@@ -79,25 +82,27 @@ export default function LabStaffDashboard() {
         setLoading(true);
         setError(null);
         try {
-            // Fetch lab staff dashboard data
-            // For now, using mock data - replace with actual API calls
-            // const { data } = await api.get('/lab-staff/dashboard');
+            // Fetch lab staff dashboard data from API
+            const { data } = await api.get('/lab-staff/dashboard');
             
-            // Mock data for demonstration
             setStats({
-                pendingTests: 12,
-                inProgressTests: 5,
-                completedToday: 8,
-                totalCompleted: 156,
+                pendingTests: data.data.stats.pendingAcceptance || 0,
+                inProgressTests: (data.data.stats.accepted || 0) + (data.data.stats.inProgress || 0),
+                completedToday: data.data.stats.completedToday || 0,
+                totalCompleted: data.data.stats.totalCompleted || 0,
             });
 
-            setRecentTests([
-                { id: 'WT-001', source: 'Well', location: 'Colombo', status: 'pending', date: '2026-02-25' },
-                { id: 'WT-002', source: 'River', location: 'Kandy', status: 'in_progress', date: '2026-02-25' },
-                { id: 'WT-003', source: 'Tap', location: 'Galle', status: 'completed', date: '2026-02-24' },
-                { id: 'WT-004', source: 'Tank', location: 'Jaffna', status: 'pending', date: '2026-02-24' },
-                { id: 'WT-005', source: 'Lake', location: 'Matara', status: 'in_progress', date: '2026-02-24' },
-            ]);
+            // Transform recent requests for display
+            const requests = data.data.recentRequests || [];
+            setRecentTests(requests.map(req => ({
+                id: req.requestNumber,
+                _id: req._id,
+                source: req.publicReport?.waterSource || 'Unknown',
+                location: req.publicReport?.location?.district || req.publicReport?.location?.city || 'Unknown',
+                status: req.status,
+                priority: req.priority,
+                date: new Date(req.createdAt).toISOString().split('T')[0],
+            })));
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to load dashboard data');
         } finally {

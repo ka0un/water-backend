@@ -11,6 +11,8 @@ const moderationRoutes = require('./moderation.routes');
 const waterSourceRoutes = require('./waterSource.routes');
 const publicReportRoutes = require('./publicReport.routes');
 const publicReportAdminRoutes = require('./publicReportAdmin.routes');
+const labStaffRoutes = require('./labStaff.routes');
+const laboratoryRoutes = require('./laboratory.routes');
 
 
 const router = express.Router();
@@ -61,6 +63,8 @@ router.get('/', (req, res) => {
             waterSources: '/api/v1/water-sources',
             publicReports: '/api/v1/public-reports',
             publicReportsAdmin: '/api/v1/public-reports-admin',
+            labStaff: '/api/v1/lab-staff',
+            laboratories: '/api/v1/laboratories',
             health: '/api/v1/health',
         },
     }, 'Welcome to Water Quality Report API');
@@ -74,5 +78,7 @@ router.use('/moderation', moderationRoutes);
 router.use('/water-sources', waterSourceRoutes);
 router.use('/public-reports', publicReportRoutes);
 router.use('/public-reports-admin', publicReportAdminRoutes);
+router.use('/lab-staff', labStaffRoutes);
+router.use('/laboratories', laboratoryRoutes);
 
 module.exports = router;

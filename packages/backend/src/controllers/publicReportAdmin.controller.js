@@ -1,4 +1,5 @@
 const { PublicReport } = require('../models/PublicReport.model');
+const { LabTestRequest } = require('../models/LabTestRequest.model');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/ApiResponse');
 const ApiError = require('../utils/ApiError');
@@ -266,6 +267,17 @@ const moderateReport = asyncHandler(async (req, res) => {
         report.approved_at = new Date();
         report.rejected_at = null;
         report.rejection_reason = null;
+
+        // Create a Lab Test Request for the approved report
+        const existingLabRequest = await LabTestRequest.findOne({ publicReport: report._id });
+        if (!existingLabRequest) {
+            await LabTestRequest.create({
+                publicReport: report._id,
+                createdBy: req.user._id,
+                requestedTests: ['full_analysis'],
+                priority: 'medium',
+            });
+        }
     } else {
         if (!reason) throw ApiError.badRequest('Rejection reason is required');
         report.mod_status = 'rejected';

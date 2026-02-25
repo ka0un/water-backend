@@ -20,7 +20,8 @@ Full project documentation and requirements are available on Trello:
 ## ✨ Features
 
 - **Authentication** - JWT-based auth with bcrypt password hashing
-- **Authorization** - Role-based access control (USER, MODERATOR, ADMIN)
+- **Authorization** - Role-based access control (USER, MODERATOR, LAB_STAFF, ADMIN)
+- **Lab Testing Workflow** - Full lab test lifecycle management with WHO safe limits
 - **Validation** - Request validation using Joi with detailed error messages
 - **Error Handling** - Centralized error handling with standardized responses
 - **Logging** - Winston logger with file rotation
@@ -106,6 +107,17 @@ Full API documentation with all endpoints, request/response examples:
 | GET | `/api/v1/public-reports-admin/stats` | Report statistics | MODERATOR+ |
 | PATCH | `/api/v1/public-reports-admin/:id/moderate` | Approve/reject | MODERATOR+ |
 | DELETE | `/api/v1/public-reports-admin/:id` | Delete report | ADMIN |
+| GET | `/api/v1/lab-staff/dashboard` | Lab dashboard stats | LAB_STAFF+ |
+| GET | `/api/v1/lab-staff/requests` | List lab test requests | LAB_STAFF+ |
+| POST | `/api/v1/lab-staff/requests/:id/accept` | Accept test request | LAB_STAFF+ |
+| POST | `/api/v1/lab-staff/requests/:id/schedule` | Schedule collection | LAB_STAFF+ |
+| POST | `/api/v1/lab-staff/requests/:id/collect` | Record collection | LAB_STAFF+ |
+| PUT | `/api/v1/lab-staff/requests/:id/results` | Input test results | LAB_STAFF+ |
+| POST | `/api/v1/lab-staff/requests/:id/complete` | Issue verdict | LAB_STAFF+ |
+| GET | `/api/v1/laboratories` | List laboratories | ADMIN |
+| POST | `/api/v1/laboratories` | Create laboratory | ADMIN |
+| PUT | `/api/v1/laboratories/:id` | Update laboratory | ADMIN |
+| DELETE | `/api/v1/laboratories/:id` | Delete laboratory | ADMIN |
 
 ---
 
@@ -157,6 +169,7 @@ water-backend/
 |------|-------------|
 | `USER` | Standard user with basic access |
 | `MODERATOR` | Can view all users and moderate content |
+| `LAB_STAFF` | Laboratory staff - manage test requests, input results, issue verdicts |
 | `ADMIN` | Full access to all endpoints |
 
 ---

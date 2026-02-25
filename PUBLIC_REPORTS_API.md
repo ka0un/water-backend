@@ -415,3 +415,387 @@ All endpoints return responses in this format:
 | `404` | Not Found |
 | `429` | Rate Limited |
 | `500` | Server Error |
+
+---
+
+## Lab Staff Endpoints (Auth + LAB_STAFF/ADMIN)
+
+All endpoints require `Authorization: Bearer <token>` with LAB_STAFF or ADMIN role.
+
+### Get Dashboard Stats
+
+```
+GET /lab-staff/dashboard
+```
+
+Returns lab staff dashboard statistics and recent requests.
+
+**Response:**
+```json
+{
+  "data": {
+    "stats": {
+      "pendingAcceptance": 5,
+      "accepted": 3,
+      "inProgress": 2,
+      "completedToday": 4,
+      "totalCompleted": 150
+    },
+    "recentRequests": [...]
+  }
+}
+```
+
+---
+
+### List Lab Test Requests
+
+```
+GET /lab-staff/requests
+```
+
+| Query Param | Type | Default | Description |
+|---|---|---|---|
+| `page` | number | 1 | Page number |
+| `limit` | number | 20 | Items per page (max 100) |
+| `status` | string | — | Filter by status |
+| `priority` | string | — | Filter: `low`, `medium`, `high`, `urgent` |
+| `sort` | string | `-createdAt` | Sort field |
+
+**Status Values:**
+- `pending_acceptance` - Waiting for lab to accept
+- `accepted` - Lab accepted, awaiting scheduling
+- `sample_scheduled` - Sample collection scheduled
+- `sample_collected` - Sample collected, ready for testing
+- `testing_in_progress` - Currently being tested
+- `completed` - Testing complete, results available
+- `rejected` - Lab rejected the request
+
+---
+
+### Get Single Request
+
+```
+GET /lab-staff/requests/:id
+```
+
+Returns full details of a lab test request including all test results.
+
+---
+
+### Get Safe Limits Reference
+
+```
+GET /lab-staff/safe-limits
+```
+
+Returns WHO water quality safe limits for all parameters.
+
+**Response:**
+```json
+{
+  "data": {
+    "safeLimits": {
+      "ph": { "min": 6.5, "max": 8.5, "unit": "pH" },
+      "turbidity": { "max": 5, "unit": "NTU" },
+      "lead": { "max": 0.01, "unit": "mg/L" },
+      "coliformBacteria": { "max": 0, "unit": "CFU/100mL" },
+      ...
+    }
+  }
+}
+```
+
+---
+
+### Accept Request
+
+```
+POST /lab-staff/requests/:id/accept
+```
+
+Accept a pending lab test request. Changes status to `accepted`.
+
+---
+
+### Reject Request
+
+```
+POST /lab-staff/requests/:id/reject
+```
+
+| Body Field | Type | Required | Description |
+|---|---|---|---|
+| `reason` | string | ✅ | Reason for rejection |
+
+```json
+{ "reason": "Insufficient sample information" }
+```
+
+---
+
+### Schedule Sample Collection
+
+```
+POST /lab-staff/requests/:id/schedule
+```
+
+| Body Field | Type | Required | Description |
+|---|---|---|---|
+| `date` | string | ✅ | Collection date (YYYY-MM-DD) |
+| `timeSlot` | string | ✅ | Time slot (e.g., "10:00 AM - 12:00 PM") |
+| `assignedCollector` | string | — | User ID of assigned collector |
+| `contactPhone` | string | — | Contact phone number |
+| `specialInstructions` | string | — | Special instructions |
+
+```json
+{
+  "date": "2026-02-26",
+  "timeSlot": "10:00 AM - 12:00 PM",
+  "contactPhone": "+94771234567",
+  "specialInstructions": "Bring sterile containers"
+}
+```
+
+---
+
+### Record Sample Collection
+
+```
+POST /lab-staff/requests/:id/collect
+```
+
+| Body Field | Type | Required | Description |
+|---|---|---|---|
+| `location.coordinates` | array | — | [longitude, latitude] |
+| `location.address` | string | — | Collection address |
+| `waterTemperature` | number | — | Water temperature in °C |
+| `weatherConditions` | string | — | Weather at collection time |
+| `sampleContainerType` | string | — | Type of container used |
+| `photos` | array | — | Array of photo objects |
+| `notes` | string | — | Collection notes |
+
+```json
+{
+  "location": {
+    "coordinates": [79.8612, 6.9271],
+    "address": "Colombo, Sri Lanka"
+  },
+  "waterTemperature": 28.5,
+  "weatherConditions": "Sunny, clear sky",
+  "sampleContainerType": "Sterile glass bottle",
+  "notes": "Sample collected from main stream"
+}
+```
+
+---
+
+### Start Testing
+
+```
+POST /lab-staff/requests/:id/start-testing
+```
+
+Begin laboratory testing. Changes status to `testing_in_progress`.
+
+---
+
+### Input Test Results
+
+```
+PUT /lab-staff/requests/:id/results
+```
+
+Input test results for various water quality parameters.
+
+```json
+{
+  "testResults": {
+    "ph": { "value": 7.2, "notes": "Normal range" },
+    "turbidity": { "value": 3.5, "notes": "Clear" },
+    "totalDissolvedSolids": { "value": 320 },
+    "lead": { "value": 0.005 },
+    "arsenic": { "value": 0.002 },
+    "coliformBacteria": { "value": 0 },
+    "ecoliCount": { "value": 0 },
+    "nitrate": { "value": 25 },
+    "iron": { "value": 0.1 },
+    "chloride": { "value": 150 }
+  }
+}
+```
+
+**Available Parameters:**
+`ph`, `turbidity`, `totalDissolvedSolids`, `lead`, `arsenic`, `mercury`, `cadmium`, `chromium`, `copper`, `iron`, `manganese`, `zinc`, `nitrate`, `nitrite`, `fluoride`, `chloride`, `sulfate`, `coliformBacteria`, `ecoliCount`
+
+---
+
+### Complete Testing & Issue Verdict
+
+```
+POST /lab-staff/requests/:id/complete
+```
+
+Complete testing and auto-calculate verdict based on WHO safe limits.
+
+| Body Field | Type | Required | Description |
+|---|---|---|---|
+| `labTechnicianNotes` | string | — | Technician notes |
+| `recommendations` | string | — | Recommendations for the user |
+
+```json
+{
+  "labTechnicianNotes": "All parameters within WHO safe limits.",
+  "recommendations": "Regular monitoring recommended during monsoon season."
+}
+```
+
+**Response includes:**
+- Auto-calculated `verdict`: `safe`, `unsafe`, or `needs_treatment`
+- `testSummary` with passed/failed parameter counts
+- `failedParameters` list if any
+
+---
+
+## Laboratory Management Endpoints (Auth + ADMIN)
+
+CRUD operations for laboratory management. Requires ADMIN role.
+
+### List Laboratories
+
+```
+GET /laboratories
+```
+
+| Query Param | Type | Default | Description |
+|---|---|---|---|
+| `page` | number | 1 | Page number |
+| `limit` | number | 20 | Items per page |
+| `status` | string | — | Filter: `active`, `inactive`, `suspended` |
+| `district` | string | — | Filter by district |
+| `certification` | string | — | Filter by certification type |
+
+---
+
+### Get Laboratory
+
+```
+GET /laboratories/:id
+```
+
+Returns full laboratory details including capabilities and certifications.
+
+---
+
+### Create Laboratory
+
+```
+POST /laboratories
+```
+
+| Body Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | string | ✅ | Laboratory name |
+| `code` | string | ✅ | Unique lab code |
+| `type` | string | ✅ | `government`, `private`, `university`, `research` |
+| `address` | object | ✅ | `{ street, city, district, province, postalCode }` |
+| `contact` | object | ✅ | `{ phone, email, website }` |
+| `operatingHours` | object | — | `{ weekdays, weekends, holidays }` |
+| `capabilities` | array | — | Array of test capabilities |
+| `certifications` | array | — | Array of certification objects |
+| `maxDailyCapacity` | number | — | Maximum daily test capacity |
+
+```json
+{
+  "name": "Central Water Testing Lab",
+  "code": "CWTL-001",
+  "type": "government",
+  "address": {
+    "street": "123 Lab Street",
+    "city": "Colombo",
+    "district": "Colombo",
+    "province": "Western",
+    "postalCode": "00100"
+  },
+  "contact": {
+    "phone": "+94112345678",
+    "email": "info@cwtl.gov.lk",
+    "website": "https://cwtl.gov.lk"
+  },
+  "capabilities": [
+    "basic_physical",
+    "chemical",
+    "heavy_metals",
+    "bacteriological"
+  ],
+  "maxDailyCapacity": 50
+}
+```
+
+---
+
+### Update Laboratory
+
+```
+PUT /laboratories/:id
+```
+
+Update laboratory information. Same fields as create.
+
+---
+
+### Delete Laboratory (Soft)
+
+```
+DELETE /laboratories/:id
+```
+
+Soft-deletes a laboratory (sets `deletedAt` timestamp).
+
+---
+
+### Update Laboratory Status
+
+```
+PATCH /laboratories/:id/status
+```
+
+| Body Field | Type | Required | Description |
+|---|---|---|---|
+| `status` | string | ✅ | `active`, `inactive`, `suspended` |
+| `reason` | string | if suspended | Reason for suspension |
+
+```json
+{ "status": "suspended", "reason": "Pending certification renewal" }
+```
+
+---
+
+### Get Laboratory Statistics
+
+```
+GET /laboratories/stats/overview
+```
+
+**Response:**
+```json
+{
+  "data": {
+    "overview": {
+      "total": 25,
+      "active": 20,
+      "inactive": 3,
+      "suspended": 2
+    },
+    "byType": [
+      { "_id": "government", "count": 10 },
+      { "_id": "private", "count": 15 }
+    ],
+    "byDistrict": [
+      { "_id": "Colombo", "count": 8 },
+      ...
+    ],
+    "totalCapacity": 500
+  }
+}
+```
