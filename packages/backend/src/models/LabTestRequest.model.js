@@ -254,7 +254,7 @@ const labTestRequestSchema = new mongoose.Schema(
 );
 
 // Generate unique request number before save
-labTestRequestSchema.pre('save', async function (next) {
+labTestRequestSchema.pre('save', async function () {
     if (this.isNew && !this.requestNumber) {
         const count = await mongoose.model('LabTestRequest').countDocuments();
         const date = new Date();
@@ -262,7 +262,6 @@ labTestRequestSchema.pre('save', async function (next) {
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         this.requestNumber = `LTR-${year}${month}-${(count + 1).toString().padStart(5, '0')}`;
     }
-    next();
 });
 
 // Virtual: days since request created
