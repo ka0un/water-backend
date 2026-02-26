@@ -1,6 +1,7 @@
 const authService = require('../services/auth.service');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/ApiResponse');
+const { ModerationLog, ModerationAction } = require('../models/ModerationLog.model');
 
 /**
  * @desc    Register a new user
@@ -47,8 +48,24 @@ const getMe = asyncHandler(async (req, res) => {
     return ApiResponse.success(res, { user }, 'Profile retrieved successfully');
 });
 
+/**
+ * @desc    Logout user (simply to log the action for moderators)
+ * @route   POST /api/v1/auth/logout
+ * @access  Private
+ */
+const logout = asyncHandler(async (req, res) => {
+    if (['MODERATOR', 'ADMIN'].includes(req.user.role)) {
+        await ModerationLog.create({
+            action: ModerationAction.LOGOUT,
+            moderatorId: req.user._id,
+        }).catch(() => { }); // fire and forget
+    }
+    return ApiResponse.success(res, null, 'Logged out successfully');
+});
+
 module.exports = {
     register,
     login,
     getMe,
+    logout,
 };

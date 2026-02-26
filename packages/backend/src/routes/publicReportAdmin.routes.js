@@ -12,6 +12,9 @@ const {
     deleteByNic,
     resetAll,
     exportReports,
+    getSecurityInfo,
+    banUser,
+    unbanUser,
 } = require('../controllers/publicReportAdmin.controller');
 
 const router = express.Router();
@@ -41,6 +44,27 @@ router.get('/stats', authorize('MODERATOR', 'ADMIN'), getStats);
  * @access  MODERATOR, ADMIN
  */
 router.get('/export', authorize('MODERATOR', 'ADMIN'), exportReports);
+
+/**
+ * @route   POST /api/v1/public-reports-admin/ban
+ * @desc    Ban a specific IP or NIC
+ * @access  MODERATOR, ADMIN
+ */
+router.post('/ban', authorize('MODERATOR', 'ADMIN'), banUser);
+
+/**
+ * @route   POST /api/v1/public-reports-admin/unban
+ * @desc    Unban a specific IP or NIC
+ * @access  MODERATOR, ADMIN
+ */
+router.post('/unban', authorize('MODERATOR', 'ADMIN'), unbanUser);
+
+/**
+ * @route   GET /api/v1/public-reports-admin/:id/security
+ * @desc    Get security stats for a given report's owner (IP/NIC)
+ * @access  MODERATOR, ADMIN
+ */
+router.get('/:id/security', authorize('MODERATOR', 'ADMIN'), getSecurityInfo);
 
 /**
  * @route   GET /api/v1/public-reports-admin/:id

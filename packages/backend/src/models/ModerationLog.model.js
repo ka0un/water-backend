@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
  * Moderation actions enum
  */
 const ModerationAction = {
+    LOGIN: 'LOGIN',
+    LOGOUT: 'LOGOUT',
+    VIEW_PUBLIC_REPORT: 'VIEW_PUBLIC_REPORT',
     APPROVE: 'APPROVE',
     REJECT: 'REJECT',
     BAN: 'BAN',

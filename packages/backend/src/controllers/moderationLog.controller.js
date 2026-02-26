@@ -53,25 +53,5 @@ exports.getModerationLogs = asyncHandler(async (req, res) => {
     );
 });
 
-/**
- * Simple endpoint to insert a sample moderation log.
- * Useful for manual testing from the frontend.
- */
-exports.createSampleModerationLog = asyncHandler(async (req, res) => {
-    const moderatorId = req.user?._id || req.body.moderatorId;
 
-    const log = await ModerationLog.create({
-        action: ModerationAction.APPROVE,
-        moderatorId,
-        targetUserId: null,
-        reportId: req.body.reportId || null,
-        previousStatus: 'Pending',
-        newStatus: 'Approved - Lab Testing Requested',
-        reason: req.body.reason || 'Sample approval for testing',
-    });
-
-    return res
-        .status(201)
-        .json(new ApiResponse(201, 'Sample moderation log created', { log }));
-});
 
