@@ -1,397 +1,147 @@
 # Water Quality Report API Documentation
 
-## Base URL
+The complete API consists of 54 RESTful endpoints handling everything from public crowdsourcing wizards to secure internal laboratory management.
 
+> [!NOTE]
+> **Interactive Swagger UI**
+> Interactive documentation and request testing is available on the running server at:
+> `http://localhost:3000/api/v1/docs`
+
+## Base URL
 ```
 http://localhost:3000/api/v1
 ```
 
----
-
 ## Authentication
-
 All protected endpoints require a Bearer token in the Authorization header:
-
 ```
 Authorization: Bearer <token>
 ```
 
 ---
 
-## Response Format
+## 🧭 Endpoint Catalog
 
-### Success Response
+### Core API
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|--------|
+| `GET` | `/health` | Health check and server status | Public |
+| `GET` | `/` | API root info | Public |
 
-```json
-{
-  "success": true,
-  "statusCode": 200,
-  "message": "Success message",
-  "data": { ... },
-  "timestamp": "2026-02-09T07:00:00.000Z"
-}
-```
+### Authentication (`/auth`)
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|--------|
+| `POST` | `/auth/register` | Register a new user | Public |
+| `POST` | `/auth/login` | Login user | Public |
+| `GET` | `/auth/me` | Get current authenticated user details | Required |
+| `POST` | `/auth/logout` | Logout user | Required |
 
-### Error Response
+### Users (`/users`)
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|--------|
+| `GET` | `/users/profile` | Get current user profile | Required |
+| `GET` | `/users` | List all registered users | MODERATOR+ |
+
+### Admin Dashboard (`/admin`)
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|--------|
+| `GET` | `/admin/dashboard` | Admin dashboard statistics | ADMIN |
+| `GET` | `/admin/users` | List users with advanced analytics | ADMIN |
+| `PATCH` | `/admin/users/:userId/role` | Update user system role | ADMIN |
+| `PATCH` | `/admin/users/:userId/status`| Activate/Deactivate user account | ADMIN |
+
+### Moderation System (`/moderation`)
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|--------|
+| `GET` | `/moderation/logs`| Get moderation audit logs (paginated) | MODERATOR+ |
+
+### Water Sources (`/water-sources`)
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|--------|
+| `GET` | `/water-sources/stats` | Get water source aggregations | Public |
+| `GET` | `/water-sources/nearby` | Get nearby water sources (Geospatial)| Public |
+| `GET` | `/water-sources` | List water sources with filters | Public |
+| `POST` | `/water-sources` | Create a new water source | Required |
+| `GET` | `/water-sources/:id` | Get water source by ID | Public |
+| `PATCH` | `/water-sources/:id` | Update water source details | Creator/Mod+ |
+| `PATCH` | `/water-sources/:id/status`| Update operational status | Admin/Verified|
+| `PATCH` | `/water-sources/:id/verify`| Verify a water source | MODERATOR+ |
+| `DELETE`| `/water-sources/:id` | Soft delete water source | Creator/Mod+ |
+
+### Public Reports Wizard (`/public-reports`)
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|--------|
+| `POST` | `/public-reports` | Create public report (Wizard step 1) | Public |
+| `GET` | `/public-reports/by-nic/:nic` | Get reports associated with an NIC | Public |
+| `GET` | `/public-reports/:id/full`| Get full report detail including metadata | Public |
+| `GET` | `/public-reports/:id`| Get report draft by ID | Public |
+| `PATCH` | `/public-reports/:id`| Auto-save wizard payload | Public |
+| `POST` | `/public-reports/:id/submit`| Submit public report to moderators | Public |
+| `POST` | `/public-reports/:id/images`| Upload report image attachments | Public |
+
+### Public Reports Admin (`/public-reports-admin`)
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|--------|
+| `GET` | `/public-reports-admin` | List public reports (paginated table) | MODERATOR+ |
+| `GET` | `/public-reports-admin/stats` | Report statistics widget data | MODERATOR+ |
+| `GET` | `/public-reports-admin/export` | Export reports as JSON blob | MODERATOR+ |
+| `POST` | `/public-reports-admin/ban` | Ban an IP or NIC | MODERATOR+ |
+| `POST` | `/public-reports-admin/unban` | Unban an IP or NIC | MODERATOR+ |
+| `GET` | `/public-reports-admin/:id/security` | Get security stats for report's owner | MODERATOR+ |
+| `GET` | `/public-reports-admin/:id`| Get full report detail wrapper | MODERATOR+ |
+| `GET` | `/public-reports-admin/:id/images/:imageId`| Stream binary image payload | MODERATOR+ |
+| `PATCH` | `/public-reports-admin/:id/moderate` | Approve or reject a report | MODERATOR+ |
+| `PATCH` | `/public-reports-admin/:id`| Admin override update any field | ADMIN |
+| `DELETE`| `/public-reports-admin/:id`| Delete public report | ADMIN |
+| `DELETE`| `/public-reports-admin/by-nic/:nic`| Delete all reports by NIC | ADMIN |
+| `POST` | `/public-reports-admin/reset` | Delete ALL reports | ADMIN |
+
+### Laboratory Staff Console (`/lab-staff`)
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|--------|
+| `GET` | `/lab-staff/dashboard` | Lab staff dashboard stats | LAB_STAFF+ |
+| `GET` | `/lab-staff/requests` | List incoming lab test requests | LAB_STAFF+ |
+| `GET` | `/lab-staff/safe-limits` | Get water quality WHO safe limits | LAB_STAFF+ |
+| `GET` | `/lab-staff/requests/:id` | Get single lab test request details | LAB_STAFF+ |
+| `POST` | `/lab-staff/requests/:id/accept` | Accept lab test request | LAB_STAFF+ |
+| `POST` | `/lab-staff/requests/:id/reject` | Reject lab test request | LAB_STAFF+ |
+| `POST` | `/lab-staff/requests/:id/schedule`| Schedule collector pickup | LAB_STAFF+ |
+| `POST` | `/lab-staff/requests/:id/collect` | Record physical sample collection | LAB_STAFF+ |
+| `POST` | `/lab-staff/requests/:id/start-testing`| Transition sample to in-progress | LAB_STAFF+ |
+| `PUT` | `/lab-staff/requests/:id/results` | Save granular test results array | LAB_STAFF+ |
+| `POST` | `/lab-staff/requests/:id/complete`| Complete testing, issue final verdict| LAB_STAFF+ |
+
+### Laboratory Management (`/laboratories`)
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|--------|
+| `POST` | `/laboratories` | Provision a new laboratory entity | ADMIN |
+| `GET` | `/laboratories` | List all laboratories | ADMIN |
+| `GET` | `/laboratories/:id` | Get single laboratory detail wrapper | ADMIN |
+| `PUT` | `/laboratories/:id` | Update laboratory settings | ADMIN |
+| `DELETE`| `/laboratories/:id` | Soft delete/deactivate laboratory | ADMIN |
+
+---
+
+## Error Response Patterns
 
 ```json
 {
   "success": false,
-  "statusCode": 400,
-  "message": "Error message",
-  "errors": [
-    {
-      "field": "email",
-      "message": "Email is required"
-    }
-  ],
+  "statusCode": 401,
+  "message": "Invalid email or password",
   "timestamp": "2026-02-09T07:00:00.000Z"
 }
 ```
-
----
-
-## Endpoints
-
-### Health Check
-
-#### GET `/health`
-
-Check server status and database connectivity.
-
-**Access**: Public
-
-**Response**:
-```json
-{
-  "success": true,
-  "statusCode": 200,
-  "message": "Server is healthy",
-  "data": {
-    "status": "healthy",
-    "timestamp": "2026-02-09T07:00:00.000Z",
-    "uptime": 1234.56,
-    "environment": "development",
-    "mongodb": "connected",
-    "memory": {
-      "used": "50 MB",
-      "total": "100 MB"
-    }
-  }
-}
-```
-
----
-
-### Authentication
-
-#### POST `/auth/register`
-
-Register a new user account.
-
-**Access**: Public
-
-**Request Body**:
-```json
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "Password123"
-}
-```
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| name | string | Yes | 2-100 characters |
-| email | string | Yes | Valid email address |
-| password | string | Yes | Min 8 chars, must contain uppercase, lowercase, and number |
-| role | string | No | USER (default), MODERATOR, ADMIN |
-
-**Response** (201 Created):
-```json
-{
-  "success": true,
-  "statusCode": 201,
-  "message": "User registered successfully",
-  "data": {
-    "user": {
-      "id": "65f1a2b3c4d5e6f7g8h9i0j1",
-      "name": "John Doe",
-      "email": "john@example.com",
-      "role": "USER",
-      "createdAt": "2026-02-09T07:00:00.000Z"
-    },
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  }
-}
-```
-
-**Errors**:
-- `400` - Validation failed
-- `409` - Email already registered
-
----
-
-#### POST `/auth/login`
-
-Login with email and password.
-
-**Access**: Public
-
-**Request Body**:
-```json
-{
-  "email": "john@example.com",
-  "password": "Password123"
-}
-```
-
-**Response** (200 OK):
-```json
-{
-  "success": true,
-  "statusCode": 200,
-  "message": "Login successful",
-  "data": {
-    "user": {
-      "id": "65f1a2b3c4d5e6f7g8h9i0j1",
-      "name": "John Doe",
-      "email": "john@example.com",
-      "role": "USER",
-      "lastLoginAt": "2026-02-09T07:00:00.000Z"
-    },
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  }
-}
-```
-
-**Errors**:
-- `400` - Validation failed
-- `401` - Invalid email or password
-
----
-
-#### GET `/auth/me`
-
-Get current user profile.
-
-**Access**: Private (Authenticated)
-
-**Headers**:
-```
-Authorization: Bearer <token>
-```
-
-**Response** (200 OK):
-```json
-{
-  "success": true,
-  "statusCode": 200,
-  "message": "Profile retrieved successfully",
-  "data": {
-    "user": {
-      "id": "65f1a2b3c4d5e6f7g8h9i0j1",
-      "name": "John Doe",
-      "email": "john@example.com",
-      "role": "USER",
-      "isEmailVerified": false,
-      "createdAt": "2026-02-09T07:00:00.000Z",
-      "lastLoginAt": "2026-02-09T07:00:00.000Z"
-    }
-  }
-}
-```
-
-**Errors**:
-- `401` - Unauthorized (no token or invalid token)
-
----
-
-### Users
-
-#### GET `/users/profile`
-
-Get current user profile.
-
-**Access**: Private (Authenticated)
-
-**Response**: Same as `GET /auth/me`
-
----
-
-#### GET `/users`
-
-Get all users (paginated).
-
-**Access**: Private (ADMIN, MODERATOR)
-
-**Query Parameters**:
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| page | number | 1 | Page number |
-| limit | number | 10 | Items per page |
-
-**Response** (200 OK):
-```json
-{
-  "success": true,
-  "statusCode": 200,
-  "message": "Users retrieved successfully",
-  "data": {
-    "users": [ ... ],
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "total": 50,
-      "pages": 5
-    }
-  }
-}
-```
-
-**Errors**:
-- `401` - Unauthorized
-- `403` - Forbidden (insufficient permissions)
-
----
-
-### Admin
-
-#### GET `/admin/dashboard`
-
-Get admin dashboard statistics.
-
-**Access**: Private (ADMIN only)
-
-**Response** (200 OK):
-```json
-{
-  "success": true,
-  "statusCode": 200,
-  "message": "Dashboard stats retrieved successfully",
-  "data": {
-    "stats": {
-      "totalUsers": 100,
-      "activeUsers": 95,
-      "inactiveUsers": 5,
-      "usersByRole": {
-        "USER": 90,
-        "MODERATOR": 8,
-        "ADMIN": 2
-      }
-    }
-  }
-}
-```
-
----
-
-#### GET `/admin/users`
-
-Get all users with advanced filtering.
-
-**Access**: Private (ADMIN only)
-
-**Query Parameters**:
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| page | number | Page number |
-| limit | number | Items per page |
-| role | string | Filter by role |
-| isActive | boolean | Filter by status |
-
----
-
-#### PATCH `/admin/users/:userId/role`
-
-Update user role.
-
-**Access**: Private (ADMIN only)
-
-**Request Body**:
-```json
-{
-  "role": "MODERATOR"
-}
-```
-
-**Response** (200 OK):
-```json
-{
-  "success": true,
-  "statusCode": 200,
-  "message": "User role updated successfully",
-  "data": {
-    "user": { ... }
-  }
-}
-```
-
----
-
-#### PATCH `/admin/users/:userId/status`
-
-Activate or deactivate user.
-
-**Access**: Private (ADMIN only)
-
-**Request Body**:
-```json
-{
-  "isActive": false
-}
-```
-
----
-
-## Error Codes
 
 | Code | Description |
 |------|-------------|
-| 400 | Bad Request - Validation failed |
+| 400 | Bad Request - Validation failed (Joi Schema Exception) |
 | 401 | Unauthorized - Authentication required or token invalid |
-| 403 | Forbidden - Insufficient permissions |
+| 403 | Forbidden - Insufficient role permissions |
 | 404 | Not Found - Resource not found |
-| 409 | Conflict - Resource already exists |
-| 429 | Too Many Requests - Rate limit exceeded |
-| 500 | Internal Server Error |
-
----
+| 409 | Conflict - Unique index constraint violation |
+| 429 | Too Many Requests - 100 requests / 15-minute window |
+| 500 | Internal Server Error - Unhandled exception |
 
 ## Rate Limiting
-
-API requests are rate-limited to **100 requests per 15 minutes** per IP address.
-
-When rate limit is exceeded:
-```json
-{
-  "success": false,
-  "statusCode": 429,
-  "message": "Too many requests, please try again later."
-}
-```
-
----
-
-## User Roles
-
-| Role | Description |
-|------|-------------|
-| USER | Standard user with basic access |
-| MODERATOR | Can view all users and moderate content |
-| ADMIN | Full access to all endpoints including user management |
-
----
-
-## Environment Variables
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| NODE_ENV | No | development | Environment mode |
-| PORT | No | 3000 | Server port |
-| MONGODB_URI | Yes | - | MongoDB connection string |
-| JWT_SECRET | Yes | - | JWT signing secret |
-| JWT_EXPIRES_IN | No | 7d | JWT expiration time |
-| LOG_LEVEL | No | info | Logging level |
-| RATE_LIMIT_WINDOW_MS | No | 900000 | Rate limit window (ms) |
-| RATE_LIMIT_MAX_REQUESTS | No | 100 | Max requests per window |
+API requests are rate-limited via `express-rate-limit` to **100 requests per 15 minutes** per IP address to prevent DDOS and Brute force attacks on `/auth`.
