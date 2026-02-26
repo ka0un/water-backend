@@ -124,7 +124,7 @@ Full API documentation with all endpoints, request/response examples:
 ## 🧪 Testing
 
 ```bash
-# Run all tests
+# Run all tests1
 npm test
 
 # Watch mode
