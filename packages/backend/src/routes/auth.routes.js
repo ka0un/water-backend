@@ -7,24 +7,81 @@ const { registerSchema, loginSchema } = require('../validations/auth.validation'
 const router = express.Router();
 
 /**
- * @route POST /api/v1/auth/register
- * @desc Register a new user
- * @access Public
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, email, password]
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Successfully registered
  */
 router.post('/register', validate(registerSchema), authController.register);
 
 /**
- * @route POST /api/v1/auth/login
- * @desc Login user
- * @access Public
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
  */
 router.post('/login', validate(loginSchema), authController.login);
 
 /**
- * @route GET /api/v1/auth/me
- * @desc Get current user profile
- * @access Private
+ * @swagger
+ * /auth/me:
+ *   get:
+ *     summary: Get current authenticated user
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Profile retrieved successfully
  */
 router.get('/me', authenticate, authController.getMe);
+
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Logout user
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logout successful
+ */
+router.post('/logout', authenticate, authController.logout);
 
 module.exports = router;

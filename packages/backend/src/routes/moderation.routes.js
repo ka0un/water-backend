@@ -10,27 +10,39 @@ const {
 const router = express.Router();
 
 /**
- * @route GET /api/v1/moderation/logs
- * @desc Get moderation logs (paginated, filterable)
- * @access Private (ADMIN, MODERATOR)
+ * @swagger
+ * /moderation/logs:
+ *   get:
+ *     summary: Get moderation logs
+ *     tags: [Moderation]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: action
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: moderatorId
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Moderation logs retrieved
  */
 router.get(
     '/logs',
     authenticate,
     authorize(UserRole.ADMIN, UserRole.MODERATOR),
     getModerationLogs
-);
-
-/**
- * @route POST /api/v1/moderation/logs/sample
- * @desc Create a sample moderation log entry (for testing)
- * @access Private (ADMIN, MODERATOR)
- */
-router.post(
-    '/logs/sample',
-    authenticate,
-    authorize(UserRole.ADMIN, UserRole.MODERATOR),
-    createSampleModerationLog
 );
 
 module.exports = router;

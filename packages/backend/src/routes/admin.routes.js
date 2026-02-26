@@ -9,9 +9,16 @@ const ApiError = require('../utils/ApiError');
 const router = express.Router();
 
 /**
- * @route GET /api/v1/admin/dashboard
- * @desc Get admin dashboard stats
- * @access Private (ADMIN only)
+ * @swagger
+ * /admin/dashboard:
+ *   get:
+ *     summary: Get admin dashboard stats
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Dashboard stats
  */
 router.get('/dashboard', authenticate, authorize(UserRole.ADMIN), asyncHandler(async (req, res) => {
     const [totalUsers, activeUsers, usersByRole] = await Promise.all([
@@ -38,9 +45,33 @@ router.get('/dashboard', authenticate, authorize(UserRole.ADMIN), asyncHandler(a
 }));
 
 /**
- * @route GET /api/v1/admin/users
- * @desc Get all users with advanced filtering
- * @access Private (ADMIN only)
+ * @swagger
+ * /admin/users:
+ *   get:
+ *     summary: Get all users with advanced filtering
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: role
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: isActive
+ *         schema:
+ *           type: boolean
+ *     responses:
+ *       200:
+ *         description: Users retrieved
  */
 router.get('/users', authenticate, authorize(UserRole.ADMIN), asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page, 10) || 1;
@@ -69,9 +100,31 @@ router.get('/users', authenticate, authorize(UserRole.ADMIN), asyncHandler(async
 }));
 
 /**
- * @route PATCH /api/v1/admin/users/:userId/role
- * @desc Update user role
- * @access Private (ADMIN only)
+ * @swagger
+ * /admin/users/{userId}/role:
+ *   patch:
+ *     summary: Update user role
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               role:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Role updated
  */
 router.patch('/users/:userId/role', authenticate, authorize(UserRole.ADMIN), asyncHandler(async (req, res) => {
     const { userId } = req.params;
@@ -95,9 +148,31 @@ router.patch('/users/:userId/role', authenticate, authorize(UserRole.ADMIN), asy
 }));
 
 /**
- * @route PATCH /api/v1/admin/users/:userId/status
- * @desc Activate/Deactivate user
- * @access Private (ADMIN only)
+ * @swagger
+ * /admin/users/{userId}/status:
+ *   patch:
+ *     summary: Activate/Deactivate user
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               isActive:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Status updated
  */
 router.patch('/users/:userId/status', authenticate, authorize(UserRole.ADMIN), asyncHandler(async (req, res) => {
     const { userId } = req.params;
