@@ -8,9 +8,14 @@ const validate = require('../middlewares/validate.middleware');
 const router = express.Router();
 
 /**
- * @route   GET /api/v1/water-sources/stats
- * @desc    Get water source statistics
- * @access  Public
+ * @swagger
+ * /water-sources/stats:
+ *   get:
+ *     summary: Get water source statistics
+ *     tags: [Water Sources]
+ *     responses:
+ *       200:
+ *         description: Stats retrieved
  */
 router.get(
     '/stats',
@@ -18,16 +23,29 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/water-sources/nearby
- * @desc    Get nearby water sources (geospatial query)
- * @access  Public
- * 
- * Query params:
- * - latitude (required)
- * - longitude (required)
- * - radius (optional, default: 5000m)
- * - type (optional)
- * - operational_status (optional)
+ * @swagger
+ * /water-sources/nearby:
+ *   get:
+ *     summary: Get nearby water sources (geospatial)
+ *     tags: [Water Sources]
+ *     parameters:
+ *       - in: query
+ *         name: latitude
+ *         required: true
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: longitude
+ *         required: true
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: radius
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Nearby sources retrieved
  */
 router.get(
     '/nearby',
@@ -36,18 +54,23 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/water-sources
- * @desc    Get all water sources with optional filters
- * @access  Public
- * 
- * Query params:
- * - type (optional)
- * - operational_status (optional)
- * - access_type (optional)
- * - verified (optional)
- * - page (optional, default: 1)
- * - limit (optional, default: 10)
- * - sort (optional, default: -createdAt)
+ * @swagger
+ * /water-sources:
+ *   get:
+ *     summary: Get all water sources with optional filters
+ *     tags: [Water Sources]
+ *     parameters:
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: operational_status
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Sources retrieved
  */
 router.get(
     '/',
@@ -56,17 +79,22 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/water-sources
- * @desc    Create a new water source
- * @access  Private (authenticated users)
- * 
- * Body:
- * - name (required)
- * - type (required)
- * - location: { latitude, longitude } (required)
- * - operational_status (optional)
- * - access_type (optional)
- * - description (optional)
+ * @swagger
+ * /water-sources:
+ *   post:
+ *     summary: Create a new water source
+ *     tags: [Water Sources]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Source created
  */
 router.post(
     '/',
@@ -76,9 +104,20 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/water-sources/:id
- * @desc    Get a single water source by ID
- * @access  Public
+ * @swagger
+ * /water-sources/{id}:
+ *   get:
+ *     summary: Get a single water source by ID
+ *     tags: [Water Sources]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Source retrieved
  */
 router.get(
     '/:id',
@@ -87,16 +126,28 @@ router.get(
 );
 
 /**
- * @route   PATCH /api/v1/water-sources/:id
- * @desc    Update water source details
- * @access  Private (Creator, Moderator, or Admin)
- * 
- * Body (all optional, at least one required):
- * - name
- * - type
- * - operational_status
- * - access_type
- * - description
+ * @swagger
+ * /water-sources/{id}:
+ *   patch:
+ *     summary: Update water source details
+ *     tags: [Water Sources]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Source updated
  */
 router.patch(
     '/:id',
@@ -106,13 +157,28 @@ router.patch(
 );
 
 /**
- * @route   PATCH /api/v1/water-sources/:id/status
- * @desc    Update operational status of a water source
- * @access  Private (Admin or users with verified status)
- * 
- * Body:
- * - operational_status (required)
- * - notes (optional)
+ * @swagger
+ * /water-sources/{id}/status:
+ *   patch:
+ *     summary: Update operational status of a water source
+ *     tags: [Water Sources]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Status updated
  */
 router.patch(
     '/:id/status',
@@ -122,9 +188,22 @@ router.patch(
 );
 
 /**
- * @route   PATCH /api/v1/water-sources/:id/verify
- * @desc    Verify a water source
- * @access  Private (Moderator or Admin only)
+ * @swagger
+ * /water-sources/{id}/verify:
+ *   patch:
+ *     summary: Verify a water source
+ *     tags: [Water Sources]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Source verified
  */
 router.patch(
     '/:id/verify',
@@ -135,9 +214,22 @@ router.patch(
 );
 
 /**
- * @route   DELETE /api/v1/water-sources/:id
- * @desc    Soft delete a water source
- * @access  Private (Creator, Moderator, or Admin)
+ * @swagger
+ * /water-sources/{id}:
+ *   delete:
+ *     summary: Soft delete a water source
+ *     tags: [Water Sources]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Source deleted
  */
 router.delete(
     '/:id',
