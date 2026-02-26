@@ -37,6 +37,12 @@ const publicReportSchema = new mongoose.Schema(
             trim: true,
             index: true,
         },
+        ipAddress: {
+            type: String,
+            trim: true,
+            default: null,
+            index: true,
+        },
 
         // ── Water Source ──────────────────────────────────────────
         waterSource: {

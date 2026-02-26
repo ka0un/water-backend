@@ -21,17 +21,5 @@ router.get(
     getModerationLogs
 );
 
-/**
- * @route POST /api/v1/moderation/logs/sample
- * @desc Create a sample moderation log entry (for testing)
- * @access Private (ADMIN, MODERATOR)
- */
-router.post(
-    '/logs/sample',
-    authenticate,
-    authorize(UserRole.ADMIN, UserRole.MODERATOR),
-    createSampleModerationLog
-);
-
 module.exports = router;
 

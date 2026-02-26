@@ -41,8 +41,9 @@ export default function WelcomeStep({ onNext }) {
             try {
                 await startNewReport(inputNic.trim());
                 onNext();
-            } catch {
-                // error handled in context
+            } catch (err) {
+                // error handled in context, clear the checked state to prevent showing empty lists
+                setChecked(false);
             }
         }
     };
@@ -56,8 +57,9 @@ export default function WelcomeStep({ onNext }) {
         try {
             await startNewReport(inputNic.trim());
             onNext();
-        } catch {
-            // error handled in context
+        } catch (err) {
+            // error is handled and set in context, which then displays in the Alert below
+            setNicError('');
         }
     };
 

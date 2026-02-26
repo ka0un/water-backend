@@ -63,7 +63,7 @@ export function AuthProvider({ children }) {
             setUser(u);
             localStorage.setItem(USER_KEY, JSON.stringify(u));
         } catch {
-            logout();
+            await logout();
         }
     };
 
@@ -95,11 +95,20 @@ export function AuthProvider({ children }) {
         }
     }, []);
 
-    const logout = useCallback(() => {
-        setToken(null);
-        setUser(null);
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USER_KEY);
+    const logout = useCallback(async () => {
+        try {
+            if (localStorage.getItem(TOKEN_KEY)) {
+                await api.post('/auth/logout');
+            }
+        } catch (err) {
+            // Ignore error so we can still clear local state
+        } finally {
+            setToken(null);
+            setUser(null);
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem(USER_KEY);
+            window.location.href = '/login';
+        }
     }, []);
 
     const value = {
