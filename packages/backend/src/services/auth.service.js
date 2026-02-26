@@ -93,10 +93,20 @@ const login = async (email, password) => {
     user.lastLoginAt = new Date();
     await user.save({ validateBeforeSave: false });
 
+    const { ModerationLog, ModerationAction } = require('../models/ModerationLog.model');
+
     // Generate token
     const token = generateToken(user._id);
 
     logger.info(`User logged in: ${email}`);
+
+    // If user is moderator or admin, log their login action
+    if (['MODERATOR', 'ADMIN'].includes(user.role)) {
+        await ModerationLog.create({
+            action: ModerationAction.LOGIN,
+            moderatorId: user._id,
+        }).catch(err => logger.error('Failed to log moderator login:', err));
+    }
 
     return {
         user: {

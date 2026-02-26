@@ -1,6 +1,7 @@
 const { PublicReport } = require('../models/PublicReport.model');
 const { LabTestRequest } = require('../models/LabTestRequest.model');
 const BannedUser = require('../models/BannedUser.model');
+const { ModerationLog, ModerationAction } = require('../models/ModerationLog.model');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/ApiResponse');
 const ApiError = require('../utils/ApiError');
@@ -228,6 +229,16 @@ const getReportDetail = asyncHandler(async (req, res) => {
         }));
     }
 
+    // Log the view action
+    await ModerationLog.create({
+        action: ModerationAction.VIEW_PUBLIC_REPORT,
+        moderatorId: req.user._id,
+        reportId: report._id,
+        previousStatus: report.mod_status,
+        newStatus: report.mod_status,
+        reason: 'Viewed report details',
+    }).catch(() => { }); // fire and forget
+
     return ApiResponse.success(res, { report: reportObj }, 'Report retrieved');
 });
 
@@ -288,6 +299,16 @@ const moderateReport = asyncHandler(async (req, res) => {
     }
 
     await report.save();
+
+    // Log the moderation action
+    await ModerationLog.create({
+        action: action === 'approve' ? ModerationAction.APPROVE : ModerationAction.REJECT,
+        moderatorId: req.user._id,
+        reportId: report._id,
+        previousStatus: 'pending', // or what it previously was
+        newStatus: report.mod_status,
+        reason: reason || 'Approved report via moderation panel',
+    }).catch(() => { });
 
     return ApiResponse.success(res, { report }, `Report ${action}d successfully`);
 });
@@ -438,6 +459,13 @@ const banUser = asyncHandler(async (req, res) => {
         bannedBy: req.user._id,
     });
 
+    // Log the ban action
+    await ModerationLog.create({
+        action: ModerationAction.BAN,
+        moderatorId: req.user._id,
+        reason: `Banned ${type.toUpperCase()}: ${value}. Reason: ${reason || 'N/A'}`,
+    }).catch(() => { });
+
     return ApiResponse.created(res, { ban: newBan }, `${type.toUpperCase()} banned successfully`);
 });
 
@@ -459,6 +487,13 @@ const unbanUser = asyncHandler(async (req, res) => {
     }
 
     await BannedUser.deleteOne({ _id: existingBan._id });
+
+    // Log the unban action
+    await ModerationLog.create({
+        action: ModerationAction.UNBAN,
+        moderatorId: req.user._id,
+        reason: `Unbanned ${type.toUpperCase()}: ${value}`,
+    }).catch(() => { });
 
     return ApiResponse.success(res, null, `${type.toUpperCase()} unbanned successfully`);
 });
