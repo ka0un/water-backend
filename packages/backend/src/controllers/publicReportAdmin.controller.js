@@ -441,6 +441,28 @@ const banUser = asyncHandler(async (req, res) => {
     return ApiResponse.created(res, { ban: newBan }, `${type.toUpperCase()} banned successfully`);
 });
 
+// ─── Unban a user by NIC or IP ──────────────────────────────────
+const unbanUser = asyncHandler(async (req, res) => {
+    const { type, value } = req.body;
+
+    if (!['ip', 'nic'].includes(type)) {
+        throw ApiError.badRequest('Ban type must be "ip" or "nic"');
+    }
+
+    if (!value) {
+        throw ApiError.badRequest('Ban value is required');
+    }
+
+    const existingBan = await BannedUser.findOne({ type, value });
+    if (!existingBan) {
+        throw ApiError.badRequest(`This ${type.toUpperCase()} is not currently banned.`);
+    }
+
+    await BannedUser.deleteOne({ _id: existingBan._id });
+
+    return ApiResponse.success(res, null, `${type.toUpperCase()} unbanned successfully`);
+});
+
 module.exports = {
     listReports,
     getStats,
@@ -454,4 +476,5 @@ module.exports = {
     exportReports,
     getSecurityInfo,
     banUser,
+    unbanUser,
 };

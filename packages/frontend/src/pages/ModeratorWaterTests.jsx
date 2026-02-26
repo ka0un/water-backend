@@ -328,6 +328,19 @@ export default function ModeratorWaterTests() {
         }
     };
 
+    const handleUnban = async (type, value) => {
+        try {
+            await api.post('/public-reports-admin/unban', { type, value });
+            // Refresh security stats to reflect the removal of the ban
+            if (selectedReport) {
+                const { data } = await api.get(`/public-reports-admin/${selectedReport._id}/security`);
+                setSecurityData(data.data.security);
+            }
+        } catch (e) {
+            setError(e.response?.data?.message || `Failed to unban ${type.toUpperCase()}`);
+        }
+    };
+
     /* ── Helpers ─────────────────────────────────────────────── */
     const imgPath = (reportId, imageId) => `/public-reports-admin/${reportId}/images/${imageId}`;
     const { page, pages, total } = pagination;
@@ -912,7 +925,13 @@ export default function ModeratorWaterTests() {
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'monospace' }}>{securityData.nic}</Typography>
                                             {securityData.isNicBanned ? (
-                                                <Chip label="Banned" size="small" color="error" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700 }} />
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <Chip label="Banned" size="small" color="error" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700 }} />
+                                                    <Button size="small" variant="outlined" color="success" sx={{ minWidth: 0, p: '2px 8px', fontSize: '0.7rem' }}
+                                                        onClick={() => handleUnban('nic', securityData.nic)}>
+                                                        Unban
+                                                    </Button>
+                                                </Box>
                                             ) : (
                                                 <Button size="small" variant="contained" color="error" sx={{ minWidth: 0, p: '2px 8px', fontSize: '0.7rem' }}
                                                     onClick={() => handleBan('nic', securityData.nic)}>
@@ -928,7 +947,13 @@ export default function ModeratorWaterTests() {
                                             <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'monospace' }}>{securityData.ipAddress}</Typography>
                                             {securityData.ipAddress !== 'Unknown' && (
                                                 securityData.isIpBanned ? (
-                                                    <Chip label="Banned" size="small" color="error" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700 }} />
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <Chip label="Banned" size="small" color="error" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700 }} />
+                                                        <Button size="small" variant="outlined" color="success" sx={{ minWidth: 0, p: '2px 8px', fontSize: '0.7rem' }}
+                                                            onClick={() => handleUnban('ip', securityData.ipAddress)}>
+                                                            Unban
+                                                        </Button>
+                                                    </Box>
                                                 ) : (
                                                     <Button size="small" variant="contained" color="error" sx={{ minWidth: 0, p: '2px 8px', fontSize: '0.7rem' }}
                                                         onClick={() => handleBan('ip', securityData.ipAddress)}>
