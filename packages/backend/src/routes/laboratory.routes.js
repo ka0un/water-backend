@@ -54,8 +54,21 @@ router.use(auth);
 router.use(authorize('ADMIN'));
 
 /**
- * POST /api/admin/laboratories
- * Create a new laboratory
+ * @swagger
+ * /laboratories:
+ *   post:
+ *     summary: Create a new laboratory
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Laboratory created
  */
 router.post(
   '/',
@@ -64,20 +77,61 @@ router.post(
 );
 
 /**
- * GET /api/admin/laboratories
- * Get all laboratories with pagination and filtering
+ * @swagger
+ * /laboratories:
+ *   get:
+ *     summary: Get all laboratories
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Loaded labs
  */
 router.get('/', getAllLaboratories);
 
 /**
- * GET /api/admin/laboratories/:id
- * Get a single laboratory by ID
+ * @swagger
+ * /laboratories/{id}:
+ *   get:
+ *     summary: Get a laboratory by ID
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Returned laboratory
  */
 router.get('/:id', getLaboratoryById);
 
 /**
- * PUT /api/admin/laboratories/:id
- * Update a laboratory
+ * @swagger
+ * /laboratories/{id}:
+ *   put:
+ *     summary: Update a laboratory
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Updated lab
  */
 router.put(
   '/:id',
@@ -86,8 +140,22 @@ router.put(
 );
 
 /**
- * DELETE /api/admin/laboratories/:id
- * Soft delete (deactivate) a laboratory
+ * @swagger
+ * /laboratories/{id}:
+ *   delete:
+ *     summary: Soft delete laboratory
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Deleted
  */
 router.delete('/:id', deleteLaboratory);
 

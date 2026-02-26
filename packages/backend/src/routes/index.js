@@ -18,9 +18,14 @@ const laboratoryRoutes = require('./laboratory.routes');
 const router = express.Router();
 
 /**
- * @route GET /api/v1/health
- * @desc Health check endpoint
- * @access Public
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Health check endpoint
+ *     tags: [Core]
+ *     responses:
+ *       200:
+ *         description: Server is healthy with system metrics
  */
 router.get('/health', (req, res) => {
     const healthCheck = {
@@ -45,9 +50,14 @@ router.get('/health', (req, res) => {
 });
 
 /**
- * @route GET /api/v1/
- * @desc API info endpoint
- * @access Public
+ * @swagger
+ * /:
+ *   get:
+ *     summary: API root information
+ *     tags: [Core]
+ *     responses:
+ *       200:
+ *         description: API version and available endpoints
  */
 router.get('/', (req, res) => {
     return ApiResponse.success(res, {

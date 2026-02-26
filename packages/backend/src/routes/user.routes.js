@@ -64,9 +64,25 @@ router.get('/profile', authenticate, asyncHandler(async (req, res) => {
 }));
 
 /**
- * @route GET /api/v1/users
- * @desc Get all users (Admin & Moderator only)
- * @access Private (ADMIN, MODERATOR)
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Get all users (Admin & Moderator only)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Users retrieved successfully
  */
 router.get('/', authenticate, authorize(UserRole.ADMIN, UserRole.MODERATOR), asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page, 10) || 1;
