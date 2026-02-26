@@ -25,8 +25,8 @@ const config = {
   },
   
   rateLimit: {
-    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 5 * 1000, // 5 s
-    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS, 10) || 20,
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60 * 1000, // 5 s
+    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS, 10) || 300,
   },
 };
 
