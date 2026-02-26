@@ -7,7 +7,7 @@ import {
     TableRow, Skeleton, LinearProgress, Divider,
 } from '@mui/material';
 import {
-    Gavel as GavelIcon, ListAlt as ListAltIcon, Science as ScienceIcon,
+    Gavel as GavelIcon, ListAlt as ListAltIcon,
     Assessment as AssessmentIcon, TrendingUp as TrendingUpIcon,
     People as PeopleIcon, PhotoCamera as PhotoIcon,
 } from '@mui/icons-material';
@@ -240,7 +240,6 @@ export default function Dashboard() {
     const navCards = [
         { title: 'Moderator Panel', desc: 'Review & moderate', icon: <GavelIcon sx={{ fontSize: 26, color: '#1565C0' }} />, path: '/moderator/water-tests', bg: '#E3F2FD' },
         { title: 'Moderation Logs', desc: 'Audit trail', icon: <ListAltIcon sx={{ fontSize: 26, color: '#2E7D32' }} />, path: '/moderation/logs', bg: '#E8F5E9' },
-        { title: 'Laboratory', desc: 'Lab management', icon: <ScienceIcon sx={{ fontSize: 26, color: '#7B1FA2' }} />, path: '/laboratory', bg: '#F3E5F5' },
     ];
 
     const kpis = [
@@ -254,7 +253,7 @@ export default function Dashboard() {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, width: '100%' }}>
 
             {/* ─── Nav Cards ────────────────────────────────── */}
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: 2 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' }, gap: 2 }}>
                 {navCards.map(c => (
                     <Card key={c.title} elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', transition: 'border-color .2s', '&:hover': { borderColor: 'primary.main' } }}>
                         <CardActionArea onClick={() => navigate(c.path)} sx={{ p: 2, display: 'flex', justifyContent: 'flex-start', gap: 2 }}>

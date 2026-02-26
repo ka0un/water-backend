@@ -52,7 +52,6 @@ const Layout = () => {
             { text: 'Moderator', icon: <GavelIcon />, path: '/moderator/water-tests' },
             { text: 'Moderation Logs', icon: <ListAltIcon />, path: '/moderation/logs' },
             { text: 'Laboratory Management', icon: <ScienceIcon />, path: '/laboratory' },
-            { text: 'Lab Tests', icon: <BiotechIcon />, path: '/lab-tests' },
         ];
     };
 
