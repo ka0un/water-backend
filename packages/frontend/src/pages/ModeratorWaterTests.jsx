@@ -10,7 +10,7 @@ import {
 import {
     CheckCircle as ApproveIcon, Cancel as RejectIcon, Visibility as ViewIcon,
     Close as CloseIcon, ArrowBack, ArrowForward, Search as SearchIcon,
-    WaterDrop, AccessTime, Person, CameraAlt, Science,
+    WaterDrop, AccessTime, Person, CameraAlt, Science, Security as SecurityIcon, Block as BlockIcon,
     Warning as WarningIcon, Info as InfoIcon, Refresh as RefreshIcon,
     FiberManualRecord as DotIcon, Map as MapIcon,
 } from '@mui/icons-material';
@@ -206,6 +206,11 @@ export default function ModeratorWaterTests() {
     const [rejectReason, setRejectReason] = useState('');
     const [rejectTargetId, setRejectTargetId] = useState(null);
 
+    /* Security dialog */
+    const [securityDialogOpen, setSecurityDialogOpen] = useState(false);
+    const [securityData, setSecurityData] = useState(null);
+    const [securityLoading, setSecurityLoading] = useState(false);
+
     /* ── Fetch list ─────────────────────────────────────────── */
     const fetchReports = useCallback(async (page = 1) => {
         setLoading(true);
@@ -286,6 +291,40 @@ export default function ModeratorWaterTests() {
             setError(e.response?.data?.message || 'Failed to reject');
         } finally {
             setActionLoading(null);
+        }
+    };
+
+    /* ── Security actions ───────────────────────────────────── */
+    const openSecurity = async (id) => {
+        setSecurityDialogOpen(true);
+        setSecurityLoading(true);
+        setSecurityData(null);
+        try {
+            const { data } = await api.get(`/public-reports-admin/${id}/security`);
+            setSecurityData(data.data.security);
+        } catch (e) {
+            setError('Failed to load security stats');
+            setSecurityDialogOpen(false);
+        } finally {
+            setSecurityLoading(false);
+        }
+    };
+
+    const closeSecurity = () => {
+        setSecurityDialogOpen(false);
+        setSecurityData(null);
+    };
+
+    const handleBan = async (type, value) => {
+        try {
+            await api.post('/public-reports-admin/ban', { type, value, reason: 'Banned from Moderation Panel' });
+            // Refresh security stats to reflect the new ban
+            if (selectedReport) {
+                const { data } = await api.get(`/public-reports-admin/${selectedReport._id}/security`);
+                setSecurityData(data.data.security);
+            }
+        } catch (e) {
+            setError(e.response?.data?.message || `Failed to ban ${type.toUpperCase()}`);
         }
     };
 
@@ -503,6 +542,11 @@ export default function ModeratorWaterTests() {
                                         Reject
                                     </Button>
                                 )}
+                                <Button variant="outlined" startIcon={<SecurityIcon />} color="secondary" size="small"
+                                    onClick={() => openSecurity(r._id)}
+                                    sx={{ borderRadius: 2, fontWeight: 700, textTransform: 'none', px: 3 }}>
+                                    Security
+                                </Button>
                                 <IconButton onClick={closeDetail}><CloseIcon /></IconButton>
                             </Box>
                         </Box>
@@ -843,6 +887,87 @@ export default function ModeratorWaterTests() {
                         sx={{ borderRadius: 2, fontWeight: 700 }}>
                         Reject Report
                     </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* ── Security Dialog ────────────────────────────── */}
+            <Dialog open={securityDialogOpen} onClose={closeSecurity} fullWidth maxWidth="sm">
+                <DialogTitle sx={{ fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <SecurityIcon sx={{ color: '#9C27B0' }} /> Security & Moderation
+                </DialogTitle>
+                <DialogContent>
+                    {securityLoading ? (
+                        <Box sx={{ p: 3, display: 'flex', justifyContent: 'center' }}>
+                            <Skeleton variant="rectangular" width="100%" height={200} sx={{ borderRadius: 2 }} />
+                        </Box>
+                    ) : securityData ? (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+                            <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden' }}>
+                                <Box sx={{ p: 1.5, bgcolor: '#F3E5F5', borderBottom: '1px solid', borderColor: 'divider' }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#6A1B9A' }}>Submitter Overview</Typography>
+                                </Box>
+                                <Box sx={{ p: 2 }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>NIC</Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'monospace' }}>{securityData.nic}</Typography>
+                                            {securityData.isNicBanned ? (
+                                                <Chip label="Banned" size="small" color="error" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700 }} />
+                                            ) : (
+                                                <Button size="small" variant="contained" color="error" sx={{ minWidth: 0, p: '2px 8px', fontSize: '0.7rem' }}
+                                                    onClick={() => handleBan('nic', securityData.nic)}>
+                                                    Ban NIC
+                                                </Button>
+                                            )}
+                                        </Box>
+                                    </Box>
+                                    <Divider sx={{ my: 1 }} />
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>IP Address</Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'monospace' }}>{securityData.ipAddress}</Typography>
+                                            {securityData.ipAddress !== 'Unknown' && (
+                                                securityData.isIpBanned ? (
+                                                    <Chip label="Banned" size="small" color="error" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700 }} />
+                                                ) : (
+                                                    <Button size="small" variant="contained" color="error" sx={{ minWidth: 0, p: '2px 8px', fontSize: '0.7rem' }}
+                                                        onClick={() => handleBan('ip', securityData.ipAddress)}>
+                                                        Ban IP
+                                                    </Button>
+                                                )
+                                            )}
+                                        </Box>
+                                    </Box>
+                                </Box>
+                            </Paper>
+
+                            <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden' }}>
+                                <Box sx={{ p: 1.5, bgcolor: '#E3F2FD', borderBottom: '1px solid', borderColor: 'divider' }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1565C0' }}>Submission Activity</Typography>
+                                </Box>
+                                <Box sx={{ p: 2 }}>
+                                    <DataRow label="Total Submissions (Life)" value={securityData.totalSubmissions} />
+                                    <Divider sx={{ my: 0.5 }} />
+                                    <DataRow label="Submissions Today" value={securityData.submissionsToday} color={securityData.submissionsToday > 5 ? '#D32F2F' : 'text.primary'} />
+                                    <Divider sx={{ my: 0.5 }} />
+                                    <DataRow label="Submissions (Last 1 Hour)" value={securityData.submissionsLastHour} color={securityData.submissionsLastHour > 3 ? '#D32F2F' : 'text.primary'} />
+                                </Box>
+                            </Paper>
+
+                            {(securityData.submissionsToday > 10 || securityData.submissionsLastHour > 5) && (
+                                <Alert severity="warning" icon={<BlockIcon />} sx={{ borderRadius: 2 }}>
+                                    High submission volume detected for this user. Monitor for spam.
+                                </Alert>
+                            )}
+                        </Box>
+                    ) : (
+                        <Box sx={{ p: 3, textAlign: 'center' }}>
+                            <Typography variant="body2" color="text.secondary">No security data available.</Typography>
+                        </Box>
+                    )}
+                </DialogContent>
+                <DialogActions sx={{ p: 2, bgcolor: '#FAFAFA' }}>
+                    <Button onClick={closeSecurity} sx={{ borderRadius: 2, fontWeight: 700 }}>Close</Button>
                 </DialogActions>
             </Dialog>
         </Box>

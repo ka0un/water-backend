@@ -1,5 +1,6 @@
 const { PublicReport } = require('../models/PublicReport.model');
 const { LabTestRequest } = require('../models/LabTestRequest.model');
+const BannedUser = require('../models/BannedUser.model');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/ApiResponse');
 const ApiError = require('../utils/ApiError');
@@ -372,6 +373,74 @@ const exportReports = asyncHandler(async (req, res) => {
     return res.json({ exportedAt: new Date(), count: reports.length, reports });
 });
 
+// ─── Get security statistics for a specific report ───────────────
+const getSecurityInfo = asyncHandler(async (req, res) => {
+    const report = await PublicReport.findById(req.params.id);
+    if (!report) throw ApiError.notFound('Report not found');
+
+    const nic = report.nic;
+    const ipAddress = report.ipAddress || 'Unknown';
+
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+
+    // Queries to determine submission counts
+    const filterBase = {
+        $or: [
+            { nic },
+            { ipAddress: { $ne: null, $eq: ipAddress } }
+        ]
+    };
+
+    const [totalSubmissions, submissionsToday, submissionsLastHour, bannedNic, bannedIp] = await Promise.all([
+        PublicReport.countDocuments(filterBase),
+        PublicReport.countDocuments({ ...filterBase, createdAt: { $gte: todayStart } }),
+        PublicReport.countDocuments({ ...filterBase, createdAt: { $gte: oneHourAgo } }),
+        BannedUser.findOne({ type: 'nic', value: nic }),
+        ipAddress !== 'Unknown' ? BannedUser.findOne({ type: 'ip', value: ipAddress }) : Promise.resolve(null),
+    ]);
+
+    return ApiResponse.success(res, {
+        security: {
+            nic,
+            ipAddress,
+            totalSubmissions,
+            submissionsToday,
+            submissionsLastHour,
+            isNicBanned: !!bannedNic,
+            isIpBanned: !!bannedIp,
+        }
+    }, 'Security information retrieved successfully');
+});
+
+// ─── Ban a user by NIC or IP ─────────────────────────────────────
+const banUser = asyncHandler(async (req, res) => {
+    const { type, value, reason } = req.body;
+
+    if (!['ip', 'nic'].includes(type)) {
+        throw ApiError.badRequest('Ban type must be "ip" or "nic"');
+    }
+
+    if (!value) {
+        throw ApiError.badRequest('Ban value is required');
+    }
+
+    const existingBan = await BannedUser.findOne({ type, value });
+    if (existingBan) {
+        throw ApiError.badRequest(`This ${type.toUpperCase()} is already banned.`);
+    }
+
+    const newBan = await BannedUser.create({
+        type,
+        value,
+        reason: reason || `Banned by moderator ${req.user._id}`,
+        bannedBy: req.user._id,
+    });
+
+    return ApiResponse.created(res, { ban: newBan }, `${type.toUpperCase()} banned successfully`);
+});
+
 module.exports = {
     listReports,
     getStats,
@@ -383,4 +452,6 @@ module.exports = {
     deleteByNic,
     resetAll,
     exportReports,
+    getSecurityInfo,
+    banUser,
 };
