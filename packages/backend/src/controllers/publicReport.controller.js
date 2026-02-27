@@ -3,6 +3,8 @@ const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/ApiResponse');
 const ApiError = require('../utils/ApiError');
 
+const BannedUser = require('../models/BannedUser.model');
+
 /**
  * @desc    Create a new public report (wizard start)
  * @route   POST /api/v1/public-reports
@@ -10,9 +12,23 @@ const ApiError = require('../utils/ApiError');
  */
 const createReport = asyncHandler(async (req, res) => {
     const { nic } = req.body;
+    const ipAddress = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress || null;
+
+    // Check if user is banned
+    const isBanned = await BannedUser.findOne({
+        $or: [
+            { type: 'nic', value: nic },
+            { type: 'ip', value: ipAddress }
+        ]
+    });
+
+    if (isBanned) {
+        throw ApiError.forbidden('You are banned from submitting public reports.');
+    }
 
     const report = await PublicReport.create({
         nic,
+        ipAddress,
         currentStep: 1,
     });
 

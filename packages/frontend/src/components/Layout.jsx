@@ -15,6 +15,7 @@ import {
     Science as ScienceIcon,
     Person as PersonIcon,
     WaterDrop as WaterDropIcon,
+    BiotechOutlined as BiotechIcon,
 } from '@mui/icons-material';
 
 const drawerWidth = 240;
@@ -36,13 +37,26 @@ const Layout = () => {
         navigate('/login', { replace: true });
     };
 
-    const menuItems = [
-        { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
-        { text: 'Moderator', icon: <GavelIcon />, path: '/moderator/water-tests' },
-        { text: 'Moderation Logs', icon: <ListAltIcon />, path: '/moderation/logs' },
-        { text: 'Laboratory Management', icon: <ScienceIcon />, path: '/laboratory' },
-        { text: 'Water Inventory', icon: <WaterDropIcon />, path: '/water-inventory' },
-    ];
+    // Role-based menu items
+    const getMenuItems = () => {
+        if (user?.role === 'LAB_STAFF') {
+            // Lab staff sees dashboard and lab test management
+            return [
+                { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
+                { text: 'Lab Tests', icon: <BiotechIcon />, path: '/lab-tests' },
+            ];
+        }
+        
+        // Admin and Moderator see all items
+        return [
+            { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
+            { text: 'Moderator', icon: <GavelIcon />, path: '/moderator/water-tests' },
+            { text: 'Moderation Logs', icon: <ListAltIcon />, path: '/moderation/logs' },
+            { text: 'Laboratory Management', icon: <ScienceIcon />, path: '/laboratory' },
+        ];
+    };
+
+    const menuItems = getMenuItems();
 
     const drawer = (
         <div>

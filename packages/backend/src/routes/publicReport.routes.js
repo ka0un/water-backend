@@ -18,51 +18,138 @@ const {
 const router = express.Router();
 
 /**
- * @route   POST /api/v1/public-reports
- * @desc    Create a new public report (wizard start)
- * @access  Public
+ * @swagger
+ * /public-reports:
+ *   post:
+ *     summary: Create a new public report
+ *     tags: [Public Reports]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Created
  */
 router.post('/', validate(createReportSchema), createReport);
 
 /**
- * @route   GET /api/v1/public-reports/by-nic/:nic
- * @desc    Get reports by NIC number (in-progress + completed)
- * @access  Public
+ * @swagger
+ * /public-reports/by-nic/{nic}:
+ *   get:
+ *     summary: Get reports by NIC
+ *     tags: [Public Reports]
+ *     parameters:
+ *       - in: path
+ *         name: nic
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Returned list of reports
  */
 router.get('/by-nic/:nic', validate(nicParamSchema, 'params'), getByNic);
 
 /**
- * @route   GET /api/v1/public-reports/:id/full
- * @desc    Get a full report (with image metadata, for viewing past submissions)
- * @access  Public
+ * @swagger
+ * /public-reports/{id}/full:
+ *   get:
+ *     summary: Get full report
+ *     tags: [Public Reports]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Full report data
  */
 router.get('/:id/full', getReportFull);
 
 /**
- * @route   GET /api/v1/public-reports/:id
- * @desc    Get a report by ID
- * @access  Public
+ * @swagger
+ * /public-reports/{id}:
+ *   get:
+ *     summary: Get a report by ID
+ *     tags: [Public Reports]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Report data
  */
 router.get('/:id', getReport);
 
 /**
- * @route   PATCH /api/v1/public-reports/:id
- * @desc    Update report (auto-save wizard step)
- * @access  Public
+ * @swagger
+ * /public-reports/{id}:
+ *   patch:
+ *     summary: Update report (Auto-save)
+ *     tags: [Public Reports]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Successfully saved
  */
 router.patch('/:id', validate(updateReportSchema), updateReport);
 
 /**
- * @route   POST /api/v1/public-reports/:id/submit
- * @desc    Submit the report (mark wizard completed)
- * @access  Public
+ * @swagger
+ * /public-reports/{id}/submit:
+ *   post:
+ *     summary: Submit the report
+ *     tags: [Public Reports]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Submitted
  */
 router.post('/:id/submit', submitReport);
 
 /**
- * @route   POST /api/v1/public-reports/:id/images
- * @desc    Upload images for a report (base64)
- * @access  Public
+ * @swagger
+ * /public-reports/{id}/images:
+ *   post:
+ *     summary: Upload images
+ *     tags: [Public Reports]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Images uploaded
  */
 router.post('/:id/images', uploadImages);
 

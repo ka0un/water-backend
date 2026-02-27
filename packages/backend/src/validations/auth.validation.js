@@ -37,10 +37,10 @@ const registerSchema = Joi.object({
             'any.required': 'Password is required',
         }),
     role: Joi.string()
-        .valid('USER', 'MODERATOR', 'ADMIN')
+        .valid('USER', 'MODERATOR', 'ADMIN', 'LAB_STAFF')
         .default('USER')
         .messages({
-            'any.only': 'Role must be one of: USER, MODERATOR, ADMIN',
+            'any.only': 'Role must be one of: USER, MODERATOR, ADMIN, LAB_STAFF',
         }),
 });
 

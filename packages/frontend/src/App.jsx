@@ -1,15 +1,28 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import theme from './theme';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
+import LabStaffDashboard from './pages/LabStaffDashboard';
+import LabTestManagement from './pages/LabTestManagement';
 import ModeratorWaterTests from './pages/ModeratorWaterTests';
 import ModerationLogs from './pages/ModerationLogs';
 import LaboratoryManagement from './pages/LaboratoryManagement';
 import WaterInventory from './pages/WaterInventory';
+
+// Component that renders different dashboard based on user role
+function RoleDashboard() {
+  const { user } = useAuth();
+  
+  if (user?.role === 'LAB_STAFF') {
+    return <LabStaffDashboard />;
+  }
+  
+  return <Dashboard />;
+}
 
 function App() {
   return (
@@ -30,11 +43,12 @@ function App() {
                 </ProtectedRoute>
               }
             >
-              <Route index element={<Dashboard />} />
+              <Route index element={<RoleDashboard />} />
               <Route path="moderator/water-tests" element={<ModeratorWaterTests />} />
               <Route path="moderation/logs" element={<ModerationLogs />} />
               <Route path="laboratory" element={<LaboratoryManagement />} />
               <Route path="water-inventory" element={<WaterInventory />} />
+              <Route path="lab-tests" element={<LabTestManagement />} />
             </Route>
           </Routes>
         </BrowserRouter>

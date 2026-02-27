@@ -63,7 +63,7 @@ export function AuthProvider({ children }) {
             setUser(u);
             localStorage.setItem(USER_KEY, JSON.stringify(u));
         } catch {
-            logout();
+            await logout();
         }
     };
 
@@ -74,9 +74,9 @@ export function AuthProvider({ children }) {
             const { data } = await api.post('/auth/login', { email, password });
             const { token: newToken, user: newUser } = data.data;
 
-            // Check role — only MODERATOR and ADMIN can access dashboard
-            if (!['MODERATOR', 'ADMIN'].includes(newUser.role)) {
-                setError('Access denied. Only moderators and admins can access this dashboard.');
+            // Check role — only MODERATOR, ADMIN, and LAB_STAFF can access dashboard
+            if (!['MODERATOR', 'ADMIN', 'LAB_STAFF'].includes(newUser.role)) {
+                setError('Access denied. Only moderators, admins, and lab staff can access this dashboard.');
                 setLoading(false);
                 return false;
             }
@@ -95,11 +95,20 @@ export function AuthProvider({ children }) {
         }
     }, []);
 
-    const logout = useCallback(() => {
-        setToken(null);
-        setUser(null);
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USER_KEY);
+    const logout = useCallback(async () => {
+        try {
+            if (localStorage.getItem(TOKEN_KEY)) {
+                await api.post('/auth/logout');
+            }
+        } catch (err) {
+            // Ignore error so we can still clear local state
+        } finally {
+            setToken(null);
+            setUser(null);
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem(USER_KEY);
+            window.location.href = '/login';
+        }
     }, []);
 
     const value = {
