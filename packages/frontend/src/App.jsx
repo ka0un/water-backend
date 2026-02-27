@@ -11,6 +11,7 @@ import LabTestManagement from './pages/LabTestManagement';
 import ModeratorWaterTests from './pages/ModeratorWaterTests';
 import ModerationLogs from './pages/ModerationLogs';
 import LaboratoryManagement from './pages/LaboratoryManagement';
+import WaterInventory from './pages/WaterInventory';
 
 // Component that renders different dashboard based on user role
 function RoleDashboard() {
@@ -46,6 +47,7 @@ function App() {
               <Route path="moderator/water-tests" element={<ModeratorWaterTests />} />
               <Route path="moderation/logs" element={<ModerationLogs />} />
               <Route path="laboratory" element={<LaboratoryManagement />} />
+              <Route path="water-inventory" element={<WaterInventory />} />
               <Route path="lab-tests" element={<LabTestManagement />} />
             </Route>
           </Routes>

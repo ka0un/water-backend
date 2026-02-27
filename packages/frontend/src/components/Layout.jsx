@@ -14,6 +14,7 @@ import {
     ExitToApp as LogoutIcon,
     Science as ScienceIcon,
     Person as PersonIcon,
+    WaterDrop as WaterDropIcon,
     BiotechOutlined as BiotechIcon,
 } from '@mui/icons-material';
 
