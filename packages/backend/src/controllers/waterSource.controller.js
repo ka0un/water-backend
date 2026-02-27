@@ -6,7 +6,6 @@ const HTTP_STATUS = {
     FORBIDDEN: 403,
 };
 const WaterSource = require('../models/WaterSource.model');
-const { ContaminationStatus } = require('../models/WaterSource.model');
 const { WaterTest } = require('../models/WaterTest.model');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/ApiResponse');
@@ -20,7 +19,7 @@ const ApiError = require('../utils/ApiError');
  * NOTE: Includes duplicate detection within 20 meters to prevent duplicate entries
  */
 const createSource = asyncHandler(async (req, res) => {
-    const { name, type, location, operational_status, access_type, description, contamination_status } = req.body;
+    const { name, type, location, operational_status, access_type, description } = req.body;
     const userId = req.user._id;
 
     // Extract coordinates from request
@@ -53,7 +52,6 @@ const createSource = asyncHandler(async (req, res) => {
         },
         operational_status,
         access_type,
-        contamination_status,
         description,
         created_by: userId,
     });
@@ -100,7 +98,6 @@ const getSources = asyncHandler(async (req, res) => {
     if (operational_status) filter.operational_status = operational_status;
     if (access_type) filter.access_type = access_type;
     if (verified !== undefined) filter.verified = verified === 'true';
-    if (req.query.contamination_status) filter.contamination_status = req.query.contamination_status;
 
     // Calculate pagination
     const skip = (page - 1) * limit;
@@ -166,7 +163,6 @@ const getNearbySources = asyncHandler(async (req, res) => {
     const filters = {};
     if (type) filters.type = type;
     if (operational_status) filters.operational_status = operational_status;
-    if (req.query.contamination_status) filters.contamination_status = req.query.contamination_status;
 
     /**
      * Use the static method defined in the model for geospatial query
@@ -312,7 +308,7 @@ const updateWaterSource = asyncHandler(async (req, res) => {
     }
 
     // Update allowed fields
-    const allowedUpdates = ['name', 'type', 'operational_status', 'access_type', 'description', 'contamination_status'];
+    const allowedUpdates = ['name', 'type', 'operational_status', 'access_type', 'description'];
     Object.keys(updateData).forEach((key) => {
         if (allowedUpdates.includes(key)) {
             waterSource[key] = updateData[key];
@@ -415,46 +411,6 @@ const softDeleteSource = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Update contamination status of a water source
- * @route   PATCH /api/v1/water-sources/:id/contamination
- * @access  Private (authenticated users)
- *
- * Allows any authenticated user to mark a water source as Clean or Contaminated
- */
-const updateContaminationStatus = asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const { contamination_status, notes } = req.body;
-    const userId = req.user._id;
-
-    const waterSource = await WaterSource.findOne({
-        _id: id,
-        is_deleted: false,
-    });
-
-    if (!waterSource) {
-        throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Water source not found');
-    }
-
-    const previousStatus = waterSource.contamination_status;
-    waterSource.contamination_status = contamination_status;
-
-    // Append status change to description for audit trail
-    if (notes) {
-        const statusUpdate = `\n[${new Date().toISOString()}] Contamination status changed from "${previousStatus}" to "${contamination_status}" by user ${userId}: ${notes}`;
-        waterSource.description = (waterSource.description || '') + statusUpdate;
-    }
-
-    await waterSource.save();
-    await waterSource.populate('created_by', 'name email');
-
-    return ApiResponse.success(
-        res,
-        waterSource,
-        `Contamination status updated from "${previousStatus}" to "${contamination_status}"`
-    );
-});
-
-/**
  * @desc    Get water source statistics
  * @route   GET /api/v1/water-sources/stats
  * @access  Public
@@ -481,9 +437,6 @@ const getSourceStats = asyncHandler(async (req, res) => {
                 byAccessType: {
                     $push: '$access_type',
                 },
-                byContaminationStatus: {
-                    $push: '$contamination_status',
-                },
             },
         },
     ]);
@@ -495,7 +448,6 @@ const getSourceStats = asyncHandler(async (req, res) => {
             byType: {},
             byStatus: {},
             byAccessType: {},
-            byContaminationStatus: {},
         }, 'No water sources found');
     }
 
@@ -514,7 +466,6 @@ const getSourceStats = asyncHandler(async (req, res) => {
         byType: countOccurrences(stats[0].byType),
         byStatus: countOccurrences(stats[0].byStatus),
         byAccessType: countOccurrences(stats[0].byAccessType),
-        byContaminationStatus: countOccurrences(stats[0].byContaminationStatus),
     };
 
     return ApiResponse.success(res, result, 'Statistics retrieved successfully');
@@ -526,7 +477,6 @@ module.exports = {
     getNearbySources,
     getSourceById,
     updateSourceStatus,
-    updateContaminationStatus,
     updateWaterSource,
     verifyWaterSource,
     softDeleteSource,

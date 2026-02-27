@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { WaterSourceType, OperationalStatus, AccessType, ContaminationStatus } = require('../models/WaterSource.model');
+const { WaterSourceType, OperationalStatus, AccessType } = require('../models/WaterSource.model');
 
 /**
  * Validation schema for creating a new water source
@@ -50,12 +50,6 @@ const createWaterSource = {
         description: Joi.string().trim().max(1000).optional().allow('').messages({
             'string.max': 'Description cannot exceed 1000 characters',
         }),
-        contamination_status: Joi.string()
-            .valid(...Object.values(ContaminationStatus))
-            .optional()
-            .messages({
-                'any.only': `Contamination status must be one of: ${Object.values(ContaminationStatus).join(', ')}`,
-            }),
     }),
 };
 
@@ -91,9 +85,6 @@ const getWaterSources = {
             'number.max': 'Limit cannot exceed 100',
         }),
         sort: Joi.string().optional().valid('createdAt', '-createdAt', 'name', '-name').default('-createdAt'),
-        contamination_status: Joi.string()
-            .valid(...Object.values(ContaminationStatus))
-            .optional(),
     }),
 };
 
@@ -121,9 +112,6 @@ const getNearbySources = {
             .optional(),
         operational_status: Joi.string()
             .valid(...Object.values(OperationalStatus))
-            .optional(),
-        contamination_status: Joi.string()
-            .valid(...Object.values(ContaminationStatus))
             .optional(),
     }),
 };
@@ -195,9 +183,6 @@ const updateWaterSource = {
             .valid(...Object.values(AccessType))
             .optional(),
         description: Joi.string().trim().max(1000).optional().allow(''),
-        contamination_status: Joi.string()
-            .valid(...Object.values(ContaminationStatus))
-            .optional(),
     }).min(1), // At least one field must be provided
 };
 
@@ -237,29 +222,6 @@ module.exports = {
     getNearbySources,
     getWaterSourceById,
     updateSourceStatus,
-    updateContaminationStatus: {
-        params: Joi.object({
-            id: Joi.string()
-                .regex(/^[0-9a-fA-F]{24}$/)
-                .required()
-                .messages({
-                    'string.pattern.base': 'Invalid water source ID format',
-                    'any.required': 'Water source ID is required',
-                }),
-        }),
-        body: Joi.object({
-            contamination_status: Joi.string()
-                .valid(...Object.values(ContaminationStatus))
-                .required()
-                .messages({
-                    'any.only': `Contamination status must be one of: ${Object.values(ContaminationStatus).join(', ')}`,
-                    'any.required': 'Contamination status is required',
-                }),
-            notes: Joi.string().trim().max(500).optional().allow('').messages({
-                'string.max': 'Notes cannot exceed 500 characters',
-            }),
-        }),
-    },
     updateWaterSource,
     verifyWaterSource,
     deleteWaterSource,
