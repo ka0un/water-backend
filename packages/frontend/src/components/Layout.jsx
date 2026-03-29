@@ -16,6 +16,8 @@ import {
     Person as PersonIcon,
     WaterDrop as WaterDropIcon,
     BiotechOutlined as BiotechIcon,
+    Inventory as InventoryIcon,
+    FactCheck as FactCheckIcon,
 } from '@mui/icons-material';
 
 const drawerWidth = 240;
@@ -46,10 +48,18 @@ const Layout = () => {
                 { text: 'Lab Tests', icon: <BiotechIcon />, path: '/lab-tests' },
             ];
         }
+
+        if (user?.role === 'USER') {
+            return [
+                { text: 'Water Inventory', icon: <InventoryIcon />, path: '/water-inventory-user' },
+            ];
+        }
         
         // Admin and Moderator see all items
         return [
             { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
+            { text: 'Water Inventory', icon: <InventoryIcon />, path: '/water-inventory' },
+            { text: 'Resource Approval', icon: <FactCheckIcon />, path: '/water-resource-approval' },
             { text: 'Moderator', icon: <GavelIcon />, path: '/moderator/water-tests' },
             { text: 'Moderation Logs', icon: <ListAltIcon />, path: '/moderation/logs' },
             { text: 'Laboratory Management', icon: <ScienceIcon />, path: '/laboratory' },

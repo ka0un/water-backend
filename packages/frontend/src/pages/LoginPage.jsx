@@ -12,6 +12,7 @@ export default function LoginPage() {
     const { login, loading, error, setError } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
+    const registrationMessage = location.state?.message;
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -64,6 +65,12 @@ export default function LoginPage() {
                     </Alert>
                 )}
 
+                {registrationMessage && !error && (
+                    <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
+                        {registrationMessage}
+                    </Alert>
+                )}
+
                 <form onSubmit={handleSubmit}>
                     <TextField
                         fullWidth
@@ -111,7 +118,19 @@ export default function LoginPage() {
                 </form>
 
                 <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', mt: 3, color: 'text.disabled' }}>
-                    Only moderators and administrators can access this dashboard.
+                    Only moderators, admins, and lab staff can access this dashboard.
+                </Typography>
+
+                <Typography variant="body2" sx={{ textAlign: 'center', mt: 1.5, color: 'text.secondary' }}>
+                    Need an account?{' '}
+                    <Button
+                        size="small"
+                        variant="text"
+                        onClick={() => navigate('/register', { state: { from: location.state?.from } })}
+                        sx={{ minWidth: 0, p: 0, textTransform: 'none', verticalAlign: 'baseline' }}
+                    >
+                        Register here
+                    </Button>
                 </Typography>
             </Card>
         </Box>

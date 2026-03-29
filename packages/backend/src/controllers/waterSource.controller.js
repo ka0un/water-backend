@@ -133,6 +133,62 @@ const getSources = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @desc    Get water sources created by the authenticated user
+ * @route   GET /api/v1/water-sources/mine
+ * @access  Private
+ */
+const getMySources = asyncHandler(async (req, res) => {
+    const {
+        type,
+        operational_status,
+        access_type,
+        verified,
+        page = 1,
+        limit = 10,
+        sort = '-createdAt',
+    } = req.query;
+
+    const filter = {
+        is_deleted: false,
+        created_by: req.user._id,
+    };
+
+    if (type) filter.type = type;
+    if (operational_status) filter.operational_status = operational_status;
+    if (access_type) filter.access_type = access_type;
+    if (verified !== undefined) filter.verified = verified === 'true';
+
+    const skip = (page - 1) * limit;
+
+    const [sources, total] = await Promise.all([
+        WaterSource.find(filter)
+            .populate('created_by', 'name email')
+            .populate('verified_by', 'name email')
+            .sort(sort)
+            .limit(parseInt(limit))
+            .skip(skip)
+            .lean(),
+        WaterSource.countDocuments(filter),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    return ApiResponse.success(res, {
+        sources,
+        pagination: {
+            total,
+            page: parseInt(page),
+            limit: parseInt(limit),
+            totalPages,
+            hasNextPage,
+            hasPrevPage,
+        },
+    }, 'Your water sources retrieved successfully');
+});
+
+/**
  * @desc    Get nearby water sources using geospatial query
  * @route   GET /api/v1/water-sources/nearby
  * @access  Public
@@ -157,12 +213,14 @@ const getNearbySources = asyncHandler(async (req, res) => {
         radius = 5000,
         type,
         operational_status,
+        verified,
     } = req.query;
 
     // Build additional filters
     const filters = {};
     if (type) filters.type = type;
     if (operational_status) filters.operational_status = operational_status;
+    if (verified !== undefined) filters.verified = verified === 'true';
 
     /**
      * Use the static method defined in the model for geospatial query
@@ -474,6 +532,7 @@ const getSourceStats = asyncHandler(async (req, res) => {
 module.exports = {
     createSource,
     getSources,
+    getMySources,
     getNearbySources,
     getSourceById,
     updateSourceStatus,

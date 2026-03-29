@@ -74,9 +74,9 @@ export function AuthProvider({ children }) {
             const { data } = await api.post('/auth/login', { email, password });
             const { token: newToken, user: newUser } = data.data;
 
-            // Check role — only MODERATOR, ADMIN, and LAB_STAFF can access dashboard
-            if (!['MODERATOR', 'ADMIN', 'LAB_STAFF'].includes(newUser.role)) {
-                setError('Access denied. Only moderators, admins, and lab staff can access this dashboard.');
+            // Check role — registered system roles can access dashboard flows
+            if (!['USER', 'MODERATOR', 'ADMIN', 'LAB_STAFF'].includes(newUser.role)) {
+                setError('Access denied for this account role.');
                 setLoading(false);
                 return false;
             }
