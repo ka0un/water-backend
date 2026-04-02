@@ -17,7 +17,7 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    const from = location.state?.from?.pathname || '/';
+    const from = location.state?.from?.pathname || '/app';
 
     const handleSubmit = async (e) => {
         e.preventDefault();

@@ -44,26 +44,31 @@ const Layout = () => {
         if (user?.role === 'LAB_STAFF') {
             // Lab staff sees dashboard and lab test management
             return [
-                { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
-                { text: 'Lab Tests', icon: <BiotechIcon />, path: '/lab-tests' },
+                { text: 'Dashboard', icon: <DashboardIcon />, path: '/app' },
+                { text: 'Lab Tests', icon: <BiotechIcon />, path: '/app/lab-tests' },
             ];
         }
 
         if (user?.role === 'USER') {
             return [
-                { text: 'Water Inventory', icon: <InventoryIcon />, path: '/water-inventory-user' },
+                { text: 'Water Inventory', icon: <InventoryIcon />, path: '/app/water-inventory-user' },
             ];
         }
         
-        // Admin and Moderator see all items
-        return [
-            { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
-            { text: 'Water Inventory', icon: <InventoryIcon />, path: '/water-inventory' },
-            { text: 'Resource Approval', icon: <FactCheckIcon />, path: '/water-resource-approval' },
-            { text: 'Moderator', icon: <GavelIcon />, path: '/moderator/water-tests' },
-            { text: 'Moderation Logs', icon: <ListAltIcon />, path: '/moderation/logs' },
-            { text: 'Laboratory Management', icon: <ScienceIcon />, path: '/laboratory' },
+        let items = [
+            { text: 'Dashboard', icon: <DashboardIcon />, path: '/app' },
+            { text: 'Water Inventory', icon: <InventoryIcon />, path: '/app/water-inventory' },
+            { text: 'Resource Approval', icon: <FactCheckIcon />, path: '/app/water-resource-approval' },
+            { text: 'Moderator', icon: <GavelIcon />, path: '/app/moderator/water-tests' },
+            { text: 'Moderation Logs', icon: <ListAltIcon />, path: '/app/moderation/logs' },
+            { text: 'Laboratory Management', icon: <ScienceIcon />, path: '/app/laboratory' },
         ];
+        
+        if (user?.role === 'ADMIN') {
+            items.push({ text: 'Users', icon: <PersonIcon />, path: '/app/users' });
+        }
+        
+        return items;
     };
 
     const menuItems = getMenuItems();
