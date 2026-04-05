@@ -238,8 +238,8 @@ export default function Dashboard() {
     const maxBubble = Math.max(...mapBubbles.map(b => b.count), 1);
 
     const navCards = [
-        { title: 'Moderator Panel', desc: 'Review & moderate', icon: <GavelIcon sx={{ fontSize: 26, color: '#1565C0' }} />, path: '/moderator/water-tests', bg: '#E3F2FD' },
-        { title: 'Moderation Logs', desc: 'Audit trail', icon: <ListAltIcon sx={{ fontSize: 26, color: '#2E7D32' }} />, path: '/moderation/logs', bg: '#E8F5E9' },
+        { title: 'Moderator Panel', desc: 'Review & moderate', icon: <GavelIcon sx={{ fontSize: 26, color: '#1565C0' }} />, path: '/app/moderator/water-tests', bg: '#E3F2FD' },
+        { title: 'Moderation Logs', desc: 'Audit trail', icon: <ListAltIcon sx={{ fontSize: 26, color: '#2E7D32' }} />, path: '/app/moderation/logs', bg: '#E8F5E9' },
     ];
 
     const kpis = [

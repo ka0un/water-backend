@@ -78,6 +78,13 @@ router.get(
     waterSourceController.getSources
 );
 
+router.get(
+    '/mine',
+    auth,
+    validate(waterSourceValidation.getWaterSources),
+    waterSourceController.getMySources
+);
+
 /**
  * @swagger
  * /water-sources:

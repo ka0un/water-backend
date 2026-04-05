@@ -113,6 +113,7 @@ const getNearbySources = {
         operational_status: Joi.string()
             .valid(...Object.values(OperationalStatus))
             .optional(),
+        verified: Joi.boolean().optional(),
     }),
 };
 
