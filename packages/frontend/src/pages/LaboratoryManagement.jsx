@@ -63,6 +63,11 @@ const LaboratoryManagement = () => {
     status: 'active',
   });
 
+  const [formErrors, setFormErrors] = useState({
+    email: '',
+    phone: '',
+  });
+
   const [filters, setFilters] = useState({
     status: 'active',
     search: '',
@@ -137,12 +142,14 @@ const LaboratoryManagement = () => {
       });
     }
     setOpenDialog(true);
+    setFormErrors({ email: '', phone: '' });
   };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setIsEditing(false);
     setCurrentLab(null);
+    setFormErrors({ email: '', phone: '' });
   };
 
   const handleInputChange = (e) => {
@@ -151,11 +158,37 @@ const LaboratoryManagement = () => {
       ...prev,
       [name]: value,
     }));
+
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handleSubmit = async () => {
     setError('');
     setSuccess('');
+
+    // Pre-validation
+    const emailRegex = /.+@.+\..+/;
+    const phoneRegex = /^[0-9]{10}$/;
+    
+    let hasErrors = false;
+    const newErrors = { email: '', phone: '' };
+
+    if (!emailRegex.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+      hasErrors = true;
+    }
+
+    if (!phoneRegex.test(formData.phone)) {
+      newErrors.phone = 'Phone number must be exactly 10 digits';
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      setFormErrors(newErrors);
+      return;
+    }
 
     try {
       const payload = {
@@ -386,6 +419,8 @@ const LaboratoryManagement = () => {
             type="email"
             value={formData.email}
             onChange={handleInputChange}
+            error={!!formErrors.email}
+            helperText={formErrors.email}
             required
           />
           <TextField
@@ -394,6 +429,8 @@ const LaboratoryManagement = () => {
             name="phone"
             value={formData.phone}
             onChange={handleInputChange}
+            error={!!formErrors.phone}
+            helperText={formErrors.phone}
             required
           />
           <TextField

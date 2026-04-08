@@ -80,6 +80,8 @@ export default function LabTestManagement() {
     const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
     const [collectDialogOpen, setCollectDialogOpen] = useState(false);
     const [resultsDialogOpen, setResultsDialogOpen] = useState(false);
+    const [verdictDialogOpen, setVerdictDialogOpen] = useState(false);
+    const [verdictResult, setVerdictResult] = useState(null);
     const [actionLoading, setActionLoading] = useState(false);
 
     // Form states
@@ -89,18 +91,18 @@ export default function LabTestManagement() {
         timeSlot: '',
         contactPhone: '',
         specialInstructions: '',
+        laboratoryId: '',
     });
+    const [scheduleError, setScheduleError] = useState('');
+    const [laboratories, setLaboratories] = useState([]);
     const [collectForm, setCollectForm] = useState({
-        lat: '',
-        lng: '',
         address: '',
         sampleId: '',
         bottleType: 'sterile plastic',
         volumeCollected: 500,
-        waterTemperature: '',
-        weatherConditions: '',
         notes: '',
     });
+    const [collectError, setCollectError] = useState('');
     const [testResults, setTestResults] = useState({});
     const [labNotes, setLabNotes] = useState('');
 
@@ -123,6 +125,18 @@ export default function LabTestManagement() {
     useEffect(() => {
         fetchRequests();
     }, [statusFilter, pagination.page]);
+
+    useEffect(() => {
+        const fetchLabs = async () => {
+            try {
+                const { data } = await api.get('/lab-staff/laboratories');
+                setLaboratories(data.data.laboratories || []);
+            } catch (err) {
+                console.error('Failed to fetch laboratories:', err);
+            }
+        };
+        fetchLabs();
+    }, [api]);
 
     // Actions
     const handleAccept = async (id) => {
@@ -158,33 +172,44 @@ export default function LabTestManagement() {
     };
 
     const handleSchedule = async () => {
-        if (!scheduleForm.date || !scheduleForm.timeSlot) {
-            setError('Date and time slot are required');
+        setScheduleError('');
+        if (!scheduleForm.date || !scheduleForm.timeSlot || !scheduleForm.laboratoryId) {
+            setScheduleError('Date, time slot, and laboratory assignment are required');
             return;
         }
+
+        const phoneRegex = /^[0-9]{10}$/;
+        if (scheduleForm.contactPhone && !phoneRegex.test(scheduleForm.contactPhone)) {
+            setScheduleError('Contact phone must be exactly 10 digits');
+            return;
+        }
+
         setActionLoading(true);
         try {
             await api.post(`/lab-staff/requests/${selectedRequest._id}/schedule`, scheduleForm);
             setSuccess('Sample collection scheduled');
             setScheduleDialogOpen(false);
-            setScheduleForm({ date: '', timeSlot: '', contactPhone: '', specialInstructions: '' });
+            setScheduleForm({ date: '', timeSlot: '', contactPhone: '', specialInstructions: '', laboratoryId: '' });
             fetchRequests();
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to schedule collection');
+            setScheduleError(err.response?.data?.message || 'Failed to schedule collection');
         } finally {
             setActionLoading(false);
         }
     };
 
     const handleCollect = async () => {
+        setCollectError('');
+        if (!collectForm.address || !collectForm.sampleId || !collectForm.bottleType || !collectForm.volumeCollected) {
+            setCollectError('Address, Sample ID, Bottle Type, and Volume are required fields.');
+            return;
+        }
+
         setActionLoading(true);
         try {
             await api.post(`/lab-staff/requests/${selectedRequest._id}/collect`, {
                 ...collectForm,
-                lat: parseFloat(collectForm.lat) || null,
-                lng: parseFloat(collectForm.lng) || null,
                 volumeCollected: parseInt(collectForm.volumeCollected) || 500,
-                waterTemperature: parseFloat(collectForm.waterTemperature) || null,
             });
             setSuccess('Sample collection recorded');
             setCollectDialogOpen(false);
@@ -227,9 +252,19 @@ export default function LabTestManagement() {
     const handleCompleteAndVerdict = async () => {
         setActionLoading(true);
         try {
-            await api.post(`/lab-staff/requests/${selectedRequest._id}/complete`);
-            setSuccess('Testing completed and verdict issued');
+            // Always save the latest results first before issuing the verdict
+            // so calculateVerdict() on the backend uses the actual entered values
+            await api.put(`/lab-staff/requests/${selectedRequest._id}/results`, {
+                results: testResults,
+                labNotes,
+            });
+
+            // Now complete the test — backend will run calculateVerdict() on the saved data
+            const { data } = await api.post(`/lab-staff/requests/${selectedRequest._id}/complete`, {});
             setResultsDialogOpen(false);
+            setVerdictResult(data.data.request);
+            setVerdictDialogOpen(true);
+            setStatusFilter('completed');
             fetchRequests();
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to complete testing');
@@ -381,7 +416,19 @@ export default function LabTestManagement() {
                                     {new Date(req.createdAt).toLocaleDateString()}
                                 </TableCell>
                                 <TableCell align="center">
-                                    <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                                    <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center', alignItems: 'center' }}>
+                                        {req.status === 'completed' && req.verdict?.result && (
+                                            <Chip
+                                                label={req.verdict.result === 'safe' ? '✓ SAFE' : req.verdict.result === 'unsafe' ? '✗ UNSAFE' : '⚠ TREATMENT'}
+                                                size="small"
+                                                sx={{
+                                                    bgcolor: req.verdict.result === 'safe' ? '#2E7D32' : req.verdict.result === 'unsafe' ? '#C62828' : '#E65100',
+                                                    color: '#fff',
+                                                    fontWeight: 700,
+                                                    fontSize: '0.7rem',
+                                                }}
+                                            />
+                                        )}
                                         <Tooltip title="View Details">
                                             <IconButton size="small" onClick={() => openViewDialog(req)}>
                                                 <ViewIcon />
@@ -446,32 +493,212 @@ export default function LabTestManagement() {
                                 </Grid>
                             </Grid>
 
-                            {/* Verdict if completed */}
+                            {/* Verdict if completed - Enhanced */}
                             {selectedRequest.status === 'completed' && selectedRequest.verdict && (
-                                <Card variant="outlined" sx={{ bgcolor: selectedRequest.verdict.result === 'safe' ? '#E8F5E9' : '#FFEBEE' }}>
-                                    <CardContent>
-                                        <Typography variant="h6" sx={{ fontWeight: 700, color: selectedRequest.verdict.result === 'safe' ? '#2E7D32' : '#D32F2F' }}>
-                                            Verdict: {selectedRequest.verdict.result?.toUpperCase()}
+                                <Box>
+                                    {/* Big Safe/Unsafe Banner */}
+                                    <Box sx={{
+                                        p: 3,
+                                        borderRadius: 2,
+                                        textAlign: 'center',
+                                        mb: 2,
+                                        bgcolor: selectedRequest.verdict.result === 'safe' ? '#E8F5E9'
+                                            : selectedRequest.verdict.result === 'unsafe' ? '#FFEBEE' : '#FFF3E0',
+                                        border: `2px solid ${
+                                            selectedRequest.verdict.result === 'safe' ? '#2E7D32'
+                                            : selectedRequest.verdict.result === 'unsafe' ? '#C62828' : '#E65100'
+                                        }`,
+                                    }}>
+                                        <Typography variant="h3" sx={{ fontWeight: 900, mb: 1,
+                                            color: selectedRequest.verdict.result === 'safe' ? '#2E7D32'
+                                                : selectedRequest.verdict.result === 'unsafe' ? '#C62828' : '#E65100'
+                                        }}>
+                                            {selectedRequest.verdict.result === 'safe' ? '✅ WATER IS SAFE'
+                                                : selectedRequest.verdict.result === 'unsafe' ? '🚫 WATER IS UNSAFE'
+                                                : '⚠️ NEEDS TREATMENT'}
                                         </Typography>
-                                        <Typography>{selectedRequest.verdict.summary}</Typography>
-                                        {selectedRequest.verdict.recommendations?.length > 0 && (
-                                            <Box sx={{ mt: 2 }}>
-                                                <Typography variant="subtitle2">Recommendations:</Typography>
-                                                <ul style={{ margin: 0, paddingLeft: 20 }}>
-                                                    {selectedRequest.verdict.recommendations.map((rec, i) => (
-                                                        <li key={i}>{rec}</li>
-                                                    ))}
-                                                </ul>
-                                            </Box>
+                                        <Typography variant="body1" color="text.secondary">
+                                            {selectedRequest.verdict.summary}
+                                        </Typography>
+                                        {selectedRequest.verdict.issuedAt && (
+                                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                                                Verdict issued: {new Date(selectedRequest.verdict.issuedAt).toLocaleString()}
+                                            </Typography>
                                         )}
-                                    </CardContent>
-                                </Card>
+                                    </Box>
+
+                                    {/* Parameter Results */}
+                                    {(() => {
+                                        const params = [
+                                            { id: 'ph', label: 'pH Level', safeRange: '6.5 – 8.5' },
+                                            { id: 'turbidity', label: 'Turbidity (NTU)', safeRange: '≤ 5.0' },
+                                            { id: 'totalDissolvedSolids', label: 'TDS (mg/L)', safeRange: '≤ 500' },
+                                            { id: 'coliformBacteria', label: 'Coliform Bacteria', safeRange: '= 0' },
+                                            { id: 'nitrate', label: 'Nitrate (mg/L)', safeRange: '≤ 50' },
+                                        ];
+                                        const results = selectedRequest.results;
+                                        const failed = selectedRequest.verdict.failedParameters || [];
+                                        const tested = params.filter(p => results?.[p.id]?.value !== null && results?.[p.id]?.value !== undefined);
+                                        if (tested.length === 0) return null;
+                                        return (
+                                            <Box>
+                                                <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Test Parameter Results</Typography>
+                                                <Grid container spacing={1}>
+                                                    {tested.map(p => {
+                                                        const val = results[p.id]?.value;
+                                                        const isFailed = failed.includes(p.id);
+                                                        return (
+                                                            <Grid item xs={12} sm={6} key={p.id}>
+                                                                <Box sx={{
+                                                                    p: 1.5, borderRadius: 1,
+                                                                    bgcolor: isFailed ? '#FFEBEE' : '#E8F5E9',
+                                                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                                                                }}>
+                                                                    <Box>
+                                                                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{p.label}</Typography>
+                                                                        <Typography variant="caption" color="text.secondary">Safe: {p.safeRange}</Typography>
+                                                                    </Box>
+                                                                    <Box sx={{ textAlign: 'right' }}>
+                                                                        <Typography variant="body1" sx={{ fontWeight: 700, color: isFailed ? '#C62828' : '#2E7D32' }}>
+                                                                            {val}
+                                                                        </Typography>
+                                                                        <Typography variant="caption" sx={{ color: isFailed ? '#C62828' : '#2E7D32' }}>
+                                                                            {isFailed ? '✗ Failed' : '✓ Pass'}
+                                                                        </Typography>
+                                                                    </Box>
+                                                                </Box>
+                                                            </Grid>
+                                                        );
+                                                    })}
+                                                </Grid>
+                                            </Box>
+                                        );
+                                    })()}
+
+                                    {/* Recommendations */}
+                                    {selectedRequest.verdict.recommendations?.length > 0 && (
+                                        <Box sx={{ mt: 2, p: 2, bgcolor: '#F5F5F5', borderRadius: 1 }}>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>📋 Recommendations</Typography>
+                                            <Box component="ul" sx={{ m: 0, pl: 2 }}>
+                                                {selectedRequest.verdict.recommendations.map((rec, i) => (
+                                                    <li key={i}><Typography variant="body2">{rec}</Typography></li>
+                                                ))}
+                                            </Box>
+                                        </Box>
+                                    )}
+
+                                    {/* Report Number */}
+                                    {selectedRequest.finalReport?.reportNumber && (
+                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                                            Report #: {selectedRequest.finalReport.reportNumber}
+                                        </Typography>
+                                    )}
+                                </Box>
                             )}
                         </Box>
                     )}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setViewDialogOpen(false)}>Close</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Verdict Result Dialog - shown immediately after completing */}
+            <Dialog open={verdictDialogOpen} onClose={() => setVerdictDialogOpen(false)} maxWidth="sm" fullWidth>
+                <DialogTitle sx={{
+                    bgcolor: verdictResult?.verdict?.result === 'safe' ? '#2E7D32'
+                        : verdictResult?.verdict?.result === 'unsafe' ? '#C62828' : '#E65100',
+                    color: '#fff',
+                    fontWeight: 700,
+                    fontSize: '1.3rem',
+                }}>
+                    {verdictResult?.verdict?.result === 'safe' ? '✅ Water Quality Report — SAFE'
+                        : verdictResult?.verdict?.result === 'unsafe' ? '🚫 Water Quality Report — UNSAFE'
+                        : '⚠️ Water Quality Report — NEEDS TREATMENT'}
+                </DialogTitle>
+                <DialogContent sx={{ pt: 3 }}>
+                    {verdictResult && (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+                            <Typography variant="body1" sx={{ p: 2, bgcolor: '#F5F5F5', borderRadius: 1 }}>
+                                {verdictResult.verdict?.summary}
+                            </Typography>
+
+                            {/* Parameter Results */}
+                            {(() => {
+                                const params = [
+                                    { id: 'ph', label: 'pH Level', safeRange: '6.5 – 8.5' },
+                                    { id: 'turbidity', label: 'Turbidity (NTU)', safeRange: '≤ 5.0' },
+                                    { id: 'totalDissolvedSolids', label: 'TDS (mg/L)', safeRange: '≤ 500' },
+                                    { id: 'coliformBacteria', label: 'Coliform Bacteria', safeRange: '= 0' },
+                                    { id: 'nitrate', label: 'Nitrate (mg/L)', safeRange: '≤ 50' },
+                                ];
+                                const results = verdictResult.results;
+                                const failed = verdictResult.verdict?.failedParameters || [];
+                                const tested = params.filter(p => results?.[p.id]?.value !== null && results?.[p.id]?.value !== undefined);
+                                if (tested.length === 0) return <Typography color="text.secondary">No parameter data recorded.</Typography>;
+                                return (
+                                    <Grid container spacing={1}>
+                                        {tested.map(p => {
+                                            const val = results[p.id]?.value;
+                                            const isFailed = failed.includes(p.id);
+                                            return (
+                                                <Grid item xs={12} key={p.id}>
+                                                    <Box sx={{
+                                                        p: 1.5, borderRadius: 1,
+                                                        bgcolor: isFailed ? '#FFEBEE' : '#E8F5E9',
+                                                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                                        border: `1px solid ${isFailed ? '#EF9A9A' : '#A5D6A7'}`,
+                                                    }}>
+                                                        <Box>
+                                                            <Typography variant="body2" sx={{ fontWeight: 600 }}>{p.label}</Typography>
+                                                            <Typography variant="caption" color="text.secondary">Safe range: {p.safeRange}</Typography>
+                                                        </Box>
+                                                        <Box sx={{ textAlign: 'right' }}>
+                                                            <Typography variant="h6" sx={{ fontWeight: 800, color: isFailed ? '#C62828' : '#2E7D32' }}>
+                                                                {val}
+                                                            </Typography>
+                                                            <Chip
+                                                                label={isFailed ? 'FAILED' : 'PASS'}
+                                                                size="small"
+                                                                sx={{
+                                                                    bgcolor: isFailed ? '#C62828' : '#2E7D32',
+                                                                    color: '#fff', fontWeight: 700, fontSize: '0.65rem'
+                                                                }}
+                                                            />
+                                                        </Box>
+                                                    </Box>
+                                                </Grid>
+                                            );
+                                        })}
+                                    </Grid>
+                                );
+                            })()}
+
+                            {/* Recommendations */}
+                            {verdictResult.verdict?.recommendations?.length > 0 && (
+                                <Box sx={{ p: 2, bgcolor: '#FFF9C4', borderRadius: 1, border: '1px solid #F9A825' }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>📋 Recommendations</Typography>
+                                    <Box component="ul" sx={{ m: 0, pl: 2 }}>
+                                        {verdictResult.verdict.recommendations.map((rec, i) => (
+                                            <li key={i}><Typography variant="body2">{rec}</Typography></li>
+                                        ))}
+                                    </Box>
+                                </Box>
+                            )}
+
+                            {verdictResult.finalReport?.reportNumber && (
+                                <Typography variant="caption" color="text.secondary">
+                                    Report Number: {verdictResult.finalReport.reportNumber}
+                                </Typography>
+                            )}
+                        </Box>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setVerdictDialogOpen(false)} variant="contained"
+                        color={verdictResult?.verdict?.result === 'safe' ? 'success' : 'error'}>
+                        Close Report
+                    </Button>
                 </DialogActions>
             </Dialog>
 
@@ -498,54 +725,64 @@ export default function LabTestManagement() {
             </Dialog>
 
             {/* Schedule Dialog */}
-            <Dialog open={scheduleDialogOpen} onClose={() => setScheduleDialogOpen(false)}>
+            <Dialog open={scheduleDialogOpen} onClose={() => setScheduleDialogOpen(false)} maxWidth="sm" fullWidth>
                 <DialogTitle>Schedule Sample Collection</DialogTitle>
                 <DialogContent>
-                    <Grid container spacing={2} sx={{ mt: 1 }}>
-                        <Grid item xs={12} md={6}>
+                    {scheduleError && <Alert severity="error" sx={{ mt: 1, mb: 2 }}>{scheduleError}</Alert>}
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+                        <TextField
+                            select
+                            fullWidth
+                            label="Assign Laboratory *"
+                            value={scheduleForm.laboratoryId}
+                            onChange={(e) => setScheduleForm({ ...scheduleForm, laboratoryId: e.target.value })}
+                        >
+                            {laboratories.map((lab) => (
+                                <MenuItem key={lab._id} value={lab._id}>
+                                    {lab.name} ({lab.location})
+                                </MenuItem>
+                            ))}
+                        </TextField>
+
+                        <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', md: 'row' } }}>
                             <TextField
                                 fullWidth
                                 type="date"
-                                label="Collection Date"
+                                label="Collection Date *"
                                 value={scheduleForm.date}
                                 onChange={(e) => setScheduleForm({ ...scheduleForm, date: e.target.value })}
                                 InputLabelProps={{ shrink: true }}
                             />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <FormControl fullWidth>
-                                <InputLabel>Time Slot</InputLabel>
-                                <Select
-                                    value={scheduleForm.timeSlot}
-                                    label="Time Slot"
-                                    onChange={(e) => setScheduleForm({ ...scheduleForm, timeSlot: e.target.value })}
-                                >
-                                    <MenuItem value="8:00 AM - 10:00 AM">8:00 AM - 10:00 AM</MenuItem>
-                                    <MenuItem value="10:00 AM - 12:00 PM">10:00 AM - 12:00 PM</MenuItem>
-                                    <MenuItem value="2:00 PM - 4:00 PM">2:00 PM - 4:00 PM</MenuItem>
-                                    <MenuItem value="4:00 PM - 6:00 PM">4:00 PM - 6:00 PM</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
                             <TextField
+                                select
                                 fullWidth
-                                label="Contact Phone"
-                                value={scheduleForm.contactPhone}
-                                onChange={(e) => setScheduleForm({ ...scheduleForm, contactPhone: e.target.value })}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                multiline
-                                rows={2}
-                                label="Special Instructions"
-                                value={scheduleForm.specialInstructions}
-                                onChange={(e) => setScheduleForm({ ...scheduleForm, specialInstructions: e.target.value })}
-                            />
-                        </Grid>
-                    </Grid>
+                                label="Time Slot *"
+                                value={scheduleForm.timeSlot}
+                                onChange={(e) => setScheduleForm({ ...scheduleForm, timeSlot: e.target.value })}
+                            >
+                                <MenuItem value="8:00 AM - 10:00 AM">8:00 AM - 10:00 AM</MenuItem>
+                                <MenuItem value="10:00 AM - 12:00 PM">10:00 AM - 12:00 PM</MenuItem>
+                                <MenuItem value="2:00 PM - 4:00 PM">2:00 PM - 4:00 PM</MenuItem>
+                                <MenuItem value="4:00 PM - 6:00 PM">4:00 PM - 6:00 PM</MenuItem>
+                            </TextField>
+                        </Box>
+
+                        <TextField
+                            fullWidth
+                            label="Contact Phone"
+                            value={scheduleForm.contactPhone}
+                            onChange={(e) => setScheduleForm({ ...scheduleForm, contactPhone: e.target.value })}
+                        />
+
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={2}
+                            label="Special Instructions"
+                            value={scheduleForm.specialInstructions}
+                            onChange={(e) => setScheduleForm({ ...scheduleForm, specialInstructions: e.target.value })}
+                        />
+                    </Box>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setScheduleDialogOpen(false)}>Cancel</Button>
@@ -559,23 +796,18 @@ export default function LabTestManagement() {
             <Dialog open={collectDialogOpen} onClose={() => setCollectDialogOpen(false)} maxWidth="sm" fullWidth>
                 <DialogTitle>Record Sample Collection</DialogTitle>
                 <DialogContent>
+                    {collectError && <Alert severity="error" sx={{ mt: 1, mb: 1 }}>{collectError}</Alert>}
                     <Grid container spacing={2} sx={{ mt: 1 }}>
-                        <Grid item xs={6}>
-                            <TextField fullWidth label="Latitude" type="number" value={collectForm.lat} onChange={(e) => setCollectForm({ ...collectForm, lat: e.target.value })} />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField fullWidth label="Longitude" type="number" value={collectForm.lng} onChange={(e) => setCollectForm({ ...collectForm, lng: e.target.value })} />
-                        </Grid>
                         <Grid item xs={12}>
-                            <TextField fullWidth label="Address" value={collectForm.address} onChange={(e) => setCollectForm({ ...collectForm, address: e.target.value })} />
+                            <TextField fullWidth label="Address *" value={collectForm.address} onChange={(e) => setCollectForm({ ...collectForm, address: e.target.value })} />
                         </Grid>
                         <Grid item xs={6}>
-                            <TextField fullWidth label="Sample ID" value={collectForm.sampleId} onChange={(e) => setCollectForm({ ...collectForm, sampleId: e.target.value })} />
+                            <TextField fullWidth label="Sample ID *" value={collectForm.sampleId} onChange={(e) => setCollectForm({ ...collectForm, sampleId: e.target.value })} />
                         </Grid>
                         <Grid item xs={6}>
                             <FormControl fullWidth>
-                                <InputLabel>Bottle Type</InputLabel>
-                                <Select value={collectForm.bottleType} label="Bottle Type" onChange={(e) => setCollectForm({ ...collectForm, bottleType: e.target.value })}>
+                                <InputLabel>Bottle Type *</InputLabel>
+                                <Select value={collectForm.bottleType} label="Bottle Type *" onChange={(e) => setCollectForm({ ...collectForm, bottleType: e.target.value })}>
                                     <MenuItem value="sterile plastic">Sterile Plastic</MenuItem>
                                     <MenuItem value="glass">Glass</MenuItem>
                                     <MenuItem value="amber glass">Amber Glass</MenuItem>
@@ -583,13 +815,7 @@ export default function LabTestManagement() {
                             </FormControl>
                         </Grid>
                         <Grid item xs={6}>
-                            <TextField fullWidth label="Volume (mL)" type="number" value={collectForm.volumeCollected} onChange={(e) => setCollectForm({ ...collectForm, volumeCollected: e.target.value })} />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField fullWidth label="Water Temp (°C)" type="number" value={collectForm.waterTemperature} onChange={(e) => setCollectForm({ ...collectForm, waterTemperature: e.target.value })} />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField fullWidth label="Weather Conditions" value={collectForm.weatherConditions} onChange={(e) => setCollectForm({ ...collectForm, weatherConditions: e.target.value })} />
+                            <TextField fullWidth label="Volume (mL) *" type="number" value={collectForm.volumeCollected} onChange={(e) => setCollectForm({ ...collectForm, volumeCollected: e.target.value })} />
                         </Grid>
                         <Grid item xs={12}>
                             <TextField fullWidth multiline rows={2} label="Notes" value={collectForm.notes} onChange={(e) => setCollectForm({ ...collectForm, notes: e.target.value })} />
@@ -608,22 +834,40 @@ export default function LabTestManagement() {
             <Dialog open={resultsDialogOpen} onClose={() => setResultsDialogOpen(false)} maxWidth="md" fullWidth>
                 <DialogTitle>Enter Test Results</DialogTitle>
                 <DialogContent>
-                    <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
-                        Enter measured values for each parameter. Leave empty if not tested.
-                    </Typography>
-                    <Grid container spacing={2}>
-                        {['ph', 'turbidity', 'totalDissolvedSolids', 'lead', 'arsenic', 'mercury', 'coliformBacteria', 'ecoliCount', 'nitrate', 'fluoride', 'iron'].map((param) => (
-                            <Grid item xs={6} md={4} key={param}>
+                    <Box sx={{ mb: 3 }}>
+                        <Alert severity="info" sx={{ mb: 2 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>Guidelines for Safe Water:</Typography>
+                            <Box component="ul" sx={{ m: 0, pl: 2, fontSize: '0.8rem' }}>
+                                <li><strong>pH:</strong> 6.5 - 8.5</li>
+                                <li><strong>Turbidity (NTU):</strong> 0 - 5.0 (Lower is better)</li>
+                                <li><strong>TDS (mg/L):</strong> 0 - 500 (Lower is better)</li>
+                                <li><strong>Coliform (CFU/100mL):</strong> Exactly 0</li>
+                                <li><strong>Nitrate (mg/L):</strong> 0 - 50.0</li>
+                            </Box>
+                        </Alert>
+                        <Typography variant="subtitle2" color="text.secondary">
+                            Enter measured values for the 5 primary parameters:
+                        </Typography>
+                    </Box>
+                    <Grid container spacing={3}>
+                        {[
+                            { id: 'ph', label: 'pH Level', help: 'Ideal: 6.5-8.5' },
+                            { id: 'turbidity', label: 'Turbidity (NTU)', help: 'Max: 5.0' },
+                            { id: 'totalDissolvedSolids', label: 'TDS (mg/L)', help: 'Max: 500' },
+                            { id: 'coliformBacteria', label: 'Coliform Bacteria', help: 'Must be 0' },
+                            { id: 'nitrate', label: 'Nitrate (mg/L)', help: 'Max: 50' }
+                        ].map((param) => (
+                            <Grid item xs={12} sm={6} key={param.id}>
                                 <TextField
                                     fullWidth
-                                    size="small"
-                                    label={param.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                    label={param.label}
+                                    helperText={param.help}
                                     type="number"
                                     inputProps={{ step: 'any' }}
-                                    value={testResults[param]?.value || ''}
+                                    value={testResults[param.id]?.value ?? ''}
                                     onChange={(e) => setTestResults({
                                         ...testResults,
-                                        [param]: { value: parseFloat(e.target.value) || null }
+                                        [param.id]: { value: e.target.value === '' ? '' : parseFloat(e.target.value) }
                                     })}
                                 />
                             </Grid>
