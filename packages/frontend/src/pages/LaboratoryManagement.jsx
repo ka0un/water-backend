@@ -26,9 +26,7 @@ import {
   InputLabel,
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
-import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:3000/api/v1';
+import { api } from '../context/AuthContext';
 
 const LaboratoryManagement = () => {
   const [laboratories, setLaboratories] = useState([]);
@@ -70,18 +68,14 @@ const LaboratoryManagement = () => {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(
-        `${API_BASE_URL}/admin/laboratories`,
+      const response = await api.get(
+        `/admin/laboratories`,
         {
           params: {
             status: filters.status || undefined,
             search: filters.search || undefined,
             page: 1,
             limit: 100,
-          },
-          headers: {
-            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -155,7 +149,6 @@ const LaboratoryManagement = () => {
     setSuccess('');
 
     try {
-      const token = localStorage.getItem('token');
       const payload = {
         ...formData,
         capacity: parseInt(formData.capacity),
@@ -171,26 +164,16 @@ const LaboratoryManagement = () => {
 
       if (isEditing && currentLab) {
         // Update
-        await axios.put(
-          `${API_BASE_URL}/admin/laboratories/${currentLab._id}`,
-          payload,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        await api.put(
+          `/admin/laboratories/${currentLab._id}`,
+          payload
         );
         setSuccess('Laboratory updated successfully');
       } else {
         // Create
-        await axios.post(
-          `${API_BASE_URL}/admin/laboratories`,
-          payload,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        await api.post(
+          `/admin/laboratories`,
+          payload
         );
         setSuccess('Laboratory created successfully');
       }
@@ -205,14 +188,8 @@ const LaboratoryManagement = () => {
   const handleDelete = async (labId) => {
     if (window.confirm('Are you sure you want to deactivate this laboratory?')) {
       try {
-        const token = localStorage.getItem('token');
-        await axios.delete(
-          `${API_BASE_URL}/admin/laboratories/${labId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        await api.delete(
+          `/admin/laboratories/${labId}`
         );
         setSuccess('Laboratory deactivated successfully');
         fetchLaboratories();
