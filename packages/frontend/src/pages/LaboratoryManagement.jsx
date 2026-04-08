@@ -12,6 +12,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogContentText,
   DialogActions,
   TextField,
   Box,
@@ -25,7 +26,7 @@ import {
   FormControl,
   InputLabel,
 } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
+import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon, DeleteForever as DeleteForeverIcon } from '@mui/icons-material';
 import { api } from '../context/AuthContext';
 
 const LaboratoryManagement = () => {
@@ -36,6 +37,14 @@ const LaboratoryManagement = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentLab, setCurrentLab] = useState(null);
+
+  // Delete Confirmation Dialog State
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [labToDelete, setLabToDelete] = useState(null);
+
+  // Permanent Delete Confirmation Dialog State
+  const [openPermanentDeleteDialog, setOpenPermanentDeleteDialog] = useState(false);
+  const [labToPermanentlyDelete, setLabToPermanentlyDelete] = useState(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -176,6 +185,8 @@ const LaboratoryManagement = () => {
           payload
         );
         setSuccess('Laboratory created successfully');
+        // Clear the search bar so the newly added lab shows up
+        setFilters(prev => ({ ...prev, search: '' }));
       }
 
       handleCloseDialog();
@@ -185,17 +196,43 @@ const LaboratoryManagement = () => {
     }
   };
 
-  const handleDelete = async (labId) => {
-    if (window.confirm('Are you sure you want to deactivate this laboratory?')) {
-      try {
-        await api.delete(
-          `/admin/laboratories/${labId}`
-        );
-        setSuccess('Laboratory deactivated successfully');
-        fetchLaboratories();
-      } catch (err) {
-        setError(err.response?.data?.message || 'Failed to delete laboratory');
-      }
+  const handleDeleteClick = (lab) => {
+    setLabToDelete(lab);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!labToDelete) return;
+    
+    try {
+      await api.delete(`/admin/laboratories/${labToDelete._id}`);
+      setSuccess('Laboratory deactivated successfully');
+      fetchLaboratories();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete laboratory');
+    } finally {
+      setOpenDeleteDialog(false);
+      setLabToDelete(null);
+    }
+  };
+
+  const handlePermanentDeleteClick = (lab) => {
+    setLabToPermanentlyDelete(lab);
+    setOpenPermanentDeleteDialog(true);
+  };
+
+  const handleConfirmPermanentDelete = async () => {
+    if (!labToPermanentlyDelete) return;
+
+    try {
+      await api.delete(`/admin/laboratories/${labToPermanentlyDelete._id}/permanent`);
+      setSuccess('Laboratory permanently deleted successfully');
+      fetchLaboratories();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to permanently delete laboratory');
+    } finally {
+      setOpenPermanentDeleteDialog(false);
+      setLabToPermanentlyDelete(null);
     }
   };
 
@@ -225,6 +262,9 @@ const LaboratoryManagement = () => {
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
               size="small"
+              type="search"
+              autoComplete="off"
+              name="laboratory_search"
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -295,10 +335,18 @@ const LaboratoryManagement = () => {
                       <IconButton
                         size="small"
                         color="error"
-                        onClick={() => handleDelete(lab._id)}
-                        title="Delete"
+                        onClick={() => handleDeleteClick(lab)}
+                        title="Deactivate"
                       >
                         <DeleteIcon />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        sx={{ color: '#d32f2f' }}
+                        onClick={() => handlePermanentDeleteClick(lab)}
+                        title="Permanent Delete"
+                      >
+                        <DeleteForeverIcon />
                       </IconButton>
                     </TableCell>
                   </TableRow>
@@ -445,6 +493,102 @@ const LaboratoryManagement = () => {
           <Button onClick={handleCloseDialog}>Cancel</Button>
           <Button onClick={handleSubmit} variant="contained" color="primary">
             {isEditing ? 'Update' : 'Create'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Confirmation Dialog for Delete/Deactivate */}
+      <Dialog
+        open={openDeleteDialog}
+        onClose={() => setOpenDeleteDialog(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: 'error.main', fontWeight: 'bold' }}>
+          Deactivate Laboratory?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to deactivate the laboratory <strong>{labToDelete?.name}</strong>? 
+            This action can be reversed later if needed.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button 
+            onClick={() => setOpenDeleteDialog(false)} 
+            color="inherit" 
+            variant="text"
+            sx={{ fontWeight: 500 }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleConfirmDelete} 
+            variant="contained" 
+            color="error"
+            disableElevation
+            sx={{ borderRadius: 1.5, fontWeight: 600 }}
+          >
+            Deactivate
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Confirmation Dialog for Permanent Delete */}
+      <Dialog
+        open={openPermanentDeleteDialog}
+        onClose={() => setOpenPermanentDeleteDialog(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            border: '2px solid #d32f2f',
+          }
+        }}
+      >
+        <Box sx={{ bgcolor: 'error.main', color: 'white', p: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <DeleteForeverIcon />
+          <DialogTitle sx={{ p: 0, fontWeight: 'bold' }}>
+            PERMANENT DELETE
+          </DialogTitle>
+        </Box>
+        <DialogContent sx={{ mt: 2 }}>
+          <DialogContentText color="error.dark" sx={{ fontWeight: 500, mb: 1 }}>
+            WARNING: This action cannot be undone!
+          </DialogContentText>
+          <DialogContentText>
+            Are you sure you want to <strong>permanently delete</strong> the laboratory <strong>{labToPermanentlyDelete?.name}</strong>? 
+            All associated data will be lost forever.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button 
+            onClick={() => setOpenPermanentDeleteDialog(false)} 
+            color="inherit" 
+            variant="text"
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleConfirmPermanentDelete} 
+            variant="contained" 
+            color="error"
+            autoFocus
+            sx={{ 
+              borderRadius: 1.5, 
+              fontWeight: 'bold',
+              px: 3,
+              '&:hover': { bgcolor: '#b71c1c' }
+            }}
+          >
+            DELETE FOREVER
           </Button>
         </DialogActions>
       </Dialog>

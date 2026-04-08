@@ -164,5 +164,6 @@ router.put(
  *         description: Deleted
  */
 router.delete('/:id', deleteLaboratory);
+router.delete('/:id/permanent', permanentlyDeleteLaboratory);
 
 module.exports = router;
