@@ -14,6 +14,7 @@ const {
     inputTestResults,
     completeTestingAndIssueVerdict,
     getSafeLimits,
+    getActiveLaboratories,
 } = require('../controllers/labStaff.controller');
 
 // All routes require authentication and LAB_STAFF or ADMIN role
@@ -40,6 +41,20 @@ router.use(authorize('LAB_STAFF', 'ADMIN'));
  *         description: Dashboard stats retrieved
  */
 router.get('/dashboard', getDashboardStats);
+
+/**
+ * @swagger
+ * /lab-staff/laboratories:
+ *   get:
+ *     summary: Get all active laboratories
+ *     tags: [Lab Staff]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Active laboratories retrieved
+ */
+router.get('/laboratories', getActiveLaboratories);
 
 /**
  * @swagger

@@ -319,12 +319,9 @@ labTestRequestSchema.methods.calculateVerdict = function () {
     if (failedParams.length === 0) {
         this.verdict.result = TestVerdict.SAFE;
         this.verdict.summary = 'Water is safe for consumption. All parameters are within acceptable limits.';
-    } else if (failedParams.some(p => ['lead', 'arsenic', 'mercury', 'coliformBacteria', 'ecoliCount'].includes(p))) {
-        this.verdict.result = TestVerdict.UNSAFE;
-        this.verdict.summary = `UNSAFE - Water is not safe for consumption. Critical parameters exceeded: ${failedParams.join(', ')}`;
     } else {
-        this.verdict.result = TestVerdict.NEEDS_TREATMENT;
-        this.verdict.summary = `Water needs treatment before consumption. Parameters exceeded: ${failedParams.join(', ')}`;
+        this.verdict.result = TestVerdict.UNSAFE;
+        this.verdict.summary = `UNSAFE - Water is not safe for consumption. Parameters exceeded: ${failedParams.join(', ')}`;
     }
 
     return this.verdict;

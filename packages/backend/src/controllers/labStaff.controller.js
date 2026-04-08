@@ -150,10 +150,10 @@ const rejectRequest = asyncHandler(async (req, res) => {
 
 // ─── Schedule Sample Collection ──────────────────────────────────
 const scheduleCollection = asyncHandler(async (req, res) => {
-    const { date, timeSlot, assignedCollector, contactPhone, specialInstructions } = req.body;
+    const { date, timeSlot, assignedCollector, contactPhone, specialInstructions, laboratoryId } = req.body;
 
-    if (!date || !timeSlot) {
-        throw ApiError.badRequest('Collection date and time slot are required');
+    if (!date || !timeSlot || !laboratoryId) {
+        throw ApiError.badRequest('Collection date, time slot, and laboratory assignment are required');
     }
 
     const request = await LabTestRequest.findById(req.params.id);
@@ -170,6 +170,7 @@ const scheduleCollection = asyncHandler(async (req, res) => {
         contactPhone,
         specialInstructions,
     };
+    request.laboratory = laboratoryId;
     request.status = LabTestStatus.SAMPLE_SCHEDULED;
 
     await request.save();
@@ -240,19 +241,21 @@ const inputTestResults = asyncHandler(async (req, res) => {
         throw ApiError.badRequest('Testing must be in progress to input results');
     }
 
-    // Update results
+    // Update results using request.set() to handle uninitialized Mongoose subdocuments
     if (results) {
+        console.log('[inputTestResults] Received results:', JSON.stringify(results));
         for (const [param, data] of Object.entries(results)) {
-            if (request.results[param] !== undefined) {
-                request.results[param] = {
-                    value: data.value,
-                    unit: data.unit || SAFE_LIMITS[param]?.unit,
-                    testedAt: new Date(),
-                    notes: data.notes,
-                };
+            if (data.value !== undefined && data.value !== '') {
+                request.set(`results.${param}.value`, parseFloat(data.value));
+                request.set(`results.${param}.unit`, data.unit || SAFE_LIMITS[param]?.unit || null);
+                request.set(`results.${param}.testedAt`, new Date());
+                if (data.notes) request.set(`results.${param}.notes`, data.notes);
+                console.log(`[inputTestResults] Set results.${param}.value = ${parseFloat(data.value)}`);
             }
         }
         request.markModified('results');
+    } else {
+        console.log('[inputTestResults] No results received in body!');
     }
 
     if (labNotes) {
@@ -266,7 +269,7 @@ const inputTestResults = asyncHandler(async (req, res) => {
 
 // ─── Complete Testing & Issue Verdict ────────────────────────────
 const completeTestingAndIssueVerdict = asyncHandler(async (req, res) => {
-    const { recommendations } = req.body;
+    const { recommendations } = req.body || {};
 
     const request = await LabTestRequest.findById(req.params.id);
     if (!request) throw ApiError.notFound('Lab test request not found');
@@ -275,8 +278,18 @@ const completeTestingAndIssueVerdict = asyncHandler(async (req, res) => {
         throw ApiError.badRequest('Testing must be in progress to complete');
     }
 
+    // Log current stored results before calculating verdict
+    console.log('[completeVerdict] Stored results before verdict:');
+    console.log('  ph:', request.results?.ph?.value);
+    console.log('  turbidity:', request.results?.turbidity?.value);
+    console.log('  totalDissolvedSolids:', request.results?.totalDissolvedSolids?.value);
+    console.log('  coliformBacteria:', request.results?.coliformBacteria?.value);
+    console.log('  nitrate:', request.results?.nitrate?.value);
+
     // Calculate verdict based on results
     request.calculateVerdict();
+    console.log('[completeVerdict] Verdict result:', request.verdict.result);
+    console.log('[completeVerdict] Failed parameters:', request.verdict.failedParameters);
 
     // Add custom recommendations if provided
     if (recommendations && Array.isArray(recommendations)) {
@@ -339,6 +352,13 @@ const getSafeLimits = asyncHandler(async (req, res) => {
     return ApiResponse.success(res, { safeLimits: SAFE_LIMITS }, 'Safe limits retrieved');
 });
 
+// ─── Get Active Laboratories ─────────────────────────────────────
+const getActiveLaboratories = asyncHandler(async (req, res) => {
+    const Laboratory = require('../models/Laboratory.model');
+    const laboratories = await Laboratory.find({ status: 'active' }).select('name location capacity status');
+    return ApiResponse.success(res, { laboratories }, 'Laboratories retrieved successfully');
+});
+
 module.exports = {
     getDashboardStats,
     listRequests,
@@ -351,4 +371,5 @@ module.exports = {
     inputTestResults,
     completeTestingAndIssueVerdict,
     getSafeLimits,
+    getActiveLaboratories,
 };
