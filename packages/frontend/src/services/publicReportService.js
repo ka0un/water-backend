@@ -14,7 +14,7 @@ import { api } from '../context/AuthContext';
  */
 export const createPublicReport = async (nic) => {
     const { data } = await api.post('/public-reports', { nic });
-    return data.data; // Returns the newly created public report object (wizard start)
+    return data.data.report; // Returns the newly created public report object
 };
 
 /**
@@ -22,7 +22,7 @@ export const createPublicReport = async (nic) => {
  */
 export const updatePublicReport = async (id, updateBody) => {
     const { data } = await api.patch(`/public-reports/${id}`, updateBody);
-    return data.data;
+    return data.data.report;
 };
 
 /**
@@ -30,7 +30,7 @@ export const updatePublicReport = async (id, updateBody) => {
  */
 export const submitPublicReport = async (id) => {
     const { data } = await api.post(`/public-reports/${id}/submit`);
-    return data.data;
+    return data.data.report;
 };
 
 /**
@@ -40,7 +40,7 @@ export const uploadPublicReportImage = async (id, formData) => {
     const { data } = await api.post(`/public-reports/${id}/images`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
     });
-    return data.data;
+    return data.data.imageCount;
 };
 
 /**
@@ -48,7 +48,7 @@ export const uploadPublicReportImage = async (id, formData) => {
  */
 export const trackReportsByNic = async (nic) => {
     const { data } = await api.get(`/public-reports/by-nic/${nic}`);
-    return data.data; // List of reports
+    return data.data.reports; // List of reports
 };
 
 /**
@@ -56,5 +56,5 @@ export const trackReportsByNic = async (nic) => {
  */
 export const getFullPublicReport = async (id) => {
     const { data } = await api.get(`/public-reports/${id}/full`);
-    return data.data;
+    return data.data.report;
 };
