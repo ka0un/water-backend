@@ -3,6 +3,8 @@ const { PublicReport } = require('../models/PublicReport.model');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/ApiResponse');
 const ApiError = require('../utils/ApiError');
+const axios = require('axios');
+const config = require('../config');
 
 // ─── Get Lab Staff Dashboard Stats ───────────────────────────────
 const getDashboardStats = asyncHandler(async (req, res) => {
@@ -193,6 +195,25 @@ const recordSampleCollection = asyncHandler(async (req, res) => {
         throw ApiError.badRequest('Sample collection must be scheduled first');
     }
 
+    let fetchedWeather = weatherConditions;
+
+    // Third-party API: Fetch real-time weather if coordinates are provided
+    if (lat && lng && config.weather.apiKey) {
+        try {
+            const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${config.weather.apiKey}&units=metric`;
+            const weatherResponse = await axios.get(weatherUrl);
+            
+            if (weatherResponse.data) {
+                const { temp } = weatherResponse.data.main;
+                const { description } = weatherResponse.data.weather[0];
+                fetchedWeather = `Temp: ${temp}°C, Desc: ${description}${weatherConditions ? ` | ${weatherConditions}` : ''}`;
+            }
+        } catch (error) {
+            console.error('[Weather API Error]:', error.message);
+            // Fallback to provided weatherConditions if API fails
+        }
+    }
+
     request.sampleCollection = {
         collectedBy: req.user._id,
         collectedAt: new Date(),
@@ -201,7 +222,7 @@ const recordSampleCollection = asyncHandler(async (req, res) => {
         bottleType,
         volumeCollected,
         waterTemperature,
-        weatherConditions,
+        weatherConditions: fetchedWeather,
         photos: photos || [],
         notes,
     };
