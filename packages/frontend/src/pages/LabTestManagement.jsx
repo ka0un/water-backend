@@ -20,6 +20,9 @@ import {
     PlayArrow as StartIcon,
     Done as CompleteIcon,
     Visibility as ViewIcon,
+    Thermostat as ThermostatIcon,
+    Cloud as CloudIcon,
+    AccessTime as TimeIcon,
 } from '@mui/icons-material';
 
 const STATUS_COLORS = {
@@ -101,6 +104,8 @@ export default function LabTestManagement() {
         bottleType: 'sterile plastic',
         volumeCollected: 500,
         notes: '',
+        lat: '',
+        lng: '',
     });
     const [collectError, setCollectError] = useState('');
     const [testResults, setTestResults] = useState({});
@@ -210,6 +215,9 @@ export default function LabTestManagement() {
             await api.post(`/lab-staff/requests/${selectedRequest._id}/collect`, {
                 ...collectForm,
                 volumeCollected: parseInt(collectForm.volumeCollected) || 500,
+                // Ensure coordinates are numbers
+                lat: parseFloat(collectForm.lat),
+                lng: parseFloat(collectForm.lng)
             });
             setSuccess('Sample collection recorded');
             setCollectDialogOpen(false);
@@ -219,6 +227,26 @@ export default function LabTestManagement() {
         } finally {
             setActionLoading(false);
         }
+    };
+
+    const handleGetCurrentLocation = () => {
+        if (!navigator.geolocation) {
+            setCollectError('Geolocation is not supported by your browser');
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                setCollectForm({
+                    ...collectForm,
+                    lat: position.coords.latitude.toFixed(6),
+                    lng: position.coords.longitude.toFixed(6)
+                });
+            },
+            (error) => {
+                setCollectError('Unable to retrieve your location. Please enter manually.');
+            }
+        );
     };
 
     const handleStartTesting = async (id) => {
@@ -492,6 +520,74 @@ export default function LabTestManagement() {
                                     </Card>
                                 </Grid>
                             </Grid>
+
+                            {/* Sample Collection & Environmental Data - Third Party Integration Display */}
+                            {selectedRequest.sampleCollection && ['sample_collected', 'testing_in_progress', 'completed'].includes(selectedRequest.status) && (
+                                <Box>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <LocationIcon fontSize="small" color="primary" /> Sample Collection & Environmental Data
+                                    </Typography>
+                                    <Card variant="outlined" sx={{ bgcolor: '#f8fbfc', borderColor: '#e0f2faf2' }}>
+                                        <CardContent sx={{ p: '16px !important' }}>
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={12} md={7}>
+                                                    <Grid container spacing={2}>
+                                                        <Grid item xs={12}>
+                                                            <Typography variant="caption" color="text.secondary">Collection Address</Typography>
+                                                            <Typography variant="body2" sx={{ fontWeight: 500 }}>{selectedRequest.sampleCollection.address || 'N/A'}</Typography>
+                                                        </Grid>
+                                                        <Grid item xs={6}>
+                                                            <Typography variant="caption" color="text.secondary">Collected At</Typography>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                <TimeIcon sx={{ fontSize: '0.8rem', color: 'text.secondary' }} />
+                                                                <Typography variant="body2">{new Date(selectedRequest.sampleCollection.collectedAt).toLocaleString()}</Typography>
+                                                            </Box>
+                                                        </Grid>
+                                                        <Grid item xs={6}>
+                                                            <Typography variant="caption" color="text.secondary">Bottle & Volume</Typography>
+                                                            <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
+                                                                {selectedRequest.sampleCollection.bottleType} ({selectedRequest.sampleCollection.volumeCollected}ml)
+                                                            </Typography>
+                                                        </Grid>
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid item xs={12} md={5}>
+                                                    <Box sx={{ 
+                                                        p: 1.5, 
+                                                        borderRadius: 2, 
+                                                        bgcolor: '#fff', 
+                                                        border: '1px solid #e3f2fd',
+                                                        height: '100%',
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        justifyContent: 'center'
+                                                    }}>
+                                                        <Typography variant="caption" color="primary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 700, mb: 0.5 }}>
+                                                            <CloudIcon sx={{ fontSize: '0.9rem' }} /> AUTOMATED WEATHER
+                                                        </Typography>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                            <ThermostatIcon color="error" sx={{ fontSize: '1.4rem' }} />
+                                                            <Typography variant="body2" sx={{ fontWeight: 600, color: '#1a237e', lineHeight: 1.2 }}>
+                                                                {selectedRequest.sampleCollection.weatherConditions?.split('|')[0] || 'No data captured'}
+                                                            </Typography>
+                                                        </Box>
+                                                        <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.65rem', mt: 0.5 }}>
+                                                            Real-time info via OpenWeatherMap API
+                                                        </Typography>
+                                                    </Box>
+                                                </Grid>
+                                                {selectedRequest.sampleCollection.notes && (
+                                                    <Grid item xs={12}>
+                                                        <Divider sx={{ my: 0.5, borderStyle: 'dotted' }} />
+                                                        <Typography variant="caption" color="text.secondary">Collection Notes</Typography>
+                                                        <Typography variant="body2" sx={{ fontStyle: 'italic' }}>"{selectedRequest.sampleCollection.notes}"</Typography>
+                                                    </Grid>
+                                                )}
+                                            </Grid>
+                                        </CardContent>
+                                    </Card>
+                                </Box>
+                            )}
 
                             {/* Verdict if completed - Enhanced */}
                             {selectedRequest.status === 'completed' && selectedRequest.verdict && (
@@ -800,6 +896,18 @@ export default function LabTestManagement() {
                     <Grid container spacing={2} sx={{ mt: 1 }}>
                         <Grid item xs={12}>
                             <TextField fullWidth label="Address *" value={collectForm.address} onChange={(e) => setCollectForm({ ...collectForm, address: e.target.value })} />
+                        </Grid>
+                        <Grid item xs={12} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                            <TextField fullWidth label="Latitude (for weather) *" value={collectForm.lat} onChange={(e) => setCollectForm({ ...collectForm, lat: e.target.value })} placeholder="e.g. 6.9271" />
+                            <TextField fullWidth label="Longitude (for weather) *" value={collectForm.lng} onChange={(e) => setCollectForm({ ...collectForm, lng: e.target.value })} placeholder="e.g. 79.8612" />
+                            <Button 
+                                variant="outlined" 
+                                size="small" 
+                                onClick={handleGetCurrentLocation}
+                                sx={{ height: 56, minWidth: 120 }}
+                            >
+                                Get Location
+                            </Button>
                         </Grid>
                         <Grid item xs={6}>
                             <TextField fullWidth label="Sample ID *" value={collectForm.sampleId} onChange={(e) => setCollectForm({ ...collectForm, sampleId: e.target.value })} />

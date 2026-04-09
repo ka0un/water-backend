@@ -9,15 +9,19 @@ const config = {
   port: parseInt(process.env.PORT, 10) || 3000,
   
   mongoose: {
-    url: process.env.MONGODB_URI || 'mongodb://localhost:27017/water_quality_db',
+    url: process.env.MONGODB_URI || 'mongodb://admin:admin@server.hapangama.com:25627/water_quality_db?authSource=admin',
     options: {
       // Mongoose 6+ doesn't need these options, but kept for compatibility
     },
   },
   
   jwt: {
-    secret: process.env.JWT_SECRET || 'your-default-secret-key',
+    secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  },
+  
+  weather: {
+    apiKey: process.env.OPENWEATHER_API_KEY,
   },
   
   logging: {

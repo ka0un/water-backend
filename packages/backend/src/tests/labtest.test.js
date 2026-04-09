@@ -5,6 +5,9 @@ const { connect, clearDatabase, closeDatabase } = require('./setup');
 const { LabTestRequest, TestVerdict, SAFE_LIMITS } = require('../models/LabTestRequest.model');
 const { PublicReport } = require('../models/PublicReport.model');
 const Laboratory = require('../models/Laboratory.model');
+const axios = require('axios');
+
+jest.mock('axios');
 
 // Custom user register helper for this test suite
 let userCounter = 0;
@@ -178,6 +181,13 @@ describe('Lab Testing Module (Unit, Integration & Performance)', () => {
             expect(res.body.data.request.status).toBe('sample_scheduled');
 
             // Step 3: Record Sample Collection
+            axios.get.mockResolvedValue({
+                data: {
+                    main: { temp: 25 },
+                    weather: [{ description: 'clear sky' }]
+                }
+            });
+
             res = await request(app)
                 .post(`/api/v1/lab-staff/requests/${reqId}/collect`)
                 .set('Authorization', `Bearer ${labStaffToken}`)
@@ -187,9 +197,12 @@ describe('Lab Testing Module (Unit, Integration & Performance)', () => {
                     waterTemperature: 24,
                     lat: 6.9,
                     lng: 79.8,
+                    weatherConditions: 'Sunny'
                 });
             expect(res.status).toBe(200);
             expect(res.body.data.request.status).toBe('sample_collected');
+            expect(res.body.data.request.sampleCollection.weatherConditions).toContain('Temp: 25°C');
+            expect(res.body.data.request.sampleCollection.weatherConditions).toContain('Sunny');
 
             // Step 4: Start Testing
             res = await request(app)
