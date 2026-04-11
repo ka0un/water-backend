@@ -92,8 +92,9 @@ function shouldSkip(stepKey, reportData) {
 // ─── Wizard orchestrator ─────────────────────────────────────────
 function WizardContent() {
     const navigate = useNavigate();
-    const { currentStep, reportData, submitReport, loading, error } = useWizard();
+    const { currentStep, reportData, reportDataRef, submitReport, loading, error } = useWizard();
     const [stepIndex, setStepIndex] = useState(currentStep || 0);
+    reportDataRef.current = reportData;
 
     // Compute active (non-skipped) step count for progress bar
     const activeStepCount = useMemo(() => {
@@ -112,24 +113,24 @@ function WizardContent() {
     const goNext = useCallback(() => {
         setStepIndex((prev) => {
             let next = prev + 1;
-            // Skip any steps that should be skipped
-            while (next < STEPS.length && shouldSkip(STEPS[next]?.key, reportData)) {
+            // Skip any steps that should be skipped — use ref so we always
+            // read the latest reportData even when called before re-render.
+            while (next < STEPS.length && shouldSkip(STEPS[next]?.key, reportDataRef.current)) {
                 next++;
             }
             return Math.min(next, STEPS.length - 1);
         });
-    }, [reportData]);
+    }, []);
 
     const goBack = useCallback(() => {
         setStepIndex((prev) => {
             let back = prev - 1;
-            // Skip any steps that should be skipped going backward
-            while (back > 0 && shouldSkip(STEPS[back]?.key, reportData)) {
+            while (back > 0 && shouldSkip(STEPS[back]?.key, reportDataRef.current)) {
                 back--;
             }
             return Math.max(back, 0);
         });
-    }, [reportData]);
+    }, []);
 
     const handleSubmit = async () => {
         try {
