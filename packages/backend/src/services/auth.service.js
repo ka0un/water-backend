@@ -93,7 +93,7 @@ const login = async (email, password) => {
     user.lastLoginAt = new Date();
     await user.save({ validateBeforeSave: false });
 
-    const { ModerationLog, ModerationAction } = require('../models/ModerationLog.model');
+    const { ModerationLog, ModerationAction, ModerationTargetType } = require('../models/ModerationLog.model');
 
     // Generate token
     const token = generateToken(user._id);
@@ -105,6 +105,9 @@ const login = async (email, password) => {
         await ModerationLog.create({
             action: ModerationAction.LOGIN,
             moderatorId: user._id,
+            targetUserId: user._id,
+            targetType: ModerationTargetType.USER,
+            targetValue: String(user._id),
         }).catch(err => logger.error('Failed to log moderator login:', err));
     }
 

@@ -34,6 +34,14 @@ const router = express.Router();
  *         name: moderatorId
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: targetUserId
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: targetType
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: Moderation logs retrieved

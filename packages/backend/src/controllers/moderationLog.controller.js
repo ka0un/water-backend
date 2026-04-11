@@ -4,7 +4,7 @@ const ApiResponse = require('../utils/ApiResponse');
 
 /**
  * Get moderation logs with basic filtering.
- * Query params: page, limit, action, moderatorId, reportId
+ * Query params: page, limit, action, moderatorId, reportId, targetUserId, targetType
  */
 exports.getModerationLogs = asyncHandler(async (req, res) => {
     const {
@@ -13,6 +13,8 @@ exports.getModerationLogs = asyncHandler(async (req, res) => {
         action,
         moderatorId,
         reportId,
+        targetUserId,
+        targetType,
     } = req.query;
 
     const pageNum = Math.max(parseInt(page, 10) || 1, 1);
@@ -28,6 +30,12 @@ exports.getModerationLogs = asyncHandler(async (req, res) => {
     }
     if (reportId) {
         filter.reportId = reportId;
+    }
+    if (targetUserId) {
+        filter.targetUserId = targetUserId;
+    }
+    if (targetType) {
+        filter.targetType = targetType;
     }
 
     const [items, total] = await Promise.all([

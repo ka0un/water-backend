@@ -16,6 +16,14 @@ const ModerationAction = {
     MARK_DUPLICATE: 'MARK_DUPLICATE',
 };
 
+const ModerationTargetType = {
+    USER: 'USER',
+    REPORT: 'REPORT',
+    NIC: 'NIC',
+    IP: 'IP',
+    SYSTEM: 'SYSTEM',
+};
+
 const moderationLogSchema = new mongoose.Schema(
     {
         /**
@@ -46,6 +54,26 @@ const moderationLogSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
             default: null,
+        },
+
+        /**
+         * Optional: target entity type when the action targets
+         * something other than a User account.
+         */
+        targetType: {
+            type: String,
+            enum: Object.values(ModerationTargetType),
+            default: null,
+            index: true,
+        },
+
+        /**
+         * Optional: raw target identifier (report id, NIC, IP, etc.).
+         */
+        targetValue: {
+            type: String,
+            default: null,
+            trim: true,
         },
 
         /**
@@ -119,5 +147,6 @@ const ModerationLog = mongoose.model('ModerationLog', moderationLogSchema);
 module.exports = {
     ModerationLog,
     ModerationAction,
+    ModerationTargetType,
 };
 

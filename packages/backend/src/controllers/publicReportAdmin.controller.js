@@ -1,7 +1,7 @@
 const { PublicReport } = require('../models/PublicReport.model');
 const { LabTestRequest } = require('../models/LabTestRequest.model');
 const BannedUser = require('../models/BannedUser.model');
-const { ModerationLog, ModerationAction } = require('../models/ModerationLog.model');
+const { ModerationLog, ModerationAction, ModerationTargetType } = require('../models/ModerationLog.model');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/ApiResponse');
 const ApiError = require('../utils/ApiError');
@@ -234,6 +234,8 @@ const getReportDetail = asyncHandler(async (req, res) => {
         action: ModerationAction.VIEW_PUBLIC_REPORT,
         moderatorId: req.user._id,
         reportId: report._id,
+        targetType: ModerationTargetType.NIC,
+        targetValue: report.nic ? String(report.nic) : null,
         previousStatus: report.mod_status,
         newStatus: report.mod_status,
         reason: 'Viewed report details',
@@ -305,6 +307,8 @@ const moderateReport = asyncHandler(async (req, res) => {
         action: action === 'approve' ? ModerationAction.APPROVE : ModerationAction.REJECT,
         moderatorId: req.user._id,
         reportId: report._id,
+        targetType: ModerationTargetType.NIC,
+        targetValue: report.nic ? String(report.nic) : null,
         previousStatus: 'pending', // or what it previously was
         newStatus: report.mod_status,
         reason: reason || 'Approved report via moderation panel',
@@ -463,6 +467,8 @@ const banUser = asyncHandler(async (req, res) => {
     await ModerationLog.create({
         action: ModerationAction.BAN,
         moderatorId: req.user._id,
+        targetType: type === 'nic' ? ModerationTargetType.NIC : ModerationTargetType.IP,
+        targetValue: String(value),
         reason: `Banned ${type.toUpperCase()}: ${value}. Reason: ${reason || 'N/A'}`,
     }).catch(() => { });
 
@@ -492,6 +498,8 @@ const unbanUser = asyncHandler(async (req, res) => {
     await ModerationLog.create({
         action: ModerationAction.UNBAN,
         moderatorId: req.user._id,
+        targetType: type === 'nic' ? ModerationTargetType.NIC : ModerationTargetType.IP,
+        targetValue: String(value),
         reason: `Unbanned ${type.toUpperCase()}: ${value}`,
     }).catch(() => { });
 
