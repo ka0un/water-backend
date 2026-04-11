@@ -317,7 +317,12 @@ export default function ModeratorWaterTests() {
 
     const handleBan = async (type, value) => {
         try {
-            await api.post('/public-reports-admin/ban', { type, value, reason: 'Banned from Moderation Panel' });
+            await api.post('/public-reports-admin/ban', {
+                type,
+                value,
+                reportId: selectedReport?._id || null,
+                reason: 'Banned from Moderation Panel',
+            });
             // Refresh security stats to reflect the new ban
             if (selectedReport) {
                 const { data } = await api.get(`/public-reports-admin/${selectedReport._id}/security`);
@@ -330,7 +335,11 @@ export default function ModeratorWaterTests() {
 
     const handleUnban = async (type, value) => {
         try {
-            await api.post('/public-reports-admin/unban', { type, value });
+            await api.post('/public-reports-admin/unban', {
+                type,
+                value,
+                reportId: selectedReport?._id || null,
+            });
             // Refresh security stats to reflect the removal of the ban
             if (selectedReport) {
                 const { data } = await api.get(`/public-reports-admin/${selectedReport._id}/security`);
