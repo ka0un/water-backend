@@ -251,8 +251,10 @@ const ModerationLogs = () => {
                                             const actionColor = ACTION_COLORS[log.action] || 'default';
                                             const targetLabel = log.targetUserId
                                                 ? getObjectLabel(log.targetUserId)
-                                                : (log.targetType && log.targetValue)
-                                                    ? `${log.targetType}: ${log.targetValue}`
+                                                : (log.targetType === 'NIC' && log.targetValue)
+                                                    ? String(log.targetValue)
+                                                    : (log.targetType && log.targetValue)
+                                                        ? `${log.targetType}: ${log.targetValue}`
                                                     : '-';
 
                                             return (

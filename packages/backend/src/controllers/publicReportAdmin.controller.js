@@ -274,6 +274,8 @@ const moderateReport = asyncHandler(async (req, res) => {
         throw ApiError.badRequest('Cannot moderate an incomplete report');
     }
 
+    const previousStatus = report.mod_status;
+
     report.moderator_id = req.user._id;
 
     if (action === 'approve') {
@@ -309,7 +311,7 @@ const moderateReport = asyncHandler(async (req, res) => {
         reportId: report._id,
         targetType: ModerationTargetType.NIC,
         targetValue: report.nic ? String(report.nic) : null,
-        previousStatus: 'pending', // or what it previously was
+        previousStatus,
         newStatus: report.mod_status,
         reason: reason || 'Approved report via moderation panel',
     }).catch(() => { });
@@ -441,7 +443,7 @@ const getSecurityInfo = asyncHandler(async (req, res) => {
 
 // ─── Ban a user by NIC or IP ─────────────────────────────────────
 const banUser = asyncHandler(async (req, res) => {
-    const { type, value, reason } = req.body;
+    const { type, value, reason, reportId } = req.body;
 
     if (!['ip', 'nic'].includes(type)) {
         throw ApiError.badRequest('Ban type must be "ip" or "nic"');
@@ -467,7 +469,10 @@ const banUser = asyncHandler(async (req, res) => {
     await ModerationLog.create({
         action: ModerationAction.BAN,
         moderatorId: req.user._id,
-        reason: `Banned ${type.toUpperCase()}: ${value}. Reason: ${reason || 'N/A'}`,
+        reportId: reportId || null,
+        targetType: type === 'nic' ? ModerationTargetType.NIC : ModerationTargetType.IP,
+        targetValue: String(value),
+        reason: reason || 'User banned',
     }).catch(() => { });
 
     return ApiResponse.created(res, { ban: newBan }, `${type.toUpperCase()} banned successfully`);
@@ -475,7 +480,7 @@ const banUser = asyncHandler(async (req, res) => {
 
 // ─── Unban a user by NIC or IP ──────────────────────────────────
 const unbanUser = asyncHandler(async (req, res) => {
-    const { type, value } = req.body;
+    const { type, value, reportId } = req.body;
 
     if (!['ip', 'nic'].includes(type)) {
         throw ApiError.badRequest('Ban type must be "ip" or "nic"');
@@ -496,7 +501,10 @@ const unbanUser = asyncHandler(async (req, res) => {
     await ModerationLog.create({
         action: ModerationAction.UNBAN,
         moderatorId: req.user._id,
-        reason: `Unbanned ${type.toUpperCase()}: ${value}`,
+        reportId: reportId || null,
+        targetType: type === 'nic' ? ModerationTargetType.NIC : ModerationTargetType.IP,
+        targetValue: String(value),
+        reason: 'User unbanned',
     }).catch(() => { });
 
     return ApiResponse.success(res, null, `${type.toUpperCase()} unbanned successfully`);
