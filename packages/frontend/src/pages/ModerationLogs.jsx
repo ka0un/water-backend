@@ -249,11 +249,6 @@ const ModerationLogs = () => {
 
                                             const actionLabel = ACTION_LABELS[log.action] || log.action || 'Unknown';
                                             const actionColor = ACTION_COLORS[log.action] || 'default';
-                                            const targetLabel = log.targetUserId
-                                                ? getObjectLabel(log.targetUserId)
-                                                : (log.targetType && log.targetValue)
-                                                    ? `${log.targetType}: ${log.targetValue}`
-                                                    : '-';
 
                                             return (
                                                 <TableRow key={`log-${log._id || index}`} hover>
@@ -264,7 +259,7 @@ const ModerationLogs = () => {
                                                         <Chip label={actionLabel} color={actionColor} size="small" />
                                                     </TableCell>
                                                     <TableCell>{getObjectLabel(log.moderatorId)}</TableCell>
-                                                    <TableCell>{targetLabel}</TableCell>
+                                                    <TableCell>{getObjectLabel(log.targetUserId)}</TableCell>
                                                     <TableCell sx={{ fontFamily: 'monospace' }}>
                                                         {getObjectLabel(log.reportId)}
                                                     </TableCell>

@@ -1,7 +1,7 @@
 const authService = require('../services/auth.service');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/ApiResponse');
-const { ModerationLog, ModerationAction, ModerationTargetType } = require('../models/ModerationLog.model');
+const { ModerationLog, ModerationAction } = require('../models/ModerationLog.model');
 
 /**
  * @desc    Register a new user
@@ -58,9 +58,6 @@ const logout = asyncHandler(async (req, res) => {
         await ModerationLog.create({
             action: ModerationAction.LOGOUT,
             moderatorId: req.user._id,
-            targetUserId: req.user._id,
-            targetType: ModerationTargetType.USER,
-            targetValue: String(req.user._id),
         }).catch(() => { }); // fire and forget
     }
     return ApiResponse.success(res, null, 'Logged out successfully');
