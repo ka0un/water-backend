@@ -1,0 +1,242 @@
+
+> @water-backend/backend@1.0.0 test
+> cross-env NODE_ENV=test JWT_SECRET=test-secret JWT_EXPIRES_IN=1d OPENWEATHER_API_KEY=dummy-key jest --runInBand src/tests/labStaff.test.js
+
+  console.log
+    [dotenv@17.2.4] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+
+      at _log (../../node_modules/dotenv/lib/main.js:142:11)
+
+(node:7022) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"status":1} for model "WaterTest". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:7022) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"isVerified":1} for model "WaterTest". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:7022) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"verifiedLocation":1} for model "WaterTest". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:7022) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"isDuplicate":1} for model "WaterTest". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+2026-04-11 22:03:57 [[32MINFO[39M]: User logged in: tech_1775925237059@lab.com
+2026-04-11 22:03:57 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:33:57 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:03:57 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:33:57 +0000] "GET /api/v1/lab-staff/dashboard HTTP/1.1" 200 - "-" "-"
+2026-04-11 22:03:58 [[32MINFO[39M]: User logged in: tech_1775925237696@lab.com
+2026-04-11 22:03:58 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:33:58 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:03:58 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:33:58 +0000] "GET /api/v1/lab-staff/laboratories HTTP/1.1" 200 261 "-" "-"
+2026-04-11 22:03:58 [[32MINFO[39M]: User logged in: tech_1775925238224@lab.com
+2026-04-11 22:03:58 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:33:58 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:03:58 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:33:58 +0000] "GET /api/v1/lab-staff/requests HTTP/1.1" 200 - "-" "-"
+2026-04-11 22:03:59 [[32MINFO[39M]: User logged in: tech_1775925238694@lab.com
+2026-04-11 22:03:59 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:33:59 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:03:59 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:33:59 +0000] "GET /api/v1/lab-staff/safe-limits HTTP/1.1" 200 842 "-" "-"
+2026-04-11 22:03:59 [[32MINFO[39M]: User logged in: tech_1775925239138@lab.com
+2026-04-11 22:03:59 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:33:59 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:03:59 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:33:59 +0000] "GET /api/v1/lab-staff/requests/69da77f7206172fd348a53af HTTP/1.1" 200 - "-" "-"
+2026-04-11 22:03:59 [[32MINFO[39M]: User logged in: tech_1775925239578@lab.com
+2026-04-11 22:03:59 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:33:59 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:04:00 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:34:00 +0000] "POST /api/v1/lab-staff/requests/69da77f8206172fd348a53c5/accept HTTP/1.1" 200 - "-" "-"
+2026-04-11 22:04:00 [[32MINFO[39M]: User logged in: tech_1775925240015@lab.com
+2026-04-11 22:04:00 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:34:00 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:04:00 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:34:00 +0000] "POST /api/v1/lab-staff/requests/69da77f8206172fd348a53db/reject HTTP/1.1" 200 - "-" "-"
+2026-04-11 22:04:00 [[32MINFO[39M]: User logged in: tech_1775925240449@lab.com
+2026-04-11 22:04:00 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:34:00 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:04:00 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:34:00 +0000] "POST /api/v1/lab-staff/requests/69da77f8206172fd348a53f1/schedule HTTP/1.1" 200 - "-" "-"
+2026-04-11 22:04:01 [[32MINFO[39M]: User logged in: tech_1775925240884@lab.com
+2026-04-11 22:04:01 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:34:01 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+  console.error
+    [Weather API Error]: Request failed with status code 401
+
+      210 |             }
+      211 |         } catch (error) {
+    > 212 |             console.error('[Weather API Error]:', error.message);
+          |                     ^
+      213 |             // Fallback to provided weatherConditions if API fails
+      214 |         }
+      215 |     }
+
+      at error (src/controllers/labStaff.controller.js:212:21)
+
+2026-04-11 22:04:01 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:34:01 +0000] "POST /api/v1/lab-staff/requests/69da77f9206172fd348a5408/collect HTTP/1.1" 200 - "-" "-"
+2026-04-11 22:04:02 [[32MINFO[39M]: User logged in: tech_1775925241968@lab.com
+2026-04-11 22:04:02 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:34:02 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:04:02 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:34:02 +0000] "POST /api/v1/lab-staff/requests/69da77fa206172fd348a541f/start-testing HTTP/1.1" 200 - "-" "-"
+2026-04-11 22:04:02 [[32MINFO[39M]: User logged in: tech_1775925242411@lab.com
+2026-04-11 22:04:02 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:34:02 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+  console.log
+    [inputTestResults] Received results: {"ph":{"value":7.2},"lead":{"value":0.05,"notes":"above limit"}}
+
+      at log (src/controllers/labStaff.controller.js:267:17)
+
+  console.log
+    [inputTestResults] Set results.ph.value = 7.2
+
+      at log (src/controllers/labStaff.controller.js:274:25)
+
+  console.log
+    [inputTestResults] Set results.lead.value = 0.05
+
+      at log (src/controllers/labStaff.controller.js:274:25)
+
+2026-04-11 22:04:02 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:34:02 +0000] "PUT /api/v1/lab-staff/requests/69da77fa206172fd348a5436/results HTTP/1.1" 200 - "-" "-"
+2026-04-11 22:04:03 [[32MINFO[39M]: User logged in: tech_1775925242844@lab.com
+2026-04-11 22:04:03 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:34:03 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+  console.log
+    [completeVerdict] Stored results before verdict:
+
+      at log (src/controllers/labStaff.controller.js:303:13)
+
+  console.log
+      ph: 7
+
+      at log (src/controllers/labStaff.controller.js:304:13)
+
+  console.log
+      turbidity: undefined
+
+      at log (src/controllers/labStaff.controller.js:305:13)
+
+  console.log
+      totalDissolvedSolids: undefined
+
+      at log (src/controllers/labStaff.controller.js:306:13)
+
+  console.log
+      coliformBacteria: undefined
+
+      at log (src/controllers/labStaff.controller.js:307:13)
+
+  console.log
+      nitrate: undefined
+
+      at log (src/controllers/labStaff.controller.js:308:13)
+
+  console.log
+    [completeVerdict] Verdict result: safe
+
+      at log (src/controllers/labStaff.controller.js:312:13)
+
+  console.log
+    [completeVerdict] Failed parameters: []
+
+      at log (src/controllers/labStaff.controller.js:313:13)
+
+2026-04-11 22:04:03 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:34:03 +0000] "POST /api/v1/lab-staff/requests/69da77fb206172fd348a544d/complete HTTP/1.1" 200 - "-" "-"
+2026-04-11 22:04:03 [[32MINFO[39M]: User logged in: tech_1775925243277@lab.com
+2026-04-11 22:04:03 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:34:03 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+  console.log
+    [completeVerdict] Stored results before verdict:
+
+      at log (src/controllers/labStaff.controller.js:303:13)
+
+  console.log
+      ph: 4
+
+      at log (src/controllers/labStaff.controller.js:304:13)
+
+  console.log
+      turbidity: undefined
+
+      at log (src/controllers/labStaff.controller.js:305:13)
+
+  console.log
+      totalDissolvedSolids: undefined
+
+      at log (src/controllers/labStaff.controller.js:306:13)
+
+  console.log
+      coliformBacteria: undefined
+
+      at log (src/controllers/labStaff.controller.js:307:13)
+
+  console.log
+      nitrate: undefined
+
+      at log (src/controllers/labStaff.controller.js:308:13)
+
+  console.log
+    [completeVerdict] Verdict result: unsafe
+
+      at log (src/controllers/labStaff.controller.js:312:13)
+
+  console.log
+    [completeVerdict] Failed parameters: [ 'ph', 'lead' ]
+
+      at log (src/controllers/labStaff.controller.js:313:13)
+
+2026-04-11 22:04:03 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:34:03 +0000] "POST /api/v1/lab-staff/requests/69da77fb206172fd348a5464/complete HTTP/1.1" 200 - "-" "-"
+(node:7022) Warning: `--localstorage-file` was provided without a valid path
+PASS src/tests/labStaff.test.js (7.395 s)
+  Lab Staff Module
+    GET /api/v1/lab-staff/dashboard
+      ✓ should return aggregation statistics correctly (637 ms)
+    GET /api/v1/lab-staff/laboratories
+      ✓ should return active laboratories (527 ms)
+    GET /api/v1/lab-staff/requests
+      ✓ should fetch a list of lab test requests (471 ms)
+    GET /api/v1/lab-staff/safe-limits
+      ✓ should return safe limits reference mapping (443 ms)
+    Lab Test Lifecycle Actions
+      ✓ should fetch an individual request details (439 ms)
+      ✓ should accept a pending request (436 ms)
+      ✓ should reject a pending request (434 ms)
+      ✓ should schedule collection after acceptance (435 ms)
+      ✓ should record sample collection (1084 ms)
+      ✓ should start testing (442 ms)
+      ✓ should input test results (433 ms)
+      ✓ should complete testing and issue verdict automatically (433 ms)
+      ✓ should issue unsafe verdict when parameters fail (432 ms)
+
+----------------------------------|---------|----------|---------|---------|------------------------------------------------------------------------------------------------------
+File                              | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                                    
+----------------------------------|---------|----------|---------|---------|------------------------------------------------------------------------------------------------------
+All files                         |   48.92 |    20.36 |    27.2 |   50.72 |                                                                                                      
+ config                           |   32.35 |    85.71 |       0 |   32.35 |                                                                                                      
+  database.js                     |       0 |      100 |       0 |       0 | 1-41                                                                                                 
+  index.js                        |     100 |    85.71 |     100 |     100 | 8,20                                                                                                 
+  swagger.js                      |     100 |      100 |     100 |     100 |                                                                                                      
+ controllers                      |   32.69 |    14.03 |   21.53 |   34.85 |                                                                                                      
+  auth.controller.js              |      60 |        0 |      20 |      60 | 12-16,38-48,57-63                                                                                    
+  labStaff.controller.js          |   82.28 |    62.22 |     100 |   87.73 | 118,140,158,165,195,206-209,242,262,279,299,317,356,359-365                                          
+  laboratory.controller.js        |   17.74 |        0 |       0 |   17.74 | 11-39,49-73,91-104,114-167,177-194,204-212                                                           
+  moderationLog.controller.js     |      25 |        0 |       0 |      25 | 16-43                                                                                                
+  publicReport.controller.js      |   14.28 |        0 |       0 |   14.44 | 14-35,44-50,59-110,119-125,134-173,184-202,211-227                                                   
+  publicReportAdmin.controller.js |   12.06 |        0 |       0 |   13.72 | 22-50,63-197,217-244,249-259,264-319,324-341,346-350,355-360,368-375,382-400,405-431,446-478,483-510 
+  waterSource.controller.js       |   12.05 |        0 |       0 |   13.07 | 22-62,92-122,149-178,217-239,262-289,304-330,343-379,394-421,437-464,479-529                         
+ middlewares                      |   43.47 |    22.64 |      50 |   44.44 |                                                                                                      
+  auth.middleware.js              |      80 |    58.33 |     100 |      80 | 18,28,33,38                                                                                          
+  authorize.middleware.js         |   77.77 |       50 |     100 |   77.77 | 11,16                                                                                                
+  error.middleware.js             |   21.05 |        0 |       0 |   21.05 | 20-32,40-94,101                                                                                      
+  validate.middleware.js          |      36 |    27.27 |      50 |   39.13 | 25-29,37-63                                                                                          
+ models                           |   80.62 |    58.92 |   42.85 |   80.62 |                                                                                                      
+  BannedUser.model.js             |     100 |      100 |     100 |     100 |                                                                                                      
+  LabTestRequest.model.js         |      98 |    96.15 |      80 |      98 | 287                                                                                                  
+  Laboratory.model.js             |     100 |      100 |     100 |     100 |                                                                                                      
+  ModerationLog.model.js          |      80 |      100 |       0 |      80 | 124-125                                                                                              
+  PublicReport.model.js           |   76.19 |    33.33 |   66.66 |   76.19 | 246,250-254                                                                                          
+  User.model.js                   |   74.07 |    66.66 |      60 |   74.07 | 65-67,96,112-113,122                                                                                 
+  WaterSource.model.js            |   54.83 |        0 |       0 |   54.83 | 75-186,215-221,239-253,270-283,290-293                                                               
+  WaterTest.model.js              |   83.33 |      100 |       0 |   83.33 | 111-112                                                                                              
+ routes                           |   75.35 |        0 |       0 |   76.07 |                                                                                                      
+  admin.routes.js                 |   31.25 |        0 |       0 |    32.6 | 24-37,77-91,130-147,178-200                                                                          
+  auth.routes.js                  |     100 |      100 |     100 |     100 |                                                                                                      
+  index.js                        |   89.65 |        0 |       0 |   89.65 | 31-49,63                                                                                             
+  labStaff.routes.js              |     100 |      100 |     100 |     100 |                                                                                                      
+  laboratory.routes.js            |      90 |      100 |       0 |      90 | 81,144                                                                                               
+  mapConfig.routes.js             |       0 |        0 |       0 |       0 | 1-16                                                                                                 
+  moderation.routes.js            |     100 |      100 |     100 |     100 |                                                                                                      
+  publicReport.routes.js          |     100 |      100 |     100 |     100 |                                                                                                      
+  publicReportAdmin.routes.js     |     100 |      100 |     100 |     100 |                                                                                                      
+  user.routes.js                  |   58.82 |        0 |       0 |   58.82 | 53-63,88-97                                                                                          
+  waterSource.routes.js           |     100 |      100 |     100 |     100 |                                                                                                      
+ services                         |   54.16 |    22.22 |      50 |   54.16 |                                                                                                      
+  auth.service.js                 |   54.16 |    22.22 |      50 |   54.16 | 23-29,37-58,78,83,89,105-108,127-131                                                                 
+ utils                            |   49.01 |    18.51 |   35.29 |      48 |                                                                                                      
+  ApiError.js                     |    5.55 |        0 |       0 |    5.55 | 6-46                                                                                                 
+  ApiResponse.js                  |   53.33 |    14.28 |      40 |   53.33 | 19-39                                                                                                
+  asyncHandler.js                 |     100 |      100 |     100 |     100 |                                                                                                      
+  logger.js                       |   85.71 |    66.66 |     100 |   85.71 | 11,14                                                                                                
+ validations                      |     100 |      100 |     100 |     100 |                                                                                                      
+  auth.validation.js              |     100 |      100 |     100 |     100 |                                                                                                      
+  publicReport.validation.js      |     100 |      100 |     100 |     100 |                                                                                                      
+  waterSource.validation.js       |     100 |      100 |     100 |     100 |                                                                                                      
+----------------------------------|---------|----------|---------|---------|------------------------------------------------------------------------------------------------------
+Test Suites: 1 passed, 1 total
+Tests:       13 passed, 13 total
+Snapshots:   0 total
+Time:        7.518 s, estimated 9 s
+Ran all test suites matching src/tests/labStaff.test.js.

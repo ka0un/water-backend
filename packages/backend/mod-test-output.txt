@@ -1,0 +1,283 @@
+
+> @water-backend/backend@1.0.0 test
+> cross-env NODE_ENV=test JWT_SECRET=test-secret JWT_EXPIRES_IN=1d OPENWEATHER_API_KEY=dummy-key jest --runInBand src/tests/moderationLog.test.js
+
+  console.log
+    [dotenv@17.2.4] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+      at _log (../../node_modules/dotenv/lib/main.js:142:11)
+
+(node:7210) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"status":1} for model "WaterTest". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:7210) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"isVerified":1} for model "WaterTest". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:7210) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"verifiedLocation":1} for model "WaterTest". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:7210) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"isDuplicate":1} for model "WaterTest". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+2026-04-11 22:05:22 [[32MINFO[39M]: User logged in: admin_1775925321110@app.com
+2026-04-11 22:05:22 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:22 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 447 "-" "-"
+2026-04-11 22:05:22 [[32MINFO[39M]: User logged in: mod_1775925321404@app.com
+2026-04-11 22:05:22 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:22 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 453 "-" "-"
+2026-04-11 22:05:22 [[32MINFO[39M]: User logged in: user_1775925321665@app.com
+2026-04-11 22:05:22 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:22 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:05:23 [[32MINFO[39M]: User logged in: admin_1775925322563@app.com
+2026-04-11 22:05:23 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:23 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 447 "-" "-"
+2026-04-11 22:05:23 [[32MINFO[39M]: User logged in: mod_1775925322767@app.com
+2026-04-11 22:05:23 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:23 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 453 "-" "-"
+2026-04-11 22:05:23 [[32MINFO[39M]: User logged in: user_1775925322972@app.com
+2026-04-11 22:05:23 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:23 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:05:24 [[32MINFO[39M]: User logged in: admin_1775925323821@app.com
+2026-04-11 22:05:24 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:24 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 447 "-" "-"
+2026-04-11 22:05:24 [[32MINFO[39M]: User logged in: mod_1775925324026@app.com
+2026-04-11 22:05:24 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:24 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 453 "-" "-"
+2026-04-11 22:05:25 [[32MINFO[39M]: User logged in: user_1775925324230@app.com
+2026-04-11 22:05:25 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:25 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:05:25 [[32MINFO[39M]: User logged in: admin_1775925325076@app.com
+2026-04-11 22:05:25 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:25 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 447 "-" "-"
+2026-04-11 22:05:26 [[32MINFO[39M]: User logged in: mod_1775925325282@app.com
+2026-04-11 22:05:26 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:26 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 453 "-" "-"
+2026-04-11 22:05:26 [[32MINFO[39M]: User logged in: user_1775925325499@app.com
+2026-04-11 22:05:26 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:26 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:05:27 [[32MINFO[39M]: User logged in: admin_1775925326341@app.com
+2026-04-11 22:05:27 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:27 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 447 "-" "-"
+2026-04-11 22:05:27 [[32MINFO[39M]: User logged in: mod_1775925326546@app.com
+2026-04-11 22:05:27 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:27 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 453 "-" "-"
+2026-04-11 22:05:27 [[32MINFO[39M]: User logged in: user_1775925326750@app.com
+2026-04-11 22:05:27 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:27 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:05:28 [[32MINFO[39M]: User logged in: admin_1775925327590@app.com
+2026-04-11 22:05:28 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:28 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 447 "-" "-"
+2026-04-11 22:05:28 [[32MINFO[39M]: User logged in: mod_1775925327794@app.com
+2026-04-11 22:05:28 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:28 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 453 "-" "-"
+2026-04-11 22:05:28 [[32MINFO[39M]: User logged in: user_1775925327999@app.com
+2026-04-11 22:05:28 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:35:28 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+(node:7210) Warning: `--localstorage-file` was provided without a valid path
+FAIL src/tests/moderationLog.test.js (8.598 s)
+  Moderation Log Module
+    GET /api/v1/moderation/logs
+      ✕ should allow ADMIN to fetch moderation logs (1451 ms)
+      ✕ should allow MODERATOR to fetch moderation logs (1257 ms)
+      ✕ should forbid STANDARD USER from fetching logs (1255 ms)
+      ✕ should filter logs by action query param (1264 ms)
+      ✕ should filter logs by moderatorId query param (1249 ms)
+      ✕ should paginate correctly (1247 ms)
+
+  ● Moderation Log Module › GET /api/v1/moderation/logs › should allow ADMIN to fetch moderation logs
+
+    ValidationError: ModerationLog validation failed: action: Path `action` is required.
+
+      70 |         beforeEach(async () => {
+      71 |             // Seed Moderation Logs
+    > 72 |             await ModerationLog.create([
+         |             ^
+      73 |                 {
+      74 |                     action: ModerationAction.BAN_USER,
+      75 |                     moderatorId: adminId,
+
+      at model.Document.invalidate (../../node_modules/mongoose/lib/document.js:3420:32)
+      at validatePath (../../node_modules/mongoose/lib/document.js:3192:13)
+          at async Promise.all (index 0)
+      at model.$__validate (../../node_modules/mongoose/lib/document.js:3133:3)
+      at model.validate (../../node_modules/mongoose/lib/document.js:2702:5)
+      at model.validateBeforeSavePreSave (../../node_modules/mongoose/lib/plugins/validateBeforeSave.js:39:5)
+      at Kareem.execPre (../../node_modules/kareem/index.js:70:24)
+      at model.$__save (../../node_modules/mongoose/lib/model.js:376:5)
+      at model.save (../../node_modules/mongoose/lib/model.js:642:5)
+      at ../../node_modules/mongoose/lib/model.js:2778:9
+          at async Promise.all (index 0)
+      at model.create (../../node_modules/mongoose/lib/model.js:2763:11)
+      at Object.<anonymous> (src/tests/moderationLog.test.js:72:13)
+
+  ● Moderation Log Module › GET /api/v1/moderation/logs › should allow MODERATOR to fetch moderation logs
+
+    ValidationError: ModerationLog validation failed: action: Path `action` is required.
+
+      70 |         beforeEach(async () => {
+      71 |             // Seed Moderation Logs
+    > 72 |             await ModerationLog.create([
+         |             ^
+      73 |                 {
+      74 |                     action: ModerationAction.BAN_USER,
+      75 |                     moderatorId: adminId,
+
+      at model.Document.invalidate (../../node_modules/mongoose/lib/document.js:3420:32)
+      at validatePath (../../node_modules/mongoose/lib/document.js:3192:13)
+          at async Promise.all (index 0)
+      at model.$__validate (../../node_modules/mongoose/lib/document.js:3133:3)
+      at model.validate (../../node_modules/mongoose/lib/document.js:2702:5)
+      at model.validateBeforeSavePreSave (../../node_modules/mongoose/lib/plugins/validateBeforeSave.js:39:5)
+      at Kareem.execPre (../../node_modules/kareem/index.js:70:24)
+      at model.$__save (../../node_modules/mongoose/lib/model.js:376:5)
+      at model.save (../../node_modules/mongoose/lib/model.js:642:5)
+      at ../../node_modules/mongoose/lib/model.js:2778:9
+          at async Promise.all (index 0)
+      at model.create (../../node_modules/mongoose/lib/model.js:2763:11)
+      at Object.<anonymous> (src/tests/moderationLog.test.js:72:13)
+
+  ● Moderation Log Module › GET /api/v1/moderation/logs › should forbid STANDARD USER from fetching logs
+
+    ValidationError: ModerationLog validation failed: action: Path `action` is required.
+
+      70 |         beforeEach(async () => {
+      71 |             // Seed Moderation Logs
+    > 72 |             await ModerationLog.create([
+         |             ^
+      73 |                 {
+      74 |                     action: ModerationAction.BAN_USER,
+      75 |                     moderatorId: adminId,
+
+      at model.Document.invalidate (../../node_modules/mongoose/lib/document.js:3420:32)
+      at validatePath (../../node_modules/mongoose/lib/document.js:3192:13)
+          at async Promise.all (index 0)
+      at model.$__validate (../../node_modules/mongoose/lib/document.js:3133:3)
+      at model.validate (../../node_modules/mongoose/lib/document.js:2702:5)
+      at model.validateBeforeSavePreSave (../../node_modules/mongoose/lib/plugins/validateBeforeSave.js:39:5)
+      at Kareem.execPre (../../node_modules/kareem/index.js:70:24)
+      at model.$__save (../../node_modules/mongoose/lib/model.js:376:5)
+      at model.save (../../node_modules/mongoose/lib/model.js:642:5)
+      at ../../node_modules/mongoose/lib/model.js:2778:9
+          at async Promise.all (index 0)
+      at model.create (../../node_modules/mongoose/lib/model.js:2763:11)
+      at Object.<anonymous> (src/tests/moderationLog.test.js:72:13)
+
+  ● Moderation Log Module › GET /api/v1/moderation/logs › should filter logs by action query param
+
+    ValidationError: ModerationLog validation failed: action: Path `action` is required.
+
+      70 |         beforeEach(async () => {
+      71 |             // Seed Moderation Logs
+    > 72 |             await ModerationLog.create([
+         |             ^
+      73 |                 {
+      74 |                     action: ModerationAction.BAN_USER,
+      75 |                     moderatorId: adminId,
+
+      at model.Document.invalidate (../../node_modules/mongoose/lib/document.js:3420:32)
+      at validatePath (../../node_modules/mongoose/lib/document.js:3192:13)
+          at async Promise.all (index 0)
+      at model.$__validate (../../node_modules/mongoose/lib/document.js:3133:3)
+      at model.validate (../../node_modules/mongoose/lib/document.js:2702:5)
+      at model.validateBeforeSavePreSave (../../node_modules/mongoose/lib/plugins/validateBeforeSave.js:39:5)
+      at Kareem.execPre (../../node_modules/kareem/index.js:70:24)
+      at model.$__save (../../node_modules/mongoose/lib/model.js:376:5)
+      at model.save (../../node_modules/mongoose/lib/model.js:642:5)
+      at ../../node_modules/mongoose/lib/model.js:2778:9
+          at async Promise.all (index 0)
+      at model.create (../../node_modules/mongoose/lib/model.js:2763:11)
+      at Object.<anonymous> (src/tests/moderationLog.test.js:72:13)
+
+  ● Moderation Log Module › GET /api/v1/moderation/logs › should filter logs by moderatorId query param
+
+    ValidationError: ModerationLog validation failed: action: Path `action` is required.
+
+      70 |         beforeEach(async () => {
+      71 |             // Seed Moderation Logs
+    > 72 |             await ModerationLog.create([
+         |             ^
+      73 |                 {
+      74 |                     action: ModerationAction.BAN_USER,
+      75 |                     moderatorId: adminId,
+
+      at model.Document.invalidate (../../node_modules/mongoose/lib/document.js:3420:32)
+      at validatePath (../../node_modules/mongoose/lib/document.js:3192:13)
+          at async Promise.all (index 0)
+      at model.$__validate (../../node_modules/mongoose/lib/document.js:3133:3)
+      at model.validate (../../node_modules/mongoose/lib/document.js:2702:5)
+      at model.validateBeforeSavePreSave (../../node_modules/mongoose/lib/plugins/validateBeforeSave.js:39:5)
+      at Kareem.execPre (../../node_modules/kareem/index.js:70:24)
+      at model.$__save (../../node_modules/mongoose/lib/model.js:376:5)
+      at model.save (../../node_modules/mongoose/lib/model.js:642:5)
+      at ../../node_modules/mongoose/lib/model.js:2778:9
+          at async Promise.all (index 0)
+      at model.create (../../node_modules/mongoose/lib/model.js:2763:11)
+      at Object.<anonymous> (src/tests/moderationLog.test.js:72:13)
+
+  ● Moderation Log Module › GET /api/v1/moderation/logs › should paginate correctly
+
+    ValidationError: ModerationLog validation failed: action: Path `action` is required.
+
+      70 |         beforeEach(async () => {
+      71 |             // Seed Moderation Logs
+    > 72 |             await ModerationLog.create([
+         |             ^
+      73 |                 {
+      74 |                     action: ModerationAction.BAN_USER,
+      75 |                     moderatorId: adminId,
+
+      at model.Document.invalidate (../../node_modules/mongoose/lib/document.js:3420:32)
+      at validatePath (../../node_modules/mongoose/lib/document.js:3192:13)
+          at async Promise.all (index 0)
+      at model.$__validate (../../node_modules/mongoose/lib/document.js:3133:3)
+      at model.validate (../../node_modules/mongoose/lib/document.js:2702:5)
+      at model.validateBeforeSavePreSave (../../node_modules/mongoose/lib/plugins/validateBeforeSave.js:39:5)
+      at Kareem.execPre (../../node_modules/kareem/index.js:70:24)
+      at model.$__save (../../node_modules/mongoose/lib/model.js:376:5)
+      at model.save (../../node_modules/mongoose/lib/model.js:642:5)
+      at ../../node_modules/mongoose/lib/model.js:2778:9
+          at async Promise.all (index 0)
+      at model.create (../../node_modules/mongoose/lib/model.js:2763:11)
+      at Object.<anonymous> (src/tests/moderationLog.test.js:72:13)
+
+----------------------------------|---------|----------|---------|---------|------------------------------------------------------------------------------------------------------
+File                              | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                                    
+----------------------------------|---------|----------|---------|---------|------------------------------------------------------------------------------------------------------
+All files                         |   35.28 |     4.67 |   10.29 |   36.61 |                                                                                                      
+ config                           |   32.35 |    85.71 |       0 |   32.35 |                                                                                                      
+  database.js                     |       0 |      100 |       0 |       0 | 1-41                                                                                                 
+  index.js                        |     100 |    85.71 |     100 |     100 | 8,20                                                                                                 
+  swagger.js                      |     100 |      100 |     100 |     100 |                                                                                                      
+ controllers                      |   14.43 |        0 |    1.53 |   15.45 |                                                                                                      
+  auth.controller.js              |      60 |        0 |      20 |      60 | 12-16,38-48,57-63                                                                                    
+  labStaff.controller.js          |   11.42 |        0 |       0 |   12.26 | 18-43,63-84,97-109,114-127,132-150,155-180,189-233,238-251,256-288,293-368,373,378-380               
+  laboratory.controller.js        |   17.74 |        0 |       0 |   17.74 | 11-39,49-73,91-104,114-167,177-194,204-212                                                           
+  moderationLog.controller.js     |      25 |        0 |       0 |      25 | 16-43                                                                                                
+  publicReport.controller.js      |   14.28 |        0 |       0 |   14.44 | 14-35,44-50,59-110,119-125,134-173,184-202,211-227                                                   
+  publicReportAdmin.controller.js |   12.06 |        0 |       0 |   13.72 | 22-50,63-197,217-244,249-259,264-319,324-341,346-350,355-360,368-375,382-400,405-431,446-478,483-510 
+  waterSource.controller.js       |   12.05 |        0 |       0 |   13.07 | 22-62,92-122,149-178,217-239,262-289,304-330,343-379,394-421,437-464,479-529                         
+ middlewares                      |   29.34 |     5.66 |      30 |      30 |                                                                                                      
+  auth.middleware.js              |      30 |        0 |       0 |      30 | 13-43                                                                                                
+  authorize.middleware.js         |   44.44 |        0 |      50 |   44.44 | 10-23                                                                                                
+  error.middleware.js             |   21.05 |        0 |       0 |   21.05 | 20-32,40-94,101                                                                                      
+  validate.middleware.js          |      36 |    27.27 |      50 |   39.13 | 25-29,37-63                                                                                          
+ models                           |   56.25 |     5.35 |    9.52 |   56.25 |                                                                                                      
+  BannedUser.model.js             |     100 |      100 |     100 |     100 |                                                                                                      
+  LabTestRequest.model.js         |      34 |        0 |       0 |      34 | 258-263,269,274-277,287,292-327                                                                      
+  Laboratory.model.js             |     100 |      100 |     100 |     100 |                                                                                                      
+  ModerationLog.model.js          |      80 |      100 |       0 |      80 | 124-125                                                                                              
+  PublicReport.model.js           |   52.38 |        0 |       0 |   52.38 | 225-226,241-246,250-254                                                                              
+  User.model.js                   |   66.66 |       50 |      40 |   66.66 | 65-67,96,111-115,122                                                                                 
+  WaterSource.model.js            |   54.83 |        0 |       0 |   54.83 | 75-186,215-221,239-253,270-283,290-293                                                               
+  WaterTest.model.js              |   83.33 |      100 |       0 |   83.33 | 111-112                                                                                              
+ routes                           |   75.35 |        0 |       0 |   76.07 |                                                                                                      
+  admin.routes.js                 |   31.25 |        0 |       0 |    32.6 | 24-37,77-91,130-147,178-200                                                                          
+  auth.routes.js                  |     100 |      100 |     100 |     100 |                                                                                                      
+  index.js                        |   89.65 |        0 |       0 |   89.65 | 31-49,63                                                                                             
+  labStaff.routes.js              |     100 |      100 |     100 |     100 |                                                                                                      
+  laboratory.routes.js            |      90 |      100 |       0 |      90 | 81,144                                                                                               
+  mapConfig.routes.js             |       0 |        0 |       0 |       0 | 1-16                                                                                                 
+  moderation.routes.js            |     100 |      100 |     100 |     100 |                                                                                                      
+  publicReport.routes.js          |     100 |      100 |     100 |     100 |                                                                                                      
+  publicReportAdmin.routes.js     |     100 |      100 |     100 |     100 |                                                                                                      
+  user.routes.js                  |   58.82 |        0 |       0 |   58.82 | 53-63,88-97                                                                                          
+  waterSource.routes.js           |     100 |      100 |     100 |     100 |                                                                                                      
+ services                         |   52.08 |    27.77 |   33.33 |   52.08 |                                                                                                      
+  auth.service.js                 |   52.08 |    27.77 |   33.33 |   52.08 | 20-29,37-58,78,83,89,108,127-131                                                                     
+ utils                            |   49.01 |    18.51 |   35.29 |      48 |                                                                                                      
+  ApiError.js                     |    5.55 |        0 |       0 |    5.55 | 6-46                                                                                                 
+  ApiResponse.js                  |   53.33 |    14.28 |      40 |   53.33 | 19-39                                                                                                
+  asyncHandler.js                 |     100 |      100 |     100 |     100 |                                                                                                      
+  logger.js                       |   85.71 |    66.66 |     100 |   85.71 | 11,14                                                                                                
+ validations                      |     100 |      100 |     100 |     100 |                                                                                                      
+  auth.validation.js              |     100 |      100 |     100 |     100 |                                                                                                      
+  publicReport.validation.js      |     100 |      100 |     100 |     100 |                                                                                                      
+  waterSource.validation.js       |     100 |      100 |     100 |     100 |                                                                                                      
+----------------------------------|---------|----------|---------|---------|------------------------------------------------------------------------------------------------------
+Test Suites: 1 failed, 1 total
+Tests:       6 failed, 6 total
+Snapshots:   0 total
+Time:        8.721 s, estimated 9 s
+Ran all test suites matching src/tests/moderationLog.test.js.
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path /Users/kasun/Downloads/water-backend/packages/backend
+npm error workspace @water-backend/backend@1.0.0
+npm error location /Users/kasun/Downloads/water-backend/packages/backend
+npm error command failed
+npm error command sh -c cross-env NODE_ENV=test JWT_SECRET=test-secret JWT_EXPIRES_IN=1d OPENWEATHER_API_KEY=dummy-key jest --runInBand src/tests/moderationLog.test.js

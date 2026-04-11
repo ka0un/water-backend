@@ -1,0 +1,331 @@
+
+> @water-backend/backend@1.0.0 test
+> cross-env NODE_ENV=test JWT_SECRET=test-secret JWT_EXPIRES_IN=1d OPENWEATHER_API_KEY=dummy-key jest --runInBand src/tests/publicReportAdmin.test.js
+
+  console.log
+    [dotenv@17.2.4] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+      at _log (../../node_modules/dotenv/lib/main.js:142:11)
+
+(node:6053) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"status":1} for model "WaterTest". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6053) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"isVerified":1} for model "WaterTest". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:6053) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"verifiedLocation":1} for model "WaterTest". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:6053) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"isDuplicate":1} for model "WaterTest". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+2026-04-11 21:55:44 [[32MINFO[39M]: New user registered: admin1_1775924744193@example.com
+2026-04-11 21:55:44 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:44 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 462 "-" "-"
+2026-04-11 21:55:44 [[32MINFO[39M]: New user registered: admin2_1775924744468@example.com
+2026-04-11 21:55:44 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:44 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 466 "-" "-"
+2026-04-11 21:55:44 [[32MINFO[39M]: New user registered: admin3_1775924744697@example.com
+2026-04-11 21:55:44 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:44 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 461 "-" "-"
+2026-04-11 21:55:44 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:44 +0000] "GET /api/v1/public-reports-admin HTTP/1.1" 200 - "-" "-"
+2026-04-11 21:55:45 [[32MINFO[39M]: New user registered: admin4_1775924744951@example.com
+2026-04-11 21:55:45 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:45 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 462 "-" "-"
+2026-04-11 21:55:45 [[32MINFO[39M]: New user registered: admin5_1775924745172@example.com
+2026-04-11 21:55:45 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:45 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 466 "-" "-"
+2026-04-11 21:55:45 [[32MINFO[39M]: New user registered: admin6_1775924745387@example.com
+2026-04-11 21:55:45 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:45 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 461 "-" "-"
+2026-04-11 21:55:45 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:45 +0000] "GET /api/v1/public-reports-admin?status=approved HTTP/1.1" 200 192 "-" "-"
+2026-04-11 21:55:45 [[32MINFO[39M]: New user registered: admin7_1775924745619@example.com
+2026-04-11 21:55:45 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:45 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 462 "-" "-"
+2026-04-11 21:55:46 [[32MINFO[39M]: New user registered: admin8_1775924745831@example.com
+2026-04-11 21:55:46 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:46 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 466 "-" "-"
+2026-04-11 21:55:46 [[32MINFO[39M]: New user registered: admin9_1775924746041@example.com
+2026-04-11 21:55:46 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:46 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 461 "-" "-"
+2026-04-11 21:55:46 [[33MWARN[39M]: Client Error Access denied. This action requires one of the following roles: MODERATOR, ADMIN {"statusCode":403,"url":"/api/v1/public-reports-admin","method":"GET","ip":"::ffff:127.0.0.1","userId":"69da760a2001a18f1ff57f60"}
+2026-04-11 21:55:46 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:46 +0000] "GET /api/v1/public-reports-admin HTTP/1.1" 403 166 "-" "-"
+2026-04-11 21:55:46 [[32MINFO[39M]: New user registered: admin10_1775924746277@example.com
+2026-04-11 21:55:46 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:46 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 463 "-" "-"
+2026-04-11 21:55:46 [[32MINFO[39M]: New user registered: admin11_1775924746489@example.com
+2026-04-11 21:55:46 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:46 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 467 "-" "-"
+2026-04-11 21:55:46 [[32MINFO[39M]: New user registered: admin12_1775924746700@example.com
+2026-04-11 21:55:46 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:46 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 462 "-" "-"
+2026-04-11 21:55:46 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:46 +0000] "GET /api/v1/public-reports-admin/stats HTTP/1.1" 200 542 "-" "-"
+2026-04-11 21:55:47 [[32MINFO[39M]: New user registered: admin13_1775924746939@example.com
+2026-04-11 21:55:47 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:47 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 463 "-" "-"
+2026-04-11 21:55:47 [[32MINFO[39M]: New user registered: admin14_1775924747151@example.com
+2026-04-11 21:55:47 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:47 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 467 "-" "-"
+2026-04-11 21:55:47 [[32MINFO[39M]: New user registered: admin15_1775924747364@example.com
+2026-04-11 21:55:47 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:47 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 462 "-" "-"
+2026-04-11 21:55:47 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:47 +0000] "GET /api/v1/public-reports-admin/export HTTP/1.1" 200 - "-" "-"
+2026-04-11 21:55:47 [[32MINFO[39M]: New user registered: admin16_1775924747602@example.com
+2026-04-11 21:55:47 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:47 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 463 "-" "-"
+2026-04-11 21:55:48 [[32MINFO[39M]: New user registered: admin17_1775924747815@example.com
+2026-04-11 21:55:48 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:48 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 467 "-" "-"
+2026-04-11 21:55:48 [[32MINFO[39M]: New user registered: admin18_1775924748027@example.com
+2026-04-11 21:55:48 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:48 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 462 "-" "-"
+2026-04-11 21:55:48 [[33MWARN[39M]: Client Error Ban value is required {"statusCode":400,"url":"/api/v1/public-reports-admin/ban","method":"POST","ip":"::ffff:127.0.0.1","userId":"69da760b2001a18f1ff57fa8"}
+2026-04-11 21:55:48 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:48 +0000] "POST /api/v1/public-reports-admin/ban HTTP/1.1" 400 107 "-" "-"
+2026-04-11 21:55:48 [[32MINFO[39M]: New user registered: admin19_1775924748249@example.com
+2026-04-11 21:55:48 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:48 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 463 "-" "-"
+2026-04-11 21:55:48 [[32MINFO[39M]: New user registered: admin20_1775924748461@example.com
+2026-04-11 21:55:48 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:48 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 467 "-" "-"
+2026-04-11 21:55:48 [[32MINFO[39M]: New user registered: admin21_1775924748672@example.com
+2026-04-11 21:55:48 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:48 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 462 "-" "-"
+2026-04-11 21:55:48 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:48 +0000] "GET /api/v1/public-reports-admin/69da760c2001a18f1ff57fc2/security HTTP/1.1" 200 296 "-" "-"
+2026-04-11 21:55:49 [[32MINFO[39M]: New user registered: admin22_1775924748897@example.com
+2026-04-11 21:55:49 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:49 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 463 "-" "-"
+2026-04-11 21:55:49 [[32MINFO[39M]: New user registered: admin23_1775924749108@example.com
+2026-04-11 21:55:49 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:49 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 467 "-" "-"
+2026-04-11 21:55:49 [[32MINFO[39M]: New user registered: admin24_1775924749319@example.com
+2026-04-11 21:55:49 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:49 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 462 "-" "-"
+2026-04-11 21:55:49 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:49 +0000] "GET /api/v1/public-reports-admin/69da760d2001a18f1ff57fdb HTTP/1.1" 200 - "-" "-"
+2026-04-11 21:55:49 [[32MINFO[39M]: New user registered: admin25_1775924749543@example.com
+2026-04-11 21:55:49 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:49 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 463 "-" "-"
+2026-04-11 21:55:49 [[32MINFO[39M]: New user registered: admin26_1775924749754@example.com
+2026-04-11 21:55:49 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:49 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 467 "-" "-"
+2026-04-11 21:55:50 [[32MINFO[39M]: New user registered: admin27_1775924749966@example.com
+2026-04-11 21:55:50 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:50 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 462 "-" "-"
+2026-04-11 21:55:50 [[33MWARN[39M]: Client Error Action must be "approve" or "reject" {"statusCode":400,"url":"/api/v1/public-reports-admin/69da760e2001a18f1ff57ff2/moderate","method":"PATCH","ip":"::ffff:127.0.0.1","userId":"69da760d2001a18f1ff57fed"}
+2026-04-11 21:55:50 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:50 +0000] "PATCH /api/v1/public-reports-admin/69da760e2001a18f1ff57ff2/moderate HTTP/1.1" 400 126 "-" "-"
+2026-04-11 21:55:50 [[32MINFO[39M]: New user registered: admin28_1775924750188@example.com
+2026-04-11 21:55:50 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:50 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 463 "-" "-"
+2026-04-11 21:55:50 [[32MINFO[39M]: New user registered: admin29_1775924750399@example.com
+2026-04-11 21:55:50 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:50 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 467 "-" "-"
+2026-04-11 21:55:50 [[32MINFO[39M]: New user registered: admin30_1775924750610@example.com
+2026-04-11 21:55:50 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:50 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 462 "-" "-"
+2026-04-11 21:55:50 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:50 +0000] "PATCH /api/v1/public-reports-admin/69da760e2001a18f1ff58006 HTTP/1.1" 200 - "-" "-"
+2026-04-11 21:55:51 [[32MINFO[39M]: New user registered: admin31_1775924750833@example.com
+2026-04-11 21:55:51 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:51 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 463 "-" "-"
+2026-04-11 21:55:51 [[32MINFO[39M]: New user registered: admin32_1775924751044@example.com
+2026-04-11 21:55:51 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:51 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 467 "-" "-"
+2026-04-11 21:55:51 [[32MINFO[39M]: New user registered: admin33_1775924751254@example.com
+2026-04-11 21:55:51 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:51 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 462 "-" "-"
+2026-04-11 21:55:51 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:51 +0000] "DELETE /api/v1/public-reports-admin/69da760f2001a18f1ff5801c HTTP/1.1" 200 197 "-" "-"
+2026-04-11 21:55:51 [[32MINFO[39M]: New user registered: admin34_1775924751477@example.com
+2026-04-11 21:55:51 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:51 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 463 "-" "-"
+2026-04-11 21:55:51 [[32MINFO[39M]: New user registered: admin35_1775924751687@example.com
+2026-04-11 21:55:51 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:51 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 467 "-" "-"
+2026-04-11 21:55:52 [[32MINFO[39M]: New user registered: admin36_1775924751898@example.com
+2026-04-11 21:55:52 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:52 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 462 "-" "-"
+2026-04-11 21:55:52 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:52 +0000] "DELETE /api/v1/public-reports-admin/by-nic/1234v HTTP/1.1" 200 161 "-" "-"
+2026-04-11 21:55:52 [[32MINFO[39M]: New user registered: admin37_1775924752121@example.com
+2026-04-11 21:55:52 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:52 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 463 "-" "-"
+2026-04-11 21:55:52 [[32MINFO[39M]: New user registered: admin38_1775924752332@example.com
+2026-04-11 21:55:52 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:52 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 467 "-" "-"
+2026-04-11 21:55:52 [[32MINFO[39M]: New user registered: admin39_1775924752542@example.com
+2026-04-11 21:55:52 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:52 +0000] "POST /api/v1/auth/register HTTP/1.1" 201 462 "-" "-"
+2026-04-11 21:55:52 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:25:52 +0000] "POST /api/v1/public-reports-admin/reset HTTP/1.1" 200 133 "-" "-"
+(node:6053) Warning: `--localstorage-file` was provided without a valid path
+FAIL src/tests/publicReportAdmin.test.js (9.313 s)
+  Public Report Admin Module
+    GET /api/v1/public-reports-admin
+      ✓ should return a paginated list of reports for Admins (758 ms)
+      ✕ should filter reports by status (665 ms)
+      ✓ should deny access to regular users (657 ms)
+    GET /api/v1/public-reports-admin/stats
+      ✕ should return aggregation statistics (663 ms)
+    GET /api/v1/public-reports-admin/export
+      ✕ should export reports as JSON (662 ms)
+    POST /api/v1/public-reports-admin/ban and unban
+      ✕ should ban an IP/NIC and then unban it (646 ms)
+    GET /api/v1/public-reports-admin/:id/security
+      ✕ should return security context for a report (649 ms)
+    GET /api/v1/public-reports-admin/:id
+      ✓ should get detail of a public report (646 ms)
+    PATCH /api/v1/public-reports-admin/:id/moderate
+      ✕ should moderate a report using a moderator account (645 ms)
+    Admin Only Operations
+      ✕ should override report details (PATCH /:id) (644 ms)
+      ✕ should soft delete a single report (DELETE /:id) (644 ms)
+      ✓ should delete all reports by NIC (DELETE /by-nic/:nic) (644 ms)
+      ✓ should truncate all reports (POST /reset) (642 ms)
+
+  ● Public Report Admin Module › GET /api/v1/public-reports-admin › should filter reports by status
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+      74 |
+      75 |             expect(res.status).toBe(200);
+    > 76 |             expect(res.body.data.reports).toHaveLength(1);
+         |                                           ^
+      77 |             expect(res.body.data.reports[0].status).toBe('approved');
+      78 |         });
+      79 |
+
+      at Object.toHaveLength (src/tests/publicReportAdmin.test.js:76:43)
+
+  ● Public Report Admin Module › GET /api/v1/public-reports-admin/stats › should return aggregation statistics
+
+    expect(received).toBeDefined()
+
+    Received: undefined
+
+       98 |
+       99 |             expect(res.status).toBe(200);
+    > 100 |             expect(res.body.data.stats).toBeDefined();
+          |                                         ^
+      101 |             expect(res.body.data.stats.totalReports).toBe(2);
+      102 |         });
+      103 |     });
+
+      at Object.toBeDefined (src/tests/publicReportAdmin.test.js:100:41)
+
+  ● Public Report Admin Module › GET /api/v1/public-reports-admin/export › should export reports as JSON
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Array
+    Received constructor: Object
+
+      113 |              expect(res.status).toBe(200);
+      114 |              expect(res.headers['content-type']).toContain('application/json');
+    > 115 |              expect(res.body).toBeInstanceOf(Array);
+          |                               ^
+      116 |              expect(res.body.length).toBe(1);
+      117 |         });
+      118 |     });
+
+      at Object.toBeInstanceOf (src/tests/publicReportAdmin.test.js:115:31)
+
+  ● Public Report Admin Module › POST /api/v1/public-reports-admin/ban and unban › should ban an IP/NIC and then unban it
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 400
+
+      129 |                     durationHours: 24
+      130 |                 });
+    > 131 |             expect(banRes.status).toBe(200);
+          |                                   ^
+      132 |             expect(banRes.body.data.ban.type).toBe('nic');
+      133 |
+      134 |             const unbanRes = await request(app)
+
+      at Object.toBe (src/tests/publicReportAdmin.test.js:131:35)
+
+  ● Public Report Admin Module › GET /api/v1/public-reports-admin/:id/security › should return security context for a report
+
+    expect(received).toBeDefined()
+
+    Received: undefined
+
+      153 |                 
+      154 |             expect(res.status).toBe(200);
+    > 155 |             expect(res.body.data.securityStats).toBeDefined();
+          |                                                 ^
+      156 |         });
+      157 |     });
+      158 |
+
+      at Object.toBeDefined (src/tests/publicReportAdmin.test.js:155:49)
+
+  ● Public Report Admin Module › PATCH /api/v1/public-reports-admin/:id/moderate › should moderate a report using a moderator account
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 400
+
+      180 |                 });
+      181 |             
+    > 182 |              expect(res.status).toBe(200);
+          |                                 ^
+      183 |              expect(res.body.data.report.status).toBe('approved');
+      184 |              expect(res.body.data.report.moderation.notes).toBe('Looks good');
+      185 |         });
+
+      at Object.toBe (src/tests/publicReportAdmin.test.js:182:33)
+
+  ● Public Report Admin Module › Admin Only Operations › should override report details (PATCH /:id)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "New Admin Edit"
+    Received: undefined
+
+      195 |                 .send({ description: 'New Admin Edit' });
+      196 |              expect(res.status).toBe(200);
+    > 197 |              expect(res.body.data.report.description).toBe('New Admin Edit');
+          |                                                       ^
+      198 |         });
+      199 |
+      200 |         it('should soft delete a single report (DELETE /:id)', async () => {
+
+      at Object.toBe (src/tests/publicReportAdmin.test.js:197:55)
+
+  ● Public Report Admin Module › Admin Only Operations › should soft delete a single report (DELETE /:id)
+
+    TypeError: Cannot read properties of undefined (reading 'deletedAt')
+
+      204 |                 .set('Authorization', `Bearer ${adminToken}`);
+      205 |              expect(res.status).toBe(200);
+    > 206 |              expect(res.body.data.report.deletedAt).toBeDefined();
+          |                                          ^
+      207 |         });
+      208 |
+      209 |         it('should delete all reports by NIC (DELETE /by-nic/:nic)', async () => {
+
+      at Object.deletedAt (src/tests/publicReportAdmin.test.js:206:42)
+
+----------------------------------|---------|----------|---------|---------|----------------------------------------------------------------------------------------
+File                              | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                      
+----------------------------------|---------|----------|---------|---------|----------------------------------------------------------------------------------------
+All files                         |   44.83 |    15.85 |   28.67 |   46.47 |                                                                                        
+ config                           |   32.35 |    85.71 |       0 |   32.35 |                                                                                        
+  database.js                     |       0 |      100 |       0 |       0 | 1-41                                                                                   
+  index.js                        |     100 |    85.71 |     100 |     100 | 8,20                                                                                   
+  swagger.js                      |     100 |      100 |     100 |     100 |                                                                                        
+ controllers                      |   25.47 |     8.77 |      20 |   27.12 |                                                                                        
+  auth.controller.js              |      60 |        0 |      20 |      60 | 25-29,38-48,57-63                                                                      
+  labStaff.controller.js          |   11.42 |        0 |       0 |   12.26 | 18-43,63-84,97-109,114-127,132-150,155-180,189-233,238-251,256-288,293-368,373,378-380 
+  laboratory.controller.js        |   17.74 |        0 |       0 |   17.74 | 11-39,49-73,91-104,114-167,177-194,204-212                                             
+  moderationLog.controller.js     |      25 |        0 |       0 |      25 | 16-43                                                                                  
+  publicReport.controller.js      |   14.28 |        0 |       0 |   14.44 | 14-35,44-50,59-110,119-125,134-173,184-202,211-227                                     
+  publicReportAdmin.controller.js |   55.17 |    32.11 |   63.15 |   62.09 | 32-34,249-259,270-319,333-334,369,388-390,449,456-478,483-510                          
+  waterSource.controller.js       |   12.05 |        0 |       0 |   13.07 | 22-62,92-122,149-178,217-239,262-289,304-330,343-379,394-421,437-464,479-529           
+ middlewares                      |   61.95 |    45.28 |      70 |   63.33 |                                                                                        
+  auth.middleware.js              |      80 |    58.33 |     100 |      80 | 18,28,33,38                                                                            
+  authorize.middleware.js         |   88.88 |       75 |     100 |   88.88 | 11                                                                                     
+  error.middleware.js             |   63.15 |     42.3 |   66.66 |   63.15 | 23-28,42,47,52-53,67,71,86,91,101                                                      
+  validate.middleware.js          |      36 |    27.27 |      50 |   39.13 | 25-29,37-63                                                                            
+ models                           |   61.87 |    19.64 |   28.57 |   61.87 |                                                                                        
+  BannedUser.model.js             |     100 |      100 |     100 |     100 |                                                                                        
+  LabTestRequest.model.js         |      34 |        0 |       0 |      34 | 258-263,269,274-277,287,292-327                                                        
+  Laboratory.model.js             |     100 |      100 |     100 |     100 |                                                                                        
+  ModerationLog.model.js          |      80 |      100 |       0 |      80 | 124-125                                                                                
+  PublicReport.model.js           |   90.47 |    66.66 |     100 |   90.47 | 246,254                                                                                
+  User.model.js                   |   70.37 |       50 |      60 |   70.37 | 65-67,87,96,104,112-113                                                                
+  WaterSource.model.js            |   54.83 |        0 |       0 |   54.83 | 75-186,215-221,239-253,270-283,290-293                                                 
+  WaterTest.model.js              |   83.33 |      100 |       0 |   83.33 | 111-112                                                                                
+ routes                           |   75.35 |        0 |       0 |   76.07 |                                                                                        
+  admin.routes.js                 |   31.25 |        0 |       0 |    32.6 | 24-37,77-91,130-147,178-200                                                            
+  auth.routes.js                  |     100 |      100 |     100 |     100 |                                                                                        
+  index.js                        |   89.65 |        0 |       0 |   89.65 | 31-49,63                                                                               
+  labStaff.routes.js              |     100 |      100 |     100 |     100 |                                                                                        
+  laboratory.routes.js            |      90 |      100 |       0 |      90 | 81,144                                                                                 
+  mapConfig.routes.js             |       0 |        0 |       0 |       0 | 1-16                                                                                   
+  moderation.routes.js            |     100 |      100 |     100 |     100 |                                                                                        
+  publicReport.routes.js          |     100 |      100 |     100 |     100 |                                                                                        
+  publicReportAdmin.routes.js     |     100 |      100 |     100 |     100 |                                                                                        
+  user.routes.js                  |   58.82 |        0 |       0 |   58.82 | 53-63,88-97                                                                            
+  waterSource.routes.js           |     100 |      100 |     100 |     100 |                                                                                        
+ services                         |   43.75 |    11.11 |      50 |   43.75 |                                                                                        
+  auth.service.js                 |   43.75 |    11.11 |      50 |   43.75 | 23-29,42,75-111,127-131                                                                
+ utils                            |   76.47 |    40.74 |   58.82 |      76 |                                                                                        
+  ApiError.js                     |   66.66 |    35.71 |    37.5 |   66.66 | 13,26,34-46                                                                            
+  ApiResponse.js                  |   66.66 |    14.28 |      60 |   66.66 | 24-39                                                                                  
+  asyncHandler.js                 |     100 |      100 |     100 |     100 |                                                                                        
+  logger.js                       |   92.85 |    83.33 |     100 |   92.85 | 14                                                                                     
+ validations                      |     100 |      100 |     100 |     100 |                                                                                        
+  auth.validation.js              |     100 |      100 |     100 |     100 |                                                                                        
+  publicReport.validation.js      |     100 |      100 |     100 |     100 |                                                                                        
+  waterSource.validation.js       |     100 |      100 |     100 |     100 |                                                                                        
+----------------------------------|---------|----------|---------|---------|----------------------------------------------------------------------------------------
+Test Suites: 1 failed, 1 total
+Tests:       8 failed, 5 passed, 13 total
+Snapshots:   0 total
+Time:        9.427 s, estimated 10 s
+Ran all test suites matching src/tests/publicReportAdmin.test.js.
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path /Users/kasun/Downloads/water-backend/packages/backend
+npm error workspace @water-backend/backend@1.0.0
+npm error location /Users/kasun/Downloads/water-backend/packages/backend
+npm error command failed
+npm error command sh -c cross-env NODE_ENV=test JWT_SECRET=test-secret JWT_EXPIRES_IN=1d OPENWEATHER_API_KEY=dummy-key jest --runInBand src/tests/publicReportAdmin.test.js

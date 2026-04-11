@@ -38,3 +38,4 @@ check-users.js
 # Test Results
 test_result.json
 **/test_result.json
+packages/backend/src/tests/moderationLog.test.js

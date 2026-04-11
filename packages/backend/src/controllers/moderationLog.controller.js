@@ -41,7 +41,7 @@ exports.getModerationLogs = asyncHandler(async (req, res) => {
     ]);
 
     return res.status(200).json(
-        new ApiResponse(200, 'Moderation logs retrieved successfully', {
+        new ApiResponse(200, {
             logs: items,
             pagination: {
                 page: pageNum,
@@ -49,7 +49,7 @@ exports.getModerationLogs = asyncHandler(async (req, res) => {
                 total,
                 pages: Math.ceil(total / pageSize),
             },
-        })
+        }, 'Moderation logs retrieved successfully')
     );
 });
 

@@ -1,0 +1,148 @@
+
+> @water-backend/backend@1.0.0 test
+> cross-env NODE_ENV=test JWT_SECRET=test-secret JWT_EXPIRES_IN=1d OPENWEATHER_API_KEY=dummy-key jest --runInBand src/tests/moderationLog.test.js
+
+  console.log
+    [dotenv@17.2.4] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+
+      at _log (../../node_modules/dotenv/lib/main.js:142:11)
+
+(node:7735) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"status":1} for model "WaterTest". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:7735) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"isVerified":1} for model "WaterTest". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:7735) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"verifiedLocation":1} for model "WaterTest". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:7735) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"isDuplicate":1} for model "WaterTest". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+2026-04-11 22:08:44 [[32MINFO[39M]: User logged in: admin_1775925523847@app.com
+2026-04-11 22:08:44 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:44 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 447 "-" "-"
+2026-04-11 22:08:45 [[32MINFO[39M]: User logged in: mod_1775925524124@app.com
+2026-04-11 22:08:45 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:45 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 453 "-" "-"
+2026-04-11 22:08:45 [[32MINFO[39M]: User logged in: user_1775925524385@app.com
+2026-04-11 22:08:45 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:45 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:08:45 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:45 +0000] "GET /api/v1/moderation/logs HTTP/1.1" 200 - "-" "-"
+2026-04-11 22:08:46 [[32MINFO[39M]: User logged in: admin_1775925525311@app.com
+2026-04-11 22:08:46 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:46 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 447 "-" "-"
+2026-04-11 22:08:46 [[32MINFO[39M]: User logged in: mod_1775925525517@app.com
+2026-04-11 22:08:46 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:46 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 453 "-" "-"
+2026-04-11 22:08:46 [[32MINFO[39M]: User logged in: user_1775925525722@app.com
+2026-04-11 22:08:46 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:46 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:08:46 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:46 +0000] "GET /api/v1/moderation/logs HTTP/1.1" 200 - "-" "-"
+2026-04-11 22:08:47 [[32MINFO[39M]: User logged in: admin_1775925526589@app.com
+2026-04-11 22:08:47 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:47 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 447 "-" "-"
+2026-04-11 22:08:47 [[32MINFO[39M]: User logged in: mod_1775925526795@app.com
+2026-04-11 22:08:47 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:47 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 453 "-" "-"
+2026-04-11 22:08:47 [[32MINFO[39M]: User logged in: user_1775925527001@app.com
+2026-04-11 22:08:47 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:47 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:08:47 [[33MWARN[39M]: Client Error Access denied. This action requires one of the following roles: ADMIN, MODERATOR {"statusCode":403,"url":"/api/v1/moderation/logs","method":"GET","ip":"::ffff:127.0.0.1","userId":"69da7917ae92ffc5f781842a"}
+2026-04-11 22:08:47 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:47 +0000] "GET /api/v1/moderation/logs HTTP/1.1" 403 166 "-" "-"
+2026-04-11 22:08:48 [[32MINFO[39M]: User logged in: admin_1775925527917@app.com
+2026-04-11 22:08:48 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:48 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 447 "-" "-"
+2026-04-11 22:08:48 [[32MINFO[39M]: User logged in: mod_1775925528126@app.com
+2026-04-11 22:08:48 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:48 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 453 "-" "-"
+2026-04-11 22:08:49 [[32MINFO[39M]: User logged in: user_1775925528333@app.com
+2026-04-11 22:08:49 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:49 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:08:49 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:49 +0000] "GET /api/v1/moderation/logs?action=APPROVE HTTP/1.1" 200 641 "-" "-"
+2026-04-11 22:08:50 [[32MINFO[39M]: User logged in: admin_1775925529184@app.com
+2026-04-11 22:08:50 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:50 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 447 "-" "-"
+2026-04-11 22:08:50 [[32MINFO[39M]: User logged in: mod_1775925529394@app.com
+2026-04-11 22:08:50 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:50 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 453 "-" "-"
+2026-04-11 22:08:50 [[32MINFO[39M]: User logged in: user_1775925529600@app.com
+2026-04-11 22:08:50 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:50 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:08:50 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:50 +0000] "GET /api/v1/moderation/logs?moderatorId=69da7919ae92ffc5f781846f HTTP/1.1" 200 - "-" "-"
+2026-04-11 22:08:51 [[32MINFO[39M]: User logged in: admin_1775925530464@app.com
+2026-04-11 22:08:51 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:51 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 447 "-" "-"
+2026-04-11 22:08:51 [[32MINFO[39M]: User logged in: mod_1775925530671@app.com
+2026-04-11 22:08:51 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:51 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 453 "-" "-"
+2026-04-11 22:08:51 [[32MINFO[39M]: User logged in: user_1775925530877@app.com
+2026-04-11 22:08:51 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:51 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 448 "-" "-"
+2026-04-11 22:08:51 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [11/Apr/2026:16:38:51 +0000] "GET /api/v1/moderation/logs?page=1&limit=2 HTTP/1.1" 200 - "-" "-"
+(node:7735) Warning: `--localstorage-file` was provided without a valid path
+FAIL src/tests/moderationLog.test.js (8.819 s)
+  Moderation Log Module
+    GET /api/v1/moderation/logs
+      ✓ should allow ADMIN to fetch moderation logs (1464 ms)
+      ✓ should allow MODERATOR to fetch moderation logs (1278 ms)
+      ✕ should forbid STANDARD USER from fetching logs (1326 ms)
+      ✓ should filter logs by action query param (1267 ms)
+      ✓ should filter logs by moderatorId query param (1280 ms)
+      ✓ should paginate correctly (1300 ms)
+
+  ● Moderation Log Module › GET /api/v1/moderation/logs › should forbid STANDARD USER from fetching logs
+
+    TypeError: Cannot read properties of undefined (reading 'message')
+
+      120 |
+      121 |             expect(res.status).toBe(403);
+    > 122 |             expect(res.body.error.message).toMatch(/Access denied/i);
+          |                                   ^
+      123 |         });
+      124 |
+      125 |         it('should filter logs by action query param', async () => {
+
+      at Object.message (src/tests/moderationLog.test.js:122:35)
+
+----------------------------------|---------|----------|---------|---------|------------------------------------------------------------------------------------------------------
+File                              | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                                    
+----------------------------------|---------|----------|---------|---------|------------------------------------------------------------------------------------------------------
+All files                         |   39.83 |    11.01 |   18.38 |   41.34 |                                                                                                      
+ config                           |   32.35 |    85.71 |       0 |   32.35 |                                                                                                      
+  database.js                     |       0 |      100 |       0 |       0 | 1-41                                                                                                 
+  index.js                        |     100 |    85.71 |     100 |     100 | 8,20                                                                                                 
+  swagger.js                      |     100 |      100 |     100 |     100 |                                                                                                      
+ controllers                      |   16.05 |     2.75 |    3.07 |   17.19 |                                                                                                      
+  auth.controller.js              |      60 |        0 |      20 |      60 | 12-16,38-48,57-63                                                                                    
+  labStaff.controller.js          |   11.42 |        0 |       0 |   12.26 | 18-43,63-84,97-109,114-127,132-150,155-180,189-233,238-251,256-288,293-368,373,378-380               
+  laboratory.controller.js        |   17.74 |        0 |       0 |   17.74 | 11-39,49-73,91-104,114-167,177-194,204-212                                                           
+  moderationLog.controller.js     |   93.75 |    78.57 |     100 |   93.75 | 30                                                                                                   
+  publicReport.controller.js      |   14.28 |        0 |       0 |   14.44 | 14-35,44-50,59-110,119-125,134-173,184-202,211-227                                                   
+  publicReportAdmin.controller.js |   12.06 |        0 |       0 |   13.72 | 22-50,63-197,217-244,249-259,264-319,324-341,346-350,355-360,368-375,382-400,405-431,446-478,483-510 
+  waterSource.controller.js       |   12.05 |        0 |       0 |   13.07 | 22-62,92-122,149-178,217-239,262-289,304-330,343-379,394-421,437-464,479-529                         
+ middlewares                      |   61.95 |    45.28 |      70 |   63.33 |                                                                                                      
+  auth.middleware.js              |      80 |    58.33 |     100 |      80 | 18,28,33,38                                                                                          
+  authorize.middleware.js         |   88.88 |       75 |     100 |   88.88 | 11                                                                                                   
+  error.middleware.js             |   63.15 |     42.3 |   66.66 |   63.15 | 23-28,42,47,52-53,67,71,86,91,101                                                                    
+  validate.middleware.js          |      36 |    27.27 |      50 |   39.13 | 25-29,37-63                                                                                          
+ models                           |   60.62 |     7.14 |    23.8 |   60.62 |                                                                                                      
+  BannedUser.model.js             |     100 |      100 |     100 |     100 |                                                                                                      
+  LabTestRequest.model.js         |      34 |        0 |       0 |      34 | 258-263,269,274-277,287,292-327                                                                      
+  Laboratory.model.js             |     100 |      100 |     100 |     100 |                                                                                                      
+  ModerationLog.model.js          |     100 |      100 |     100 |     100 |                                                                                                      
+  PublicReport.model.js           |   52.38 |        0 |       0 |   52.38 | 225-226,241-246,250-254                                                                              
+  User.model.js                   |   85.18 |    66.66 |      80 |   85.18 | 96,112-113,122                                                                                       
+  WaterSource.model.js            |   54.83 |        0 |       0 |   54.83 | 75-186,215-221,239-253,270-283,290-293                                                               
+  WaterTest.model.js              |   83.33 |      100 |       0 |   83.33 | 111-112                                                                                              
+ routes                           |   75.35 |        0 |       0 |   76.07 |                                                                                                      
+  admin.routes.js                 |   31.25 |        0 |       0 |    32.6 | 24-37,77-91,130-147,178-200                                                                          
+  auth.routes.js                  |     100 |      100 |     100 |     100 |                                                                                                      
+  index.js                        |   89.65 |        0 |       0 |   89.65 | 31-49,63                                                                                             
+  labStaff.routes.js              |     100 |      100 |     100 |     100 |                                                                                                      
+  laboratory.routes.js            |      90 |      100 |       0 |      90 | 81,144                                                                                               
+  mapConfig.routes.js             |       0 |        0 |       0 |       0 | 1-16                                                                                                 
+  moderation.routes.js            |     100 |      100 |     100 |     100 |                                                                                                      
+  publicReport.routes.js          |     100 |      100 |     100 |     100 |                                                                                                      
+  publicReportAdmin.routes.js     |     100 |      100 |     100 |     100 |                                                                                                      
+  user.routes.js                  |   58.82 |        0 |       0 |   58.82 | 53-63,88-97                                                                                          
+  waterSource.routes.js           |     100 |      100 |     100 |     100 |                                                                                                      
+ services                         |   56.25 |    27.77 |      50 |   56.25 |                                                                                                      
+  auth.service.js                 |   56.25 |    27.77 |      50 |   56.25 | 23-29,37-58,78,83,89,108,127-131                                                                     
+ utils                            |   66.66 |    37.03 |   47.05 |      66 |                                                                                                      
+  ApiError.js                     |      50 |    28.57 |      25 |      50 | 13,20-26,34-46                                                                                       
+  ApiResponse.js                  |   53.33 |    14.28 |      40 |   53.33 | 19-39                                                                                                
+  asyncHandler.js                 |     100 |      100 |     100 |     100 |                                                                                                      
+  logger.js                       |   92.85 |    83.33 |     100 |   92.85 | 14                                                                                                   
+ validations                      |     100 |      100 |     100 |     100 |                                                                                                      
+  auth.validation.js              |     100 |      100 |     100 |     100 |                                                                                                      
+  publicReport.validation.js      |     100 |      100 |     100 |     100 |                                                                                                      
+  waterSource.validation.js       |     100 |      100 |     100 |     100 |                                                                                                      
+----------------------------------|---------|----------|---------|---------|------------------------------------------------------------------------------------------------------
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 5 passed, 6 total
+Snapshots:   0 total
+Time:        8.941 s, estimated 10 s
+Ran all test suites matching src/tests/moderationLog.test.js.
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path /Users/kasun/Downloads/water-backend/packages/backend
+npm error workspace @water-backend/backend@1.0.0
+npm error location /Users/kasun/Downloads/water-backend/packages/backend
+npm error command failed
+npm error command sh -c cross-env NODE_ENV=test JWT_SECRET=test-secret JWT_EXPIRES_IN=1d OPENWEATHER_API_KEY=dummy-key jest --runInBand src/tests/moderationLog.test.js
