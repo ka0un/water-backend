@@ -26,7 +26,10 @@ export class WaterInventoryPage {
     this.saveSourceButton   = page.getByRole('button', { name: /Save|Add Source|Create/i }).last();
     this.cancelButton       = page.getByRole('button', { name: /Cancel/i }).last();
 
-    // ── Source actions ────────────────────────────────────────────
+    // ── Add Source (FAB — map mode only, no text label) ──────────
+    this.addSourceButton    = page.locator('button.MuiFab-root').first();
+
+    // ── Source actions (table mode — IconButton with Tooltip) ────
     this.editButtons        = page.getByRole('button', { name: /Edit/i });
     this.deleteButtons      = page.getByRole('button', { name: /Delete/i });
     this.approveButtons     = page.getByRole('button', { name: /Approve|Verify/i });
@@ -39,6 +42,19 @@ export class WaterInventoryPage {
   async gotoInventory() {
     await this.page.goto('/app/water-inventory');
     await this.page.waitForLoadState('networkidle');
+  }
+
+  /**
+   * WaterInventory defaults to map view. Click the view toggle switch
+   * to switch to table view so the data table becomes visible.
+   */
+  async switchToTableMode() {
+    // The MUI Switch in the header toggles between map and table view
+    const viewSwitch = this.page.locator('input[type="checkbox"]').first();
+    if (await viewSwitch.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await viewSwitch.click({ force: true });
+      await this.page.waitForTimeout(300);
+    }
   }
 
   async gotoApproval() {

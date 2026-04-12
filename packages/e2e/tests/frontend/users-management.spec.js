@@ -24,13 +24,13 @@ test.describe('Frontend — Users Management (/app/users)', () => {
 
   test('should display admin user name in the table', async ({ page }) => {
     await expect(
-      page.getByText(MOCK_USERS.admin.name)
+      page.getByText(MOCK_USERS.admin.name).first()
     ).toBeVisible({ timeout: 8000 });
   });
 
   test('should display user email in the table', async ({ page }) => {
     await expect(
-      page.getByText(MOCK_USERS.admin.email)
+      page.getByText(MOCK_USERS.admin.email).first()
     ).toBeVisible({ timeout: 8000 });
   });
 

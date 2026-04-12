@@ -46,22 +46,26 @@ test.describe('Frontend — Moderator Water Tests (/app/moderator/water-tests)',
   // ── Report detail & actions ────────────────────────────────────
 
   test('should open detail drawer when a report row is clicked', async ({ page }) => {
-    // Mock the single report fetch
-    await page.route(`**/api/v1/reports/${MOCK_WATER_REPORT._id}**`, async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(apiEnvelope({ report: MOCK_WATER_REPORT })),
-      });
+    // ModeratorWaterTests fetches /public-reports-admin/{id} for the detail view
+    await page.route('**/api/v1/public-reports-admin/**', async (route) => {
+      if (route.request().method() === 'GET') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(apiEnvelope({ report: MOCK_WATER_REPORT })),
+        });
+      } else {
+        await route.continue();
+      }
     });
 
     const firstRow = mod.reportRows.first();
     if (await firstRow.isVisible({ timeout: 5000 }).catch(() => false)) {
       await firstRow.click();
-      // A drawer or modal should appear
+      // The right-side detail drawer (anchor="right") opens on row click
       await expect(
-        page.getByRole('presentation').or(page.locator('[class*="Drawer"]')).first()
-      ).toBeVisible({ timeout: 5000 });
+        page.locator('.MuiDrawer-anchorRight')
+      ).toBeVisible({ timeout: 8000 });
     }
   });
 

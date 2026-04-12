@@ -65,9 +65,8 @@ test.describe('Frontend — Lab Tests & Lab Staff Dashboard', () => {
     });
 
     test('should show status filter', async ({ page }) => {
-      // Status filter is typically a MUI Select or a native select
-      const filter = page.getByLabel(/Status/i).or(page.locator('select')).first();
-      await expect(filter).toBeVisible({ timeout: 5000 });
+      // LabTestManagement uses a MUI Select — renders as div[role="combobox"]
+      await expect(page.locator('[role="combobox"]').first()).toBeVisible({ timeout: 5000 });
     });
 
     test('should open view details dialog when View button is clicked', async ({ page }) => {

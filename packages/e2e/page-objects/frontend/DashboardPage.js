@@ -9,15 +9,17 @@ export class DashboardPage {
     this.page = page;
 
     // ── Sidebar navigation links ──────────────────────────────────
-    this.dashboardLink         = page.getByRole('button', { name: /Dashboard/i });
-    this.labTestsLink          = page.getByRole('button', { name: /Lab Tests/i });
-    this.waterInventoryLink    = page.getByRole('button', { name: /Water Inventory/i });
-    this.moderatorLink         = page.getByRole('button', { name: /Moderator/i });
-    this.moderationLogsLink    = page.getByRole('button', { name: /Moderation Logs/i });
-    this.laboratoryLink        = page.getByRole('button', { name: /Laboratory/i });
-    this.resourceApprovalLink  = page.getByRole('button', { name: /Resource Approval/i });
-    this.usersLink             = page.getByRole('button', { name: /Users/i });
-    this.logoutButton          = page.getByRole('button', { name: /Logout/i });
+    // Scope to the <nav> element so dashboard card buttons don't interfere.
+    const nav = page.locator('nav');
+    this.dashboardLink         = nav.getByRole('button', { name: /Dashboard/i }).first();
+    this.labTestsLink          = nav.getByRole('button', { name: /Lab Tests/i }).first();
+    this.waterInventoryLink    = nav.getByRole('button', { name: /Water Inventory/i }).first();
+    this.moderatorLink         = nav.getByRole('button', { name: /^Moderator$/i }).first();
+    this.moderationLogsLink    = nav.getByRole('button', { name: /^Moderation Logs$/i }).first();
+    this.laboratoryLink        = nav.getByRole('button', { name: /Laboratory/i }).first();
+    this.resourceApprovalLink  = nav.getByRole('button', { name: /Resource Approval/i }).first();
+    this.usersLink             = nav.getByRole('button', { name: /^Users$/i }).first();
+    this.logoutButton          = nav.getByRole('button', { name: /Logout/i }).first();
 
     // ── Mobile hamburger ──────────────────────────────────────────
     this.menuToggle = page.getByRole('button', { name: /menu/i });

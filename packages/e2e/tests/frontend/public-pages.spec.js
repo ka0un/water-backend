@@ -163,15 +163,8 @@ test.describe('Frontend — Public Pages (unauthenticated)', () => {
     });
 
     test('should show no reports message when NIC has no reports', async ({ page }) => {
-      await page.route('**/api/v1/public-reports/track**', async (route) => {
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({ status: 'success', data: { reports: [] } }),
-        });
-      });
-      // Also mock the public report service route
-      await page.route('**/api/v1/**track**', async (route) => {
+      // The tracker calls GET /api/v1/public-reports/by-nic/{nic}
+      await page.route('**/api/v1/public-reports/by-nic/**', async (route) => {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -185,7 +178,8 @@ test.describe('Frontend — Public Pages (unauthenticated)', () => {
 
     test('should show error for empty NIC submission', async ({ page }) => {
       await pp.trackButton.click();
-      await expect(page.getByText(/valid NIC|enter/i)).toBeVisible({ timeout: 3000 });
+      // Use role='alert' to avoid matching the paragraph instruction text
+      await expect(page.getByRole('alert').first()).toBeVisible({ timeout: 3000 });
     });
 
     test('should display Submit New Report button', async ({ page }) => {

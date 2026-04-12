@@ -45,11 +45,12 @@ test.describe('Frontend — Authentication', () => {
     });
 
     test('should show an error alert for invalid credentials', async ({ page }) => {
+      // Use 400 (not 401) — the Axios interceptor redirects on 401 before the error can be displayed
       await page.route('**/api/v1/auth/login', async (route) => {
         await route.fulfill({
-          status: 401,
+          status: 400,
           contentType: 'application/json',
-          body: JSON.stringify(apiError('Invalid email or password', 401)),
+          body: JSON.stringify(apiError('Invalid email or password', 400)),
         });
       });
 
@@ -60,23 +61,22 @@ test.describe('Frontend — Authentication', () => {
     test('should show error when submitting empty form', async ({ page }) => {
       await auth.loginButton.click();
       await expect(
-        auth.loginErrorAlert.or(page.getByText(/Please enter/i))
+        auth.loginErrorAlert.or(page.getByText(/Please enter/i)).first()
       ).toBeVisible({ timeout: 3000 });
     });
 
     test('should redirect to /app after successful login as ADMIN', async ({ page }) => {
-      await page.route('**/api/v1/auth/login', async (route) => {
+      // Register in LIFO order: catch-all first (lowest priority), specific mocks last (highest priority)
+
+      // 1. Catch-all for any other API calls (dashboard, etc.) — registered first = lowest priority
+      await page.route('**/api/v1/**', async (route) => {
         await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            status: 'success',
-            token: MOCK_TOKEN,
-            data: { user: MOCK_USERS.admin },
-          }),
+          status: 200, contentType: 'application/json',
+          body: JSON.stringify({ status: 'success', data: {} }),
         });
       });
 
+      // 2. /auth/me for session verification after redirect
       await page.route('**/api/v1/auth/me', async (route) => {
         await route.fulfill({
           status: 200,
@@ -85,16 +85,17 @@ test.describe('Frontend — Authentication', () => {
         });
       });
 
-      // Catch-all so dashboard data loads without errors
-      await page.route('**/api/v1/**', async (route) => {
-        if (!route.request().url().includes('/auth/')) {
-          await route.fulfill({
-            status: 200, contentType: 'application/json',
-            body: JSON.stringify({ status: 'success', data: {} }),
-          });
-        } else {
-          await route.continue();
-        }
+      // 3. Login endpoint — registered last = highest priority
+      // Response structure must match AuthContext: `const { token, user } = data.data`
+      await page.route('**/api/v1/auth/login', async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            status: 'success',
+            data: { token: MOCK_TOKEN, user: MOCK_USERS.admin },
+          }),
+        });
       });
 
       await auth.login('admin@example.com', 'Admin123!');
@@ -156,7 +157,7 @@ test.describe('Frontend — Authentication', () => {
     test('should show error when fields are empty', async ({ page }) => {
       await auth.registerButton.click();
       await expect(
-        page.getByText(/fill in all/i).or(auth.registerErrorAlert)
+        page.getByText(/fill in all/i).or(auth.registerErrorAlert).first()
       ).toBeVisible({ timeout: 3000 });
     });
 

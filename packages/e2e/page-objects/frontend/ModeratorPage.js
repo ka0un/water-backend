@@ -8,7 +8,7 @@ export class ModeratorPage {
     this.page = page;
 
     // ── Water Tests list ──────────────────────────────────────────
-    this.pageHeading        = page.getByRole('heading', { name: /Reports|Water Tests/i }).first();
+    this.pageHeading        = page.getByRole('heading', { name: /Reports|Water Tests|Moderator Panel/i }).first();
     this.searchInput        = page.locator('input[placeholder*="Search"]').or(
       page.getByPlaceholder(/search/i)
     ).first();
@@ -26,7 +26,7 @@ export class ModeratorPage {
     this.confirmActionButton = page.getByRole('button', { name: /Confirm|Yes/i }).last();
 
     // ── Moderation Logs ───────────────────────────────────────────
-    this.logsHeading        = page.getByRole('heading', { name: /Moderation Logs|Audit/i });
+    this.logsHeading        = page.getByRole('heading', { name: /Moderation Activity|Moderation Logs|Audit/i });
     this.logTable           = page.locator('table').first();
     this.allTab             = page.getByRole('tab', { name: /All/i });
     this.approveTab         = page.getByRole('tab', { name: /Approve/i });

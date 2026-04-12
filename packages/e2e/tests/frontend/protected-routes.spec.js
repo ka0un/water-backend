@@ -19,10 +19,10 @@ test.describe('Frontend — Protected Routes', () => {
 
     for (const path of protectedPaths) {
       test(`should redirect ${path} → /login when unauthenticated`, async ({ page }) => {
-        // Make sure no token is in storage
+        // Make sure no token is in storage (keys must match AuthContext)
         await page.addInitScript(() => {
-          window.localStorage.removeItem('token');
-          window.localStorage.removeItem('user');
+          window.localStorage.removeItem('wq_admin_token');
+          window.localStorage.removeItem('wq_admin_user');
         });
 
         // Auth check will fail
@@ -43,18 +43,14 @@ test.describe('Frontend — Protected Routes', () => {
   // ── Authenticated access ───────────────────────────────────────
 
   test('should allow authenticated ADMIN to access /app', async ({ page }) => {
-    await setupAuthMock(page, 'admin');
-    // Catch-all for dashboard data
+    // Catch-all FIRST (lowest priority), then specific auth mocks LAST (highest priority — LIFO)
     await page.route('**/api/v1/**', async (route) => {
-      if (!route.request().url().includes('/auth/')) {
-        await route.fulfill({
-          status: 200, contentType: 'application/json',
-          body: JSON.stringify({ status: 'success', data: {} }),
-        });
-      } else {
-        await route.continue();
-      }
+      await route.fulfill({
+        status: 200, contentType: 'application/json',
+        body: JSON.stringify({ status: 'success', data: {} }),
+      });
     });
+    await setupAuthMock(page, 'admin');
 
     await page.goto('/app');
     await expect(page).toHaveURL(/\/app/, { timeout: 10000 });
@@ -63,7 +59,7 @@ test.describe('Frontend — Protected Routes', () => {
   });
 
   test('should preserve intended URL in state when redirecting to /login', async ({ page }) => {
-    await page.addInitScript(() => window.localStorage.removeItem('token'));
+    await page.addInitScript(() => window.localStorage.removeItem('wq_admin_token'));
     await page.route('**/api/v1/auth/me', async (route) => {
       await route.fulfill({
         status: 401, contentType: 'application/json',

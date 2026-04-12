@@ -62,11 +62,12 @@ export function apiError(message, statusCode = 400) {
 export async function setupAuthMock(page, role = 'admin') {
   const user = MOCK_USERS[role];
 
-  // Inject token into localStorage before page loads
+  // Inject token into localStorage before page loads.
+  // Keys must match AuthContext: TOKEN_KEY='wq_admin_token', USER_KEY='wq_admin_user'
   await page.addInitScript(
     ({ token, userData }) => {
-      window.localStorage.setItem('token', token);
-      window.localStorage.setItem('user', JSON.stringify(userData));
+      window.localStorage.setItem('wq_admin_token', token);
+      window.localStorage.setItem('wq_admin_user', JSON.stringify(userData));
     },
     { token: MOCK_TOKEN, userData: user }
   );
@@ -80,20 +81,21 @@ export async function setupAuthMock(page, role = 'admin') {
     });
   });
 
-  // Intercept login
+  // Intercept login.
+  // Response structure must match AuthContext: `const { token, user } = data.data`
   await page.route('**/api/v1/auth/login', async (route) => {
     const body = JSON.parse(route.request().postData() || '{}');
     if (body.email && body.password) {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ status: 'success', token: MOCK_TOKEN, data: { user } }),
+        body: JSON.stringify({ status: 'success', data: { token: MOCK_TOKEN, user } }),
       });
     } else {
       await route.fulfill({
-        status: 401,
+        status: 400,
         contentType: 'application/json',
-        body: JSON.stringify(apiError('Invalid email or password', 401)),
+        body: JSON.stringify(apiError('Invalid email or password', 400)),
       });
     }
   });
@@ -158,13 +160,49 @@ export const MOCK_WATER_SOURCE = {
 export const MOCK_MOD_LOG = {
   _id: 'log-001',
   moderator: { _id: 'user-mod-001', name: 'Moderator User', email: 'mod@example.com' },
+  moderatorId: { _id: 'user-mod-001', name: 'Moderator User', email: 'mod@example.com' },
   action: 'APPROVE',
   targetType: 'report',
   targetId: 'report-001',
   createdAt: '2026-01-01T10:00:00.000Z',
+  timestamp: '2026-01-01T10:00:00.000Z',
 };
 
 // ─── Page-specific mock setup ──────────────────────────────────────
+
+/**
+ * Mock the admin Dashboard page's data endpoints.
+ * Dashboard.jsx destructures `stats.overview`, `stats.photoStats` etc.
+ * Sending the wrong shape (e.g. photoStats:{}) causes a React crash.
+ * Register BEFORE setupAuthMock so auth mocks win in LIFO ordering.
+ */
+export async function setupAdminDashboardMock(page) {
+  await page.route('**/api/v1/public-reports-admin**', async (route) => {
+    const url = route.request().url();
+    if (url.includes('/stats')) {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          status: 'success',
+          data: {
+            overview: { total: 0, pending: 0, completed: 0, rejected: 0 },
+            byStatus: {}, bySource: [], byDistrict: [], dailySubmissions: [],
+            weeklyTrend: [], testingMethods: [], observationFreqs: [],
+            mapPoints: [], turbidityLevels: [], appearanceDist: [],
+            hourlyPattern: [], photoStats: null, waterFlowDist: [], totalImages: 0,
+          },
+        }),
+      });
+    } else {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ status: 'success', data: { reports: [], total: 0 } }),
+      });
+    }
+  });
+}
 
 /**
  * Mock dashboard data endpoints
@@ -234,10 +272,11 @@ export async function setupWaterSourceMocks(page) {
 }
 
 /**
- * Mock moderation reports endpoints
+ * Mock moderation (public-reports-admin) endpoints.
+ * ModeratorWaterTests.jsx calls /api/v1/public-reports-admin, not /api/v1/reports.
  */
 export async function setupReportMocks(page) {
-  await page.route('**/api/v1/reports**', async (route) => {
+  await page.route('**/api/v1/public-reports-admin**', async (route) => {
     const method = route.request().method();
     if (method === 'GET') {
       await route.fulfill({
@@ -257,10 +296,13 @@ export async function setupReportMocks(page) {
 }
 
 /**
- * Mock lab tests endpoints
+ * Mock lab tests endpoints.
+ * LabTestManagement.jsx calls /api/v1/lab-staff/requests (not /lab-tests).
+ * LabStaffDashboard.jsx calls /api/v1/lab-staff/dashboard.
  */
 export async function setupLabTestMocks(page) {
-  await page.route('**/api/v1/lab-tests**', async (route) => {
+  // Broad catch-all FIRST (lower LIFO priority)
+  await page.route('**/api/v1/lab-staff/**', async (route) => {
     const method = route.request().method();
     if (method === 'GET') {
       await route.fulfill({
@@ -268,9 +310,10 @@ export async function setupLabTestMocks(page) {
         contentType: 'application/json',
         body: JSON.stringify(apiEnvelope({
           requests: [MOCK_LAB_TEST],
+          laboratories: [],
           total: 1,
-          page: 1,
-          pages: 1,
+          // LabTestManagement.jsx reads data.data.pagination, so include it:
+          pagination: { page: 1, total: 1, pages: 1 },
         })),
       });
     } else {
@@ -278,6 +321,7 @@ export async function setupLabTestMocks(page) {
     }
   });
 
+  // Dashboard-specific response LAST (highest LIFO priority)
   await page.route('**/api/v1/lab-staff/dashboard**', async (route) => {
     await route.fulfill({
       status: 200,
@@ -294,10 +338,12 @@ export async function setupLabTestMocks(page) {
 }
 
 /**
- * Mock laboratories endpoints
+ * Mock laboratories endpoints.
+ * LaboratoryManagement.jsx calls /api/v1/admin/laboratories (not /laboratories).
+ * Response shape: response.data.data.laboratories
  */
 export async function setupLaboratoryMocks(page) {
-  await page.route('**/api/v1/laboratories**', async (route) => {
+  await page.route('**/api/v1/admin/laboratories**', async (route) => {
     const method = route.request().method();
     if (method === 'GET') {
       await route.fulfill({
@@ -323,10 +369,20 @@ export async function setupLaboratoryMocks(page) {
 }
 
 /**
- * Mock moderation logs endpoints
+ * Mock moderation logs endpoints.
+ * ModerationLogs.jsx uses fetch('/api/v1/moderation/logs') — note the slash (not hyphen).
+ * Also mocks /api/v1/users (for the moderator filter dropdown).
  */
 export async function setupModerationLogMocks(page) {
-  await page.route('**/api/v1/moderation-logs**', async (route) => {
+  await page.route('**/api/v1/users**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(apiEnvelope({ users: Object.values(MOCK_USERS), total: 4 })),
+    });
+  });
+
+  await page.route('**/api/v1/moderation/logs**', async (route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -341,10 +397,12 @@ export async function setupModerationLogMocks(page) {
 }
 
 /**
- * Mock users management endpoints
+ * Mock users management endpoints.
+ * UsersManagement.jsx calls /api/v1/admin/users (not /users).
+ * Response shape: res.data.data.users and res.data.data.pagination.total
  */
 export async function setupUsersMocks(page) {
-  await page.route('**/api/v1/users**', async (route) => {
+  await page.route('**/api/v1/admin/users**', async (route) => {
     const method = route.request().method();
     if (method === 'GET') {
       await route.fulfill({
@@ -352,9 +410,8 @@ export async function setupUsersMocks(page) {
         contentType: 'application/json',
         body: JSON.stringify(apiEnvelope({
           users: Object.values(MOCK_USERS),
+          pagination: { total: 4, page: 1, pages: 1 },
           total: 4,
-          page: 1,
-          pages: 1,
         })),
       });
     } else {

@@ -2,8 +2,12 @@ import { test, expect } from '@playwright/test';
 import { DashboardPage } from '../../page-objects/frontend/DashboardPage.js';
 import { setupAuthMock } from '../../helpers/frontend-mocks.js';
 
-/** Mock all dashboard-level API calls to prevent unhandled errors */
+/**
+ * Mock all dashboard-level API calls to prevent crashes in Dashboard.jsx.
+ * Register the specific admin-dashboard endpoint LAST so it wins in LIFO order.
+ */
 async function mockDashboardApis(page) {
+  // Broad catch-all first (lowest priority)
   await page.route('**/api/v1/**', async (route) => {
     if (!route.request().url().includes('/auth/')) {
       await route.fulfill({
@@ -12,6 +16,32 @@ async function mockDashboardApis(page) {
       });
     } else {
       await route.continue();
+    }
+  });
+
+  // Admin dashboard stats — must have `overview` to prevent Dashboard.jsx crash.
+  // Registered LAST so it takes priority over the catch-all (Playwright LIFO).
+  await page.route('**/api/v1/public-reports-admin**', async (route) => {
+    const url = route.request().url();
+    if (url.includes('/stats')) {
+      await route.fulfill({
+        status: 200, contentType: 'application/json',
+        body: JSON.stringify({
+          status: 'success',
+          data: {
+            overview: { total: 0, pending: 0, completed: 0, rejected: 0 },
+            byStatus: {}, bySource: [], byDistrict: [], dailySubmissions: [],
+            weeklyTrend: [], testingMethods: [], observationFreqs: [],
+            mapPoints: [], turbidityLevels: [], appearanceDist: [],
+            hourlyPattern: [], photoStats: null, waterFlowDist: [], totalImages: 0,
+          },
+        }),
+      });
+    } else {
+      await route.fulfill({
+        status: 200, contentType: 'application/json',
+        body: JSON.stringify({ status: 'success', data: { reports: [], total: 0 } }),
+      });
     }
   });
 }
@@ -24,8 +54,8 @@ test.describe('Frontend — Sidebar Navigation', () => {
     let dash;
 
     test.beforeEach(async ({ page }) => {
-      await setupAuthMock(page, 'admin');
       await mockDashboardApis(page);
+      await setupAuthMock(page, 'admin');
       dash = new DashboardPage(page);
       await dash.goto();
     });
@@ -74,8 +104,8 @@ test.describe('Frontend — Sidebar Navigation', () => {
     let dash;
 
     test.beforeEach(async ({ page }) => {
-      await setupAuthMock(page, 'moderator');
       await mockDashboardApis(page);
+      await setupAuthMock(page, 'moderator');
       dash = new DashboardPage(page);
       await dash.goto();
     });
@@ -99,8 +129,8 @@ test.describe('Frontend — Sidebar Navigation', () => {
     let dash;
 
     test.beforeEach(async ({ page }) => {
-      await setupAuthMock(page, 'labStaff');
       await mockDashboardApis(page);
+      await setupAuthMock(page, 'labStaff');
       dash = new DashboardPage(page);
       await dash.goto();
     });
@@ -128,8 +158,8 @@ test.describe('Frontend — Sidebar Navigation', () => {
     let dash;
 
     test.beforeEach(async ({ page }) => {
-      await setupAuthMock(page, 'regularUser');
       await mockDashboardApis(page);
+      await setupAuthMock(page, 'regularUser');
       dash = new DashboardPage(page);
       await dash.goto();
     });
