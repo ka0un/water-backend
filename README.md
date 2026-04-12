@@ -324,7 +324,8 @@ Frontend (`packages/frontend`):
 - Frontend app is reachable with HTTP 200 OK.
 - Backend and frontend build logs show successful build and launch.
 - Screenshots of Heroku dashboard activity and live frontend are included in submission evidence.
-
+![alt text](image.png)
+![alt text](image-1.png)
 ---
 
 ## 🛡️ Security Features
@@ -342,4 +343,4 @@ Frontend (`packages/frontend`):
 This project is licensed under the ISC License.
 
 
-80% backend completed 2-27-2026 9:56 PM
+
