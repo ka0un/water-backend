@@ -1,0 +1,32 @@
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './tests',
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : 20,
+  reporter: 'html',
+  use: {
+    trace: 'on-first-retry',
+  },
+
+  projects: [
+    {
+      name: 'lp',
+      testDir: './tests/lp',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'http://localhost:5174',
+      },
+    },
+    {
+      name: 'frontend',
+      testDir: './tests/frontend',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'http://localhost:5173',
+      },
+    },
+  ],
+});

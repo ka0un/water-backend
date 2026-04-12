@@ -38,3 +38,5 @@ check-users.js
 # Test Results
 test_result.json
 **/test_result.json
+playwright-report/
+test-results/

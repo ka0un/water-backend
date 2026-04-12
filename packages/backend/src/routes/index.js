@@ -80,6 +80,8 @@ router.get('/', (req, res) => {
     }, 'Welcome to Water Quality Report API');
 });
 
+const mapConfigRoutes = require('./mapConfig.routes');
+
 // Mount routes
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
@@ -90,5 +92,6 @@ router.use('/public-reports', publicReportRoutes);
 router.use('/public-reports-admin', publicReportAdminRoutes);
 router.use('/lab-staff', labStaffRoutes);
 router.use('/laboratories', laboratoryRoutes);
+router.use('/config', mapConfigRoutes);
 
 module.exports = router;

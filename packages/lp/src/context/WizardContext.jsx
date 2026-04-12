@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import Cookies from 'js-cookie';
 import * as reportApi from '../api/reportApi';
 
@@ -16,6 +16,18 @@ export function WizardProvider({ children }) {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState(null);
     const [existingReports, setExistingReports] = useState([]);
+
+    // Ref that is updated synchronously whenever reportData changes.
+    // This allows goNext/goBack in WizardPage to always read the latest
+    // reportData for skip-logic even when called before the next render.
+    const reportDataRef = useRef({});
+
+    // Helper: update reportData state AND ref atomically so consumers that
+    // read reportDataRef.current always get the latest value.
+    const updateReportData = useCallback((data) => {
+        reportDataRef.current = data;
+        setReportData(data);
+    }, []);
 
     // Restore session from cookie on mount
     useEffect(() => {
@@ -48,7 +60,7 @@ export function WizardProvider({ children }) {
         setError(null);
         try {
             const report = await reportApi.getReport(id);
-            setReportData(report);
+            updateReportData(report);
             setCurrentStep(report.currentStep || 0);
             setNic(report.nic);
         } catch (err) {
@@ -79,7 +91,7 @@ export function WizardProvider({ children }) {
             setReportId(report._id);
             setNic(nicValue);
             setCurrentStep(1);
-            setReportData(report);
+            updateReportData(report);
             saveSession(nicValue, report._id);
             return report;
         } catch (err) {
@@ -110,7 +122,7 @@ export function WizardProvider({ children }) {
                 updates.currentStep = nextStep;
             }
             const updated = await reportApi.updateReport(reportId, updates);
-            setReportData(updated);
+            updateReportData(updated);
             if (nextStep !== undefined) {
                 setCurrentStep(nextStep);
             }
@@ -128,7 +140,7 @@ export function WizardProvider({ children }) {
         setError(null);
         try {
             const result = await reportApi.submitReport(reportId);
-            setReportData(result);
+            updateReportData(result);
             Cookies.remove(COOKIE_KEY);
             return result;
         } catch (err) {
@@ -145,7 +157,7 @@ export function WizardProvider({ children }) {
         setReportId(null);
         setNic('');
         setCurrentStep(0);
-        setReportData({});
+        updateReportData({});
         setExistingReports([]);
     }, []);
 
@@ -154,6 +166,7 @@ export function WizardProvider({ children }) {
         nic,
         currentStep,
         reportData,
+        reportDataRef,
         loading,
         saving,
         error,
