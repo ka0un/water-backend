@@ -62,6 +62,19 @@ test.describe('Frontend — Moderation Logs (/app/moderation/logs)', () => {
     await expect(filter).toBeVisible({ timeout: 5000 });
   });
 
+  test('should request logs for the selected moderator', async ({ page }) => {
+    const requestPromise = page.waitForRequest((request) => {
+      return request.url().includes('/api/v1/moderation/logs') &&
+        request.url().includes('moderatorId=user-mod-001');
+    });
+
+    await mod.moderatorFilter.click();
+    await page.getByRole('option', { name: /Moderator User/i }).click();
+
+    const request = await requestPromise;
+    expect(request.url()).toContain('moderatorId=user-mod-001');
+  });
+
   // ── Timestamps ────────────────────────────────────────────────
 
   test('should display a timestamp in the log entry', async ({ page }) => {

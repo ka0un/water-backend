@@ -72,7 +72,7 @@ const ModerationLogs = () => {
     };
 
     const fetchLogs = useCallback(
-        async (selectedAction) => {
+        async (selectedAction, moderatorId) => {
             try {
                 setLoading(true);
                 setError('');
@@ -83,8 +83,8 @@ const ModerationLogs = () => {
                 if (selectedAction && selectedAction !== 'ALL') {
                     params.set('action', selectedAction);
                 }
-                if (selectedModerator) {
-                    params.set('moderatorId', selectedModerator);
+                if (moderatorId) {
+                    params.set('moderatorId', moderatorId);
                 }
 
                 const res = await fetch(`${API_BASE_URL}/moderation/logs?${params.toString()}`, {
@@ -117,7 +117,7 @@ const ModerationLogs = () => {
     );
 
     useEffect(() => {
-        fetchLogs(tab);
+        fetchLogs(tab, selectedModerator);
     }, [fetchLogs, tab, selectedModerator]);
 
     useEffect(() => {
