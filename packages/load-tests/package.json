@@ -1,0 +1,24 @@
+{
+  "name": "@water-backend/load-tests",
+  "version": "1.0.0",
+  "description": "k6 load tests for water test submission and moderator workflows",
+  "scripts": {
+    "smoke:submission": "k6 run -e SCENARIO=smoke scripts/water-submission.js",
+    "smoke:moderator":  "k6 run -e SCENARIO=smoke scripts/moderator-actions.js",
+    "smoke:combined":   "k6 run scripts/combined.js",
+
+    "load:submission":  "k6 run -e SCENARIO=load  scripts/water-submission.js",
+    "load:moderator":   "k6 run -e SCENARIO=load  scripts/moderator-actions.js",
+    "load:combined":    "k6 run scripts/combined.js",
+
+    "stress:submission": "k6 run -e SCENARIO=stress scripts/water-submission.js",
+    "stress:moderator":  "k6 run -e SCENARIO=stress scripts/moderator-actions.js",
+
+    "spike:submission":  "k6 run -e SCENARIO=spike  scripts/water-submission.js",
+
+    "ci":               "k6 run -e SCENARIO=smoke scripts/water-submission.js && k6 run -e SCENARIO=smoke scripts/moderator-actions.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
