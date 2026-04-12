@@ -11,7 +11,6 @@
     "test:coverage": "cross-env NODE_ENV=test JWT_SECRET=test-secret JWT_EXPIRES_IN=1d OPENWEATHER_API_KEY=dummy-key jest --coverage --runInBand",
     "test:performance": "npx artillery run ./src/tests/performance/water-source-load.yml",
     "test:performance:report": "npx artillery run --output ./src/tests/performance/results.json ./src/tests/performance/water-source-load.yml && npx artillery report ./src/tests/performance/results.json"
-
   },
   "keywords": [
     "water",
