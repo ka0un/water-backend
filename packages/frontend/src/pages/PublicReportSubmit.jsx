@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    Box, Typography, AppBar, Toolbar, Button, Container, TextField, Card, CardContent,
-    Stack, IconButton, CircularProgress, Alert, MenuItem, Stepper, Step, StepLabel, Select, InputLabel, FormControl
+    Box, Typography, Button, Container, TextField, Card, CardContent,
+    Stack, CircularProgress, Alert, MenuItem, Stepper, Step, StepLabel, Select, InputLabel, FormControl
 } from '@mui/material';
-import { ArrowBack, Assessment as AssessmentIcon, CloudUpload as CloudUploadIcon } from '@mui/icons-material';
+import { CloudUpload as CloudUploadIcon } from '@mui/icons-material';
 import { createPublicReport, updatePublicReport, submitPublicReport, uploadPublicReportImage } from '../services/publicReportService';
+import { useAuth } from '../context/AuthContext';
 
 const WATER_SOURCES = ['well', 'river', 'lake', 'tap', 'tank', 'canal', 'spring', 'rainwater', 'borehole', 'other'];
 
 export default function PublicReportSubmit() {
     const navigate = useNavigate();
+    const { isAuthenticated, user } = useAuth();
     const [activeStep, setActiveStep] = useState(0);
     const [reportId, setReportId] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -25,6 +27,8 @@ export default function PublicReportSubmit() {
     const [image, setImage] = useState(null);
 
     const steps = ['Identity', 'Details', 'Photo (Optional)', 'Review'];
+    const isUserPortal = isAuthenticated && user?.role === 'USER';
+    const trackPath = isUserPortal ? '/app/user/reports/track' : '/track';
 
     const handleNext = async () => {
         setError(null);
@@ -58,7 +62,7 @@ export default function PublicReportSubmit() {
             } else if (activeStep === steps.length - 1) {
                 // Final submit
                 await submitPublicReport(reportId);
-                navigate('/track', { state: { message: 'Report submitted successfully!' } });
+                navigate(trackPath, { state: { message: 'Report submitted successfully!' } });
                 return;
             }
             setActiveStep((prev) => prev + 1);
@@ -76,21 +80,7 @@ export default function PublicReportSubmit() {
 
     return (
         <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#F5F7FA' }}>
-            <AppBar position="static" elevation={1} sx={{ bgcolor: '#fff', color: '#1A2027' }}>
-                <Toolbar>
-                    <IconButton edge="start" onClick={() => navigate('/')} aria-label="back" sx={{ mr: 2 }}>
-                        <ArrowBack />
-                    </IconButton>
-                    <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: 'primary.main', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1 }}>
-                        <AssessmentIcon sx={{ color: '#fff', fontSize: 20 }} />
-                    </Box>
-                    <Typography variant="h6" sx={{ fontWeight: 800, flexGrow: 1 }}>
-                        Submit Water Report
-                    </Typography>
-                </Toolbar>
-            </AppBar>
-
-            <Container maxWidth="md" sx={{ flexGrow: 1, py: { xs: 4, md: 8 } }}>
+            <Container maxWidth="md" sx={{ flexGrow: 1, py: { xs: 3, md: 6 } }}>
                 <Card elevation={0} sx={{ borderRadius: 4, border: '1px solid #E0E0E0' }}>
                     <CardContent sx={{ p: { xs: 3, md: 5 } }}>
                         <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 6 }}>

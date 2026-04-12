@@ -29,11 +29,15 @@ import {
     Add as AddIcon,
     CheckCircle as CheckCircleIcon,
     HourglassEmpty as HourglassEmptyIcon,
+    LocationOn as LocationOnIcon,
     MyLocation as MyLocationIcon,
     Refresh as RefreshIcon,
     Search as SearchIcon,
     WaterDrop as WaterDropIcon,
 } from '@mui/icons-material';
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { useAuth } from '../context/AuthContext';
 import {
     createWaterSource,
@@ -45,6 +49,16 @@ import {
 const WATER_SOURCE_TYPES = ['Well', 'Public Tap', 'River', 'Lake', 'Bowser Point'];
 const ACCESS_TYPES = ['Public', 'Private', 'Restricted'];
 const OPERATIONAL_STATUSES = ['Functional', 'Broken', 'Maintenance', 'Abandoned'];
+const SRI_LANKA_CENTER = [7.8731, 80.7718];
+
+const mapPickerIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41],
+});
 
 const defaultForm = {
     name: '',
@@ -55,6 +69,20 @@ const defaultForm = {
     latitude: '',
     longitude: '',
 };
+
+function LocationPickerMap({ value, onPick }) {
+    useMapEvents({
+        click(event) {
+            onPick({ latitude: event.latlng.lat, longitude: event.latlng.lng });
+        },
+    });
+
+    if (!value) {
+        return null;
+    }
+
+    return <Marker position={[value.latitude, value.longitude]} icon={mapPickerIcon} />;
+}
 
 export default function UserWaterInventory() {
     const { api } = useAuth();
@@ -74,6 +102,7 @@ export default function UserWaterInventory() {
 
     const [addOpen, setAddOpen] = useState(false);
     const [addForm, setAddForm] = useState(defaultForm);
+    const [locationPickerOpen, setLocationPickerOpen] = useState(false);
     const [submitting, setSubmitting] = useState(false);
 
     const [snackbar, setSnackbar] = useState({ open: false, severity: 'success', message: '' });
@@ -244,6 +273,14 @@ export default function UserWaterInventory() {
         } finally {
             setSubmitting(false);
         }
+    };
+
+    const handlePickLocation = ({ latitude, longitude }) => {
+        setAddForm((prev) => ({
+            ...prev,
+            latitude: latitude.toFixed(6),
+            longitude: longitude.toFixed(6),
+        }));
     };
 
     return (
@@ -517,25 +554,44 @@ export default function UserWaterInventory() {
                                 required
                             />
                         </Box>
-                        <Button variant="outlined" startIcon={<MyLocationIcon />} onClick={() => {
-                            if (!navigator.geolocation) {
-                                showToast('error', 'Geolocation is not supported in this browser.');
-                                return;
-                            }
-                            navigator.geolocation.getCurrentPosition(
-                                (position) => {
-                                    setAddForm((prev) => ({
-                                        ...prev,
-                                        latitude: String(position.coords.latitude),
-                                        longitude: String(position.coords.longitude),
-                                    }));
-                                },
-                                () => showToast('error', 'Unable to fetch your current location.'),
-                                { enableHighAccuracy: true }
-                            );
-                        }}>
-                            Use My Current Location
-                        </Button>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                            <Button
+                                variant="outlined"
+                                startIcon={<LocationOnIcon />}
+                                onClick={() => setLocationPickerOpen(true)}
+                                sx={{ textTransform: 'none' }}
+                            >
+                                Select on Map
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                startIcon={<MyLocationIcon />}
+                                onClick={() => {
+                                    if (!navigator.geolocation) {
+                                        showToast('error', 'Geolocation is not supported in this browser.');
+                                        return;
+                                    }
+                                    navigator.geolocation.getCurrentPosition(
+                                        (position) => {
+                                            setAddForm((prev) => ({
+                                                ...prev,
+                                                latitude: String(position.coords.latitude),
+                                                longitude: String(position.coords.longitude),
+                                            }));
+                                            showToast('success', 'Current location applied.');
+                                        },
+                                        () => showToast('error', 'Unable to fetch your current location.'),
+                                        { enableHighAccuracy: true }
+                                    );
+                                }}
+                                sx={{ textTransform: 'none' }}
+                            >
+                                Use My Current Location
+                            </Button>
+                        </Box>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                            Tip: select a point on the map to fill the coordinates automatically.
+                        </Typography>
                         <TextField
                             multiline
                             minRows={3}
@@ -552,6 +608,38 @@ export default function UserWaterInventory() {
                     <Button variant="contained" onClick={submitResource} disabled={submitting}>
                         {submitting ? 'Submitting...' : 'Submit for Approval'}
                     </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={locationPickerOpen} onClose={() => setLocationPickerOpen(false)} fullWidth maxWidth="md">
+                <DialogTitle>Select Water Resource Location</DialogTitle>
+                <DialogContent dividers>
+                    <Alert severity="info" sx={{ mb: 2 }}>
+                        Click anywhere on the map to place the pin, then use the selected coordinates.
+                    </Alert>
+                    <Box sx={{ height: { xs: 360, md: 480 }, borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
+                        <MapContainer center={SRI_LANKA_CENTER} zoom={8} style={{ height: '100%', width: '100%' }}>
+                            <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                            <LocationPickerMap
+                                value={
+                                    addForm.latitude && addForm.longitude
+                                        ? {
+                                              latitude: Number(addForm.latitude),
+                                              longitude: Number(addForm.longitude),
+                                          }
+                                        : null
+                                }
+                                onPick={handlePickLocation}
+                            />
+                        </MapContainer>
+                    </Box>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, mt: 2 }}>
+                        <TextField label="Latitude" value={addForm.latitude} disabled />
+                        <TextField label="Longitude" value={addForm.longitude} disabled />
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setLocationPickerOpen(false)}>Done</Button>
                 </DialogActions>
             </Dialog>
 

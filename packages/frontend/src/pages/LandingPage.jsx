@@ -7,6 +7,24 @@ import {
 import {
     WaterDrop, Shield, Science, BarChart, ArrowForward, Login
 } from '@mui/icons-material';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+/* Fix Leaflet default marker icon */
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+});
+
+const PREVIEW_MARKERS = [
+    { id: 1, position: [6.9271, 79.8612], name: 'Colombo Well', type: 'Well' },
+    { id: 2, position: [7.2906, 80.6337], name: 'Kandy River Tap', type: 'River Tap' },
+    { id: 3, position: [8.3114, 80.4037], name: 'Anuradhapura Spring', type: 'Spring' },
+    { id: 4, position: [6.0535, 80.2210], name: 'Galle Reservoir', type: 'Reservoir' },
+];
 
 const features = [
     {
@@ -106,30 +124,82 @@ export default function LandingPage() {
                         </Box>
                     </Grid>
                     <Grid item xs={12} md={6}>
-                        {/* Hero Image / Map Mockup */}
+                        {/* Hero Map Preview */}
                         <Box sx={{
-                            position: 'relative', height: 400, width: '100%', borderRadius: 4, overflow: 'hidden',
-                            boxShadow: '0 24px 48px rgba(0,0,0,0.1)', bgcolor: '#fff',
-                            p: 2, display: 'flex', flexDirection: 'column', border: '1px solid #E0E0E0'
+                            position: 'relative',
+                            borderRadius: 4,
+                            overflow: 'hidden',
+                            boxShadow: '0 32px 64px rgba(21,101,192,0.18)',
+                            border: '1px solid rgba(255,255,255,0.6)',
+                            bgcolor: '#fff',
+                            p: '12px',
+                            background: 'linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%)',
                         }}>
-                            <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                            {/* Window chrome bar */}
+                            <Box sx={{
+                                display: 'flex', alignItems: 'center', gap: 1, mb: '10px',
+                                px: 0.5,
+                            }}>
                                 <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#FF5F56' }} />
                                 <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#FFBD2E' }} />
                                 <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#27C93F' }} />
+                                <Typography variant="caption" sx={{ ml: 1, color: '#90A4AE', fontWeight: 600, fontSize: '0.7rem' }}>
+                                    AquaMonitor — Live Water Map
+                                </Typography>
                             </Box>
-                            <Box sx={{ flexGrow: 1, borderRadius: 2, bgcolor: '#F0F4F8', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: 'radial-gradient(#CFD8DC 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
-                                <Typography variant="h5" sx={{ color: '#90A4AE', fontWeight: 700 }}>Interactive Map Preview</Typography>
+
+                            {/* Leaflet Map — explicit px height so Leaflet can resolve it */}
+                            <Box sx={{ flexGrow: 1, width: '100%', borderRadius: 2, overflow: 'hidden', height: 360 }}>
+                                <MapContainer
+                                    center={[7.8731, 80.7718]}
+                                    zoom={7}
+                                    zoomControl={false}
+                                    attributionControl={false}
+                                    scrollWheelZoom={false}
+                                    dragging={false}
+                                    doubleClickZoom={false}
+                                    style={{ width: '100%', height: '360px' }}
+                                >
+                                    <TileLayer
+                                        attribution='&copy; OpenStreetMap'
+                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    />
+                                    {PREVIEW_MARKERS.map((m) => (
+                                        <Marker key={m.id} position={m.position}>
+                                            <Popup>
+                                                <strong>{m.name}</strong><br />{m.type}
+                                            </Popup>
+                                        </Marker>
+                                    ))}
+                                </MapContainer>
                             </Box>
-                            {/* Floating elements */}
-                            <Paper elevation={3} sx={{ position: 'absolute', bottom: -20, left: -20, p: 2, borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2, bgcolor: '#fff' }}>
-                                <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: '#E8F5E9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Shield sx={{ color: '#2E7D32' }} />
-                                </Box>
-                                <Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>Report Approved</Typography>
-                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>Just now</Typography>
-                                </Box>
-                            </Paper>
+
+
+
+                            {/* Live indicator badge */}
+                            <Box sx={{
+                                position: 'absolute', top: 52, right: 20,
+                                display: 'flex', alignItems: 'center', gap: 0.8,
+                                bgcolor: 'rgba(255,255,255,0.92)',
+                                backdropFilter: 'blur(6px)',
+                                border: '1px solid #E0E0E0',
+                                borderRadius: 99, px: 1.5, py: 0.5,
+                                zIndex: 1000,
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                            }}>
+                                <Box sx={{
+                                    width: 8, height: 8, borderRadius: '50%', bgcolor: '#2E7D32',
+                                    animation: 'pulse 2s infinite',
+                                    '@keyframes pulse': {
+                                        '0%': { opacity: 1 },
+                                        '50%': { opacity: 0.3 },
+                                        '100%': { opacity: 1 },
+                                    }
+                                }} />
+                                <Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.7rem', color: '#2E7D32' }}>
+                                    LIVE
+                                </Typography>
+                            </Box>
                         </Box>
                     </Grid>
                 </Grid>

@@ -1,16 +1,14 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
-    Box, Typography, AppBar, Toolbar, Button, Container, TextField, Card, CardContent,
-    Stack, Chip, IconButton, CircularProgress, Alert
+    Box, Typography, Button, Container, TextField, Card, CardContent,
+    Stack, Chip, CircularProgress, Alert
 } from '@mui/material';
-import { ArrowBack, Search as SearchIcon, WaterDrop as WaterDropIcon, Assessment as AssessmentIcon } from '@mui/icons-material';
+import { Search as SearchIcon, WaterDrop as WaterDropIcon } from '@mui/icons-material';
 import { trackReportsByNic } from '../services/publicReportService';
 
 const STATUS_COLORS = { pending: 'warning', approved: 'success', rejected: 'error' };
 
 export default function PublicReportTracker() {
-    const navigate = useNavigate();
     const [nic, setNic] = useState('');
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -39,26 +37,8 @@ export default function PublicReportTracker() {
 
     return (
         <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#F5F7FA' }}>
-            {/* Top Bar */}
-            <AppBar position="static" elevation={1} sx={{ bgcolor: '#fff', color: '#1A2027' }}>
-                <Toolbar>
-                    <IconButton edge="start" onClick={() => navigate('/')} aria-label="back" sx={{ mr: 2 }}>
-                        <ArrowBack />
-                    </IconButton>
-                    <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: 'primary.main', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1 }}>
-                        <AssessmentIcon sx={{ color: '#fff', fontSize: 20 }} />
-                    </Box>
-                    <Typography variant="h6" sx={{ fontWeight: 800, flexGrow: 1 }}>
-                        Track Water Reports
-                    </Typography>
-                    <Button variant="outlined" onClick={() => navigate('/report')} sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 600 }}>
-                        Submit New Report
-                    </Button>
-                </Toolbar>
-            </AppBar>
-
             {/* Tracker Form */}
-            <Container maxWidth="sm" sx={{ flexGrow: 1, py: { xs: 6, md: 10 } }}>
+            <Container maxWidth="sm" sx={{ flexGrow: 1, py: { xs: 3, md: 6 } }}>
                 <Card elevation={2} sx={{ borderRadius: 4, mb: 4, overflow: 'visible' }}>
                     <CardContent sx={{ p: { xs: 3, md: 5 }, textAlign: 'center' }}>
                         <Box sx={{ width: 64, height: 64, borderRadius: '50%', bgcolor: '#E3F2FD', color: '#1565C0', mx: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 3 }}>

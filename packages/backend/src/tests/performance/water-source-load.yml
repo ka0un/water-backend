@@ -1,0 +1,46 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 30
+      arrivalRate: 5
+      name: warm-up
+    - duration: 60
+      arrivalRate: 20
+      name: sustained load
+    - duration: 30
+      arrivalRate: 40
+      name: stress burst
+  defaults:
+    headers:
+      content-type: application/json
+
+scenarios:
+  - name: Register -> create water source -> list inventory
+    flow:
+      - post:
+          url: "/api/v1/auth/register"
+          json:
+            name: "Perf User {{$randomNumber(1000,9999)}}"
+            email: "perf_{{$randomNumber(100000,999999)}}@example.com"
+            password: "Password123"
+          capture:
+            - json: "$.data.token"
+              as: token
+      - post:
+          url: "/api/v1/water-sources"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          json:
+            name: "Perf Source {{$randomNumber(1000,9999)}}"
+            type: "Well"
+            location:
+              latitude: 6.9
+              longitude: 79.8
+            operational_status: "Functional"
+            access_type: "Public"
+      - get:
+          url: "/api/v1/water-sources"
+      - get:
+          url: "/api/v1/water-sources/mine"
+          headers:
+            Authorization: "Bearer {{ token }}"

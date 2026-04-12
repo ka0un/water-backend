@@ -78,7 +78,7 @@ export function AuthProvider({ children }) {
             if (!['USER', 'MODERATOR', 'ADMIN', 'LAB_STAFF'].includes(newUser.role)) {
                 setError('Access denied for this account role.');
                 setLoading(false);
-                return false;
+                return null;
             }
 
             setToken(newToken);
@@ -86,12 +86,12 @@ export function AuthProvider({ children }) {
             localStorage.setItem(TOKEN_KEY, newToken);
             localStorage.setItem(USER_KEY, JSON.stringify(newUser));
             setLoading(false);
-            return true;
+            return newUser;
         } catch (err) {
             const msg = err.response?.data?.message || 'Login failed. Please check your credentials.';
             setError(msg);
             setLoading(false);
-            return false;
+            return null;
         }
     }, []);
 

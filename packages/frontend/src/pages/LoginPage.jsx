@@ -17,7 +17,7 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    const from = location.state?.from?.pathname || '/app';
+    const from = location.state?.from?.pathname;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,9 +25,19 @@ export default function LoginPage() {
             setError('Please enter both email and password');
             return;
         }
-        const success = await login(email.trim(), password);
-        if (success) {
-            navigate(from, { replace: true });
+        const loggedInUser = await login(email.trim(), password);
+        if (loggedInUser) {
+            if (from) {
+                navigate(from, { replace: true });
+                return;
+            }
+
+            const role = loggedInUser.role;
+            if (role === 'USER') {
+                navigate('/app/user/reports', { replace: true });
+            } else {
+                navigate('/app', { replace: true });
+            }
         }
     };
 
@@ -52,7 +62,7 @@ export default function LoginPage() {
                         <WaterDropIcon sx={{ color: '#fff', fontSize: 28 }} />
                     </Box>
                     <Typography variant="h5" sx={{ fontWeight: 700, color: '#1A2027' }}>
-                        Admin Dashboard
+                        System Login
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
                         Water Quality Monitoring System
@@ -118,7 +128,7 @@ export default function LoginPage() {
                 </form>
 
                 <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', mt: 3, color: 'text.disabled' }}>
-                    Only moderators, admins, and lab staff can access this dashboard.
+                    Users, moderators, admins, and lab staff can access their role dashboard.
                 </Typography>
 
                 <Typography variant="body2" sx={{ textAlign: 'center', mt: 1.5, color: 'text.secondary' }}>

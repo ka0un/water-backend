@@ -8,7 +8,9 @@
     "dev": "nodemon server.js",
     "test": "cross-env NODE_ENV=test jest --runInBand",
     "test:watch": "cross-env NODE_ENV=test jest --watch --runInBand",
-    "test:coverage": "cross-env NODE_ENV=test jest --coverage --runInBand"
+    "test:coverage": "cross-env NODE_ENV=test jest --coverage --runInBand",
+    "test:performance": "npx artillery run ./src/tests/performance/water-source-load.yml",
+    "test:performance:report": "npx artillery run --output ./src/tests/performance/results.json ./src/tests/performance/water-source-load.yml && npx artillery report ./src/tests/performance/results.json"
   },
   "keywords": [
     "water",

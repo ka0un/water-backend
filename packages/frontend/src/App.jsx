@@ -1,11 +1,15 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import theme from './theme';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import PublicReportSubmit from './pages/PublicReportSubmit';
+import PublicMap from './pages/PublicMap';
+import PublicReportTracker from './pages/PublicReportTracker';
 import Dashboard from './pages/Dashboard';
 import LabStaffDashboard from './pages/LabStaffDashboard';
 import LabTestManagement from './pages/LabTestManagement';
@@ -15,22 +19,18 @@ import LaboratoryManagement from './pages/LaboratoryManagement';
 import WaterInventory from './pages/WaterInventory';
 import WaterResourceApproval from './pages/WaterResourceApproval';
 import UserWaterInventory from './pages/UserWaterInventory';
-import LandingPage from './pages/LandingPage';
-import UsersManagement from './pages/UsersManagement';
-import PublicMap from './pages/PublicMap';
-import PublicReportSubmit from './pages/PublicReportSubmit';
-import PublicReportTracker from './pages/PublicReportTracker';
+import UserReportsHub from './pages/UserReportsHub';
 
 // Component that renders different dashboard based on user role
 function RoleDashboard() {
   const { user } = useAuth();
+
+  if (user?.role === 'USER') {
+    return <Navigate to="/app/user/reports" replace />;
+  }
   
   if (user?.role === 'LAB_STAFF') {
     return <LabStaffDashboard />;
-  }
-
-  if (user?.role === 'USER') {
-    return <UserWaterInventory />;
   }
   
   return <Dashboard />;
@@ -43,12 +43,18 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            {/* Public — Login */}
+            {/* Public — Landing Page */}
+            <Route path="/" element={<LandingPage />} />
+            
+            {/* Public — Authentication & Registration */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/map" element={<PublicMap />} />
+            
+            {/* Public — Report Submission */}
             <Route path="/report" element={<PublicReportSubmit />} />
+            
+            {/* Public — Map & Tracker */}
+            <Route path="/map" element={<PublicMap />} />
             <Route path="/track" element={<PublicReportTracker />} />
 
             {/* Protected — Dashboard */}
@@ -65,10 +71,14 @@ function App() {
               <Route path="moderation/logs" element={<ModerationLogs />} />
               <Route path="laboratory" element={<LaboratoryManagement />} />
               <Route path="water-inventory" element={<WaterInventory />} />
-              <Route path="water-inventory-user" element={<UserWaterInventory />} />
               <Route path="water-resource-approval" element={<WaterResourceApproval />} />
               <Route path="lab-tests" element={<LabTestManagement />} />
-              <Route path="users" element={<UsersManagement />} />
+
+              {/* User dashboard routes */}
+              <Route path="user/reports" element={<UserReportsHub />} />
+              <Route path="user/reports/submit" element={<PublicReportSubmit />} />
+              <Route path="user/reports/track" element={<PublicReportTracker />} />
+              <Route path="user/water-sources" element={<UserWaterInventory />} />
             </Route>
           </Routes>
         </BrowserRouter>
