@@ -23,7 +23,11 @@ import {
     MenuItem,
 } from '@mui/material';
 
-const API_BASE_URL = '/api/v1';
+const ENV_API_URL = import.meta.env.VITE_API_URL;
+const PROD_API_FALLBACK = 'https://af-frontend-075ecd5ff9fe.herokuapp.com/api/v1';
+const API_BASE_URL = import.meta.env.PROD
+    ? (!ENV_API_URL || ENV_API_URL.includes('localhost') ? PROD_API_FALLBACK : ENV_API_URL)
+    : (ENV_API_URL || '/api/v1');
 
 const ACTION_LABELS = {
     LOGIN: 'Login',

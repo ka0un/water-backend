@@ -228,6 +228,105 @@ water-backend/
 
 ---
 
+## 🚀 Deployment
+
+This project is deployed using Heroku for both backend and frontend services.
+
+### Backend deployment platform and setup steps
+
+- Platform: Heroku (Node.js buildpack)
+- App name: `af-frontend`
+- Live API base URL: `https://af-frontend-075ecd5ff9fe.herokuapp.com/api/v1`
+
+Steps used:
+
+1. Open backend project folder:
+   ```bash
+   cd packages/backend
+   ```
+2. Initialize and connect Heroku remote (first-time setup):
+   ```bash
+   git init
+   heroku login
+   heroku git:remote -a af-frontend
+   ```
+3. Commit and deploy:
+   ```bash
+   git add .
+   git commit -m "deploy backend"
+   git push heroku master:main
+   ```
+4. Verify deployment:
+   ```bash
+   curl -I https://af-frontend-075ecd5ff9fe.herokuapp.com/
+   ```
+
+### Frontend deployment platform and setup steps
+
+- Platform: Heroku (Node.js buildpack)
+- App name: `aqua-monitor`
+- Live frontend URL: `https://aqua-monitor-7d6f882792ee.herokuapp.com/`
+
+Steps used:
+
+1. Open frontend project folder:
+   ```bash
+   cd packages/frontend
+   ```
+2. Initialize and connect Heroku remote (first-time setup):
+   ```bash
+   git init
+   heroku login
+   heroku git:remote -a aqua-monitor
+   ```
+3. Configure frontend API endpoint for production build:
+   ```bash
+   heroku config:set VITE_API_URL=https://af-frontend-075ecd5ff9fe.herokuapp.com/api/v1 -a aqua-monitor
+   ```
+4. Deploy frontend:
+   ```bash
+   git add .
+   git commit -m "deploy frontend"
+   git push heroku master:main
+   ```
+5. Verify deployment:
+   ```bash
+   curl -I https://aqua-monitor-7d6f882792ee.herokuapp.com/
+   ```
+
+### Environment variables used (secrets redacted)
+
+Backend (`packages/backend`):
+
+- `NODE_ENV` (e.g., `production`)
+- `PORT`
+- `MONGODB_URI`
+- `JWT_SECRET`
+- `JWT_EXPIRES_IN`
+- `LOG_LEVEL`
+- `RATE_LIMIT_WINDOW_MS`
+- `RATE_LIMIT_MAX_REQUESTS`
+- `Google_Map_apiKey`
+
+Frontend (`packages/frontend`):
+
+- `VITE_API_URL`
+- `VITE_GOOGLE_MAPS_API_KEY`
+
+### Live URLs
+
+- Deployed backend API: `https://af-frontend-075ecd5ff9fe.herokuapp.com/api/v1`
+- Deployed frontend application: `https://aqua-monitor-7d6f882792ee.herokuapp.com/`
+
+### Deployment evidence
+
+- Heroku activity shows successful backend and frontend releases.
+- Frontend app is reachable with HTTP 200 OK.
+- Backend and frontend build logs show successful build and launch.
+- Screenshots of Heroku dashboard activity and live frontend are included in submission evidence.
+
+---
+
 ## 🛡️ Security Features
 
 - **Helmet** - Secure HTTP headers

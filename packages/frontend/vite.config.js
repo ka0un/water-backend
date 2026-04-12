@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: ' https://af-frontend-075ecd5ff9fe.herokuapp.com/',
+        target: 'https://af-frontend-075ecd5ff9fe.herokuapp.com/',
         changeOrigin: true,
       },
     },
