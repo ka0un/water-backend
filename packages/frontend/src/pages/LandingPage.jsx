@@ -52,12 +52,13 @@ const features = [
 export default function LandingPage() {
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
+    const LP_APP_URL = import.meta.env.VITE_LP_APP_URL || 'https://landing-page-af-b547e71ea931.herokuapp.com/';
 
     const handleGetStarted = () => {
         if (isAuthenticated) {
             navigate('/app');
         } else {
-            navigate('/report');
+            window.location.href = LP_APP_URL;
         }
     };
 

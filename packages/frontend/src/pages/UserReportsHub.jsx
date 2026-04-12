@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Button,
@@ -13,7 +12,7 @@ import {
 } from '@mui/icons-material';
 
 export default function UserReportsHub() {
-    const navigate = useNavigate();
+    const LP_APP_URL = import.meta.env.VITE_LP_APP_URL || 'https://landing-page-af-b547e71ea931.herokuapp.com/';
 
     return (
         <Box>
@@ -38,7 +37,9 @@ export default function UserReportsHub() {
                         </Typography>
                         <Button
                             variant="contained"
-                            onClick={() => navigate('/app/user/reports/submit')}
+                            onClick={() => {
+                                window.location.href = LP_APP_URL;
+                            }}
                             sx={{ textTransform: 'none', fontWeight: 700 }}
                         >
                             Go to Submit
@@ -59,7 +60,9 @@ export default function UserReportsHub() {
                         </Typography>
                         <Button
                             variant="outlined"
-                            onClick={() => navigate('/app/user/reports/track')}
+                            onClick={() => {
+                                window.location.href = LP_APP_URL;
+                            }}
                             sx={{ textTransform: 'none', fontWeight: 700 }}
                         >
                             Go to Tracker
